@@ -1,38 +1,58 @@
-import React from 'react';
-import logo from '../logo.svg';
-import logo2 from '../assets/logo.png';
+import React, { useState } from 'react';
+import logo from './logo.svg'; // Corrected the variable name
+import cat from './cat.svg'; 
 import './homepage.css';
+import { FaShoppingCart } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
-function Homepage(){
-    return(
-        <div className="homepage">
-            <header className="header">
-                <img src={logo2} className="logo2" alt="logo2" />
-                <h1 className="site-title">WildBites Food Express</h1>
-                <h2 className="site-subtitle">CIT-UNIVERSITY</h2>
-                
-                <nav className="auth-buttons">
-                    <button className="login-button">LOG IN</button>
-                    <button className="signup-button">SIGN UP</button>
-                </nav>
+function Homepage() {
+    const [cartCount, setCartCount] = useState(0);
+    const navigate = useNavigate(); // Initialize useNavigate
+
+    // Example function to add items to the cart
+    const addToCart = () => {
+        setCartCount(cartCount + 1);
+    };
+
+    // Function to navigate to the login page
+    const handleOrderClick = () => {
+        navigate('/login'); // Navigate to the login page
+    };
+
+    return (
+        <div className="App">
+            {/* Navigation Bar */}
+            <nav className="navbar">
+                {/* Logo and Brand Name */}
+                <div className="navbar-logo">
+                    <img src={logo} className="App-logo" alt="WildBites Logo" />
+                </div>
+
+                {/* Authentication Buttons and Cart Icon */}
+                <div className="navbar-actions">
+                    <button className="btn login-btn">Log In</button>
+                    <button className="btn signup-btn">Sign Up</button>
+                    <button className="btn cart-btn" aria-label="View Cart">
+                        <FaShoppingCart size={20} />
+                        <span className="cart-count">{cartCount}</span>
+                    </button>
+                </div>
+            </nav>
+
+            {/* Hero Section */}
+            <header className="hero">
+                <div className="hero-content">
+                    <div className="hero-text">
+                        <h1>WildBites</h1>
+                        <h2>CIT-U Food Express</h2>
+                        <p>Fast. Fresh. Fierce.</p>
+                        <button className="btn order-btn" onClick={handleOrderClick}>Order Now</button>
+                    </div>
+                    <div className="hero-logo">
+                        <img src={cat} alt="WildBites Logo" className="hero-logo-image" />
+                    </div>
+                </div>
             </header>
-            <main className="main-content">
-                <div className="content">
-                    <h1 className="main-title">WildBites Food</h1>
-                    <h2 className='main-title2'>Express</h2>
-                    <p className="tagline">Fast. Fresh. Fierce.</p>
-                    <button className="order-button">Order Food</button>
-                </div>
-
-                <div className="wildcat-image">
-                    <img src={logo} className="App-logo" alt="Wildcat Chef" />
-                </div>
-            </main>
-            <footer>
-                <hr></hr>
-                <p>&copy; {new Date().getFullYear()} WildBites Food Express </p>
-            </footer>
-
         </div>
     );
 }

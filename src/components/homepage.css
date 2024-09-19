@@ -1,163 +1,283 @@
-.homepage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-family: 'Arial', sans-serif;
-    padding: 20px;
-    background-color: #fff;
-}
+/* src/App.css */
 
-.header {
-    height: 75px;
-    width: 100%;
-    padding: 20px;
-    background-color: #fff;
+/* Reset some default styles */
+body, html, #root, .App {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* Navigation Bar Styles */
+  .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e0e0e0;
-    box-shadow: 2.5px 5px 5px gray;
-}
-
-.logo2 {
-    
-    width: 100px;
-    height: auto;
-    margin-top: -20px;
-}
-.site-title {
-    position: absolute;
-    margin-bottom: 75px;
-    margin-left: 150px;
-    font-size: 3rem;
-    color: #a30606;
+    padding: 15px 30px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .navbar-logo {
+    display: flex;
+    align-items: center;
+    margin-left: 90px;
+  }
+  
+  .navbar-logo img {
+    height: 50px;
+    margin-right: 10px;
+    animation: App-logo-spin infinite 20s linear;
+  }
+  
+  .navbar-logo span {
+    font-size: 1.2rem;
     font-weight: bold;
-}
-
-.site-subtitle {
-    position: absolute;
-    margin-bottom: -25px;
-    margin-left: 150px;
-    font-size: 2rem;
-    color: #DAA520;
-}
-
-.auth-buttons {
+    color:rgba(163, 19, 19, 1); /* Tomato color for prominence */
+  }
+  
+  .navbar-links {
+    list-style: none;
     display: flex;
     gap: 20px;
-}
-
-.login-button, .signup-button {
-    padding: 15px 20px;
-    border: none;
-    background-color: #a30606;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.login-button:hover, .signup-button:hover {
-    background-color: #ba2222;
-    box-shadow: 1px 5px 10px gray;  
-}
-
-.main-content {
+  }
+  
+  .navbar-links li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  
+  .navbar-links li a:hover {
+    color: #FF6347;
+  }
+  
+  .navbar-actions {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 50px 0;
-    max-width: 1200px;
-    width: 100%;
-}
-
-
-.content {
-    max-width: 600px;
-}
-
-.main-title {
-    position: absolute;
-    font-size: 5rem;
-    margin-top: -250px;
-    margin-left: -50px;
-    font-weight: bold   ;
-    color: #C30000;
-}
-
-.main-title2 {
-    position: absolute;
-    font-size: 5rem;
-    margin-top: -175px;
-    margin-left: -50px;
-    color: #DAA520;
-}
-
-.tagline {
-    position: absolute;
-    margin-top: -15px;
-    font-size: 2.5rem;
-    display: inline-block;
-    letter-spacing: 0.1em;
-    color: #a30606;
-    font-weight: bolder;
-    margin-bottom: 50px;
-}   
-
-.order-button {
-    position: absolute;
-    margin-top: 130px;
-    margin-left: 75px;
-    padding: 15px 30px;
-    background-color: #a30606; /* Red color */
-    color: white;
+    gap: 15px;
+    margin-right: 50PX;
+  }
+  
+  .btn {
+    padding: 8px 16px;
     border: none;
-    font-size: 1.2rem;
-    border-radius: 5px;
+    border-radius: 25px;
     cursor: pointer;
-}
-
-.order-button:hover {
-    background-color: #ba2222;
-    box-shadow: 1px 5px 10px gray;
-}
-
-
-.wildcat-image {
-    max-width: 500px;
-    margin-top: -80px;
-    margin-left: 30px;
-}
-
-.App-logo {
+    font-size: 0.9rem;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .login-btn {
+    background-color: transparent;
+    color: rgba(163, 19, 19, 1);
+    border: 2px solid rgba(163, 19, 19, 1);
+  }
+  
+  .login-btn:hover {
+    background-color: rgb(239, 48, 48);
+    color: #fff;
+  }
+  
+  .signup-btn {
+    background-color: #FF6347;
+    color: #fff;
+  }
+  
+  .signup-btn:hover {
+    background-color: #E5533D;
+  }
+  
+  .cart-btn {
+    position: relative;
+    background-color: transparent;
+    color: #FF6347;
+    border: 2px solid #FF6347;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 25px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .cart-btn:hover {
+    background-color: #FF6347;
+    color: #fff;
+  }
+  
+  .cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #fff;
+    color: #FF6347;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border: 1px solid #FF6347;
+  }
+  
+  /* Cart Icon Hover Effect */
+  .cart-btn:hover .cart-count {
+    background-color: #fff;
+    color: #fff;
+  }
+  
+  /* Hero Section Styles */
+  .hero {
+    background-image: url('https://images.unsplash.com/photo-1604908177525-6421000c4e5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80'); /* Replace with your desired image */
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px; /* To offset the fixed navbar */
+  }
+  
+  .hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 40px;
+    border-radius: 10px;
+    max-width: 1200px;
+    width: 90%;
+    
+  }
+  
+  .hero-text {
+    flex: 1;
+    margin-right: 20px;
+    margin-bottom: 300px;
+  }
+  
+  .hero-text h1 {
+    font-size: 4.5rem;
+    color: rgba(163, 19, 19, 1);
+   
+  }
+  .hero-text h2 {
+    font-size: 2.5rem;
+    color: rgba(163, 19, 19, 1);
+    
+  }
+  
+  .hero-text p {
+    font-size: 1.1rem;
+    color: rgba(163, 19, 19, 1);
+    margin-bottom: 30px;
+  }
+  
+  .order-btn {
+    background-color: #FF6347;
+    color: #fff;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .order-btn:hover {
+    background-color: #E5533D;
+  }
+  
+  .hero-logo {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .hero-logo-image {
     max-width: 100%;
     height: auto;
-}
-
-footer {
-    text-align: center;
-    padding: 20px 0;
-    background-color: #f9f9f9;
-    position: relative;
-    width: 100%;
-}
-
-
-footer hr {
-    border: none;
-    height: 1px;
-    background-color: #ddd;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 95vw;
-    margin: 0;
-}
-
-footer p {
-    color: rgba(0, 0, 0, 0.6);
-    font-size: 14px;
-    margin-top: 20px;
-}
-
+    border-radius: 10px;
+    
+  }
+  
+  /* Keyframes for Logo Animation */
+  
+  
+  
+  
+  /* Responsive Design */
+  @media (max-width: 992px) {
+    .hero-content {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .hero-text {
+      margin-right: 0;
+      margin-bottom: 20px;
+    }
+  
+    .hero-logo {
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .navbar {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 15px 20px;
+    }
+  
+    .navbar-logo {
+      margin-bottom: 10px;
+    }
+  
+    .navbar-links {
+      flex-direction: column;
+      width: 100%;
+      display: none; /* Hide links on small screens, can be toggled with a hamburger menu */
+    }
+  
+    .navbar-links li {
+      margin-bottom: 10px;
+    }
+  
+    .navbar-actions {
+      gap: 10px;
+    }
+  
+    .btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+  
+    .cart-btn {
+      padding: 6px 10px;
+    }
+  
+    .cart-count {
+      top: -3px;
+      right: -3px;
+      padding: 1px 4px;
+      font-size: 0.6rem;
+    }
+  
+    .hero-content {
+      padding: 20px;
+    }
+  
+    .hero-text h1 {
+      font-size: 2rem;
+    }
+  
+    .hero-text p {
+      font-size: 1rem;
+    }
+  }
+  
