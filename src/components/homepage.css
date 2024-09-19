@@ -1,0 +1,163 @@
+.homepage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+    background-color: #fff;
+}
+
+.header {
+    height: 75px;
+    width: 100%;
+    padding: 20px;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 2.5px 5px 5px gray;
+}
+
+.logo2 {
+    
+    width: 100px;
+    height: auto;
+    margin-top: -20px;
+}
+.site-title {
+    position: absolute;
+    margin-bottom: 75px;
+    margin-left: 150px;
+    font-size: 3rem;
+    color: #a30606;
+    font-weight: bold;
+}
+
+.site-subtitle {
+    position: absolute;
+    margin-bottom: -25px;
+    margin-left: 150px;
+    font-size: 2rem;
+    color: #DAA520;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 20px;
+}
+
+.login-button, .signup-button {
+    padding: 15px 20px;
+    border: none;
+    background-color: #a30606;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.login-button:hover, .signup-button:hover {
+    background-color: #ba2222;
+    box-shadow: 1px 5px 10px gray;  
+}
+
+.main-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 50px 0;
+    max-width: 1200px;
+    width: 100%;
+}
+
+
+.content {
+    max-width: 600px;
+}
+
+.main-title {
+    position: absolute;
+    font-size: 5rem;
+    margin-top: -250px;
+    margin-left: -50px;
+    font-weight: bold   ;
+    color: #C30000;
+}
+
+.main-title2 {
+    position: absolute;
+    font-size: 5rem;
+    margin-top: -175px;
+    margin-left: -50px;
+    color: #DAA520;
+}
+
+.tagline {
+    position: absolute;
+    margin-top: -15px;
+    font-size: 2.5rem;
+    display: inline-block;
+    letter-spacing: 0.1em;
+    color: #a30606;
+    font-weight: bolder;
+    margin-bottom: 50px;
+}   
+
+.order-button {
+    position: absolute;
+    margin-top: 130px;
+    margin-left: 75px;
+    padding: 15px 30px;
+    background-color: #a30606; /* Red color */
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.order-button:hover {
+    background-color: #ba2222;
+    box-shadow: 1px 5px 10px gray;
+}
+
+
+.wildcat-image {
+    max-width: 500px;
+    margin-top: -80px;
+    margin-left: 30px;
+}
+
+.App-logo {
+    max-width: 100%;
+    height: auto;
+}
+
+footer {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #f9f9f9;
+    position: relative;
+    width: 100%;
+}
+
+
+footer hr {
+    border: none;
+    height: 1px;
+    background-color: #ddd;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 95vw;
+    margin: 0;
+}
+
+footer p {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+    margin-top: 20px;
+}
+
