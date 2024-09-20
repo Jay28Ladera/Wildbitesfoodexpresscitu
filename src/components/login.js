@@ -1,53 +1,61 @@
 import React, { useState } from 'react';
-import './login.css'; // Make sure to create this CSS file for styling
+import logo from './logo.svg'; // Corrected the variable name
+import cat from './cat.svg'; 
+import './login.css';
+import { FaShoppingCart } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import landing from './landingpage.svg';
 
-function Auth() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+function Homepage() {
+    const [cartCount, setCartCount] = useState(0);
+    const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle login or signup logic here
-    console.log(isLogin ? 'Logging in...' : 'Signing up...', { email, password });
-  };
+    // Example function to add items to the cart
+    const addToCart = () => {
+        setCartCount(cartCount + 1);
+    };
 
-  return (
-    <div className="auth-container">
-      <h2>{isLogin ? 'Log In' : 'Sign Up'}</h2>
-      <form onSubmit={handleSubmit} className="auth-form">
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    // Function to navigate to the login page
+    const handleOrderClick = () => {
+        navigate('/login'); // Navigate to the login page
+    };
+
+    return (
+        <div className="App">
+            {/* Navigation Bar */}
+            <nav className="navbar">
+                {/* Logo and Brand Name */}
+                <div className="navbar-logo">
+                    <img src={logo} className="App-logo" alt="WildBites Logo" />
+                </div>
+
+                {/* Authentication Buttons and Cart Icon */}
+                <div className="navbar-actions">
+                    <button className="btn login-btn">Log In</button>
+                    <button className="btn signup-btn">Sign Up</button>
+                    <button className="btn cart-btn" aria-label="View Cart">
+                        <FaShoppingCart size={20} />
+                        <span className="cart-count">{cartCount}</span>
+                    </button>
+                </div>
+            </nav>
+
+            {/* Hero Section */}
+            <header className="hero">
+                <div className="hero-content">
+                    <div className="hero-text">
+                      
+                        <img src={landing} alt="WildBites Logo" className="hero-logo-image" />
+                        <p>Fast. Fresh. Fierce.</p>
+                        <button className="btn order-btn" onClick={handleOrderClick}>Order Now</button>
+                    </div>
+                    <div className="hero-logo">
+                        <img src={cat} alt="WildBites Logo" className="hero-logo-image" />
+                    </div>
+                </div>
+            </header>
         </div>
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="btn submit-btn">
-          {isLogin ? 'Log In' : 'Sign Up'}
-        </button>
-      </form>
-      <p>
-        {isLogin ? 'Don’t have an account?' : 'Already have an account?'}{' '}
-        <button onClick={() => setIsLogin(!isLogin)} className="toggle-btn">
-          {isLogin ? 'Sign Up' : 'Log In'}
-        </button>
-      </p>
-    </div>
-  );
+    );
 }
 
-export default Auth;
+export default Homepage;
