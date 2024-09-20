@@ -6,6 +6,9 @@ import loghead from './loginhead.svg'; // Corrected the variable name
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from '../firebase/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore'; // Import Firestore functions
+import signInWithGoogle from './signInWithGoogle';
+
+
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -288,7 +291,13 @@ function Auth() {
         <button type="submit" className="btn submit-btn">
           {isLogin ? 'Log In' : 'Sign Up'}
         </button>
+        
       </form>
+      <p className="continue-p">-- Or continue with --</p>
+
+      <button onClick={signInWithGoogle} className="btn google-signin-btn">
+        <img src={require("../assets/google.png")} alt="Sign in with Google" width="60%" />
+      </button>
 
       <p>
         {isLogin ? 'Don’t have an account?' : 'Already have an account?'}{' '}
@@ -296,6 +305,7 @@ function Auth() {
           {isLogin ? 'Sign Up' : 'Log In'}
         </button>
       </p>
+      
     </div>
   );
 }
