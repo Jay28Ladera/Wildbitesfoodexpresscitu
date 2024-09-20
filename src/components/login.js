@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './login.css'; // Ensure this file contains styling for the form
 import loghead from './loginhead.svg'; // Corrected the variable name
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
+import { auth, db } from '../firebase/firebase';
+import { doc, setDoc } from 'firebase/firestore'; // Import Firestore functions
+
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,23 +19,53 @@ function Auth() {
   const [contactNumber, setContactNumber] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate(); 
 
-  const handleSubmit = (e) => {
+  
+  const handleRegister = async (e) => {
     e.preventDefault();
-
-    if (!isLogin) {
-      // Check if password and confirm password match
+    try {
       if (password !== confirmPassword) {
         setError('Passwords do not match.');
         return;
       }
-      // Reset error if passwords match
-      setError('');
-      // Handle sign-up logic here
-      console.log('Signing up...', { name, course, address, contactNumber, email, password });
+      // Create the user with email and password
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Store additional user information in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        name,
+        course,
+        address,
+        contactNumber,
+        email: user.email,
+        uid: user.uid,
+      });
+
+      console.log('User registered and profile stored:', user.uid);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      navigate('/profile'); // Redirect to profile page on successful login
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+    if (isLogin) {
+      handleLogin(e);
     } else {
-      // Handle login logic here
-      console.log('Logging in...', { email, password });
+      handleRegister(e);
     }
 
     // Reset form fields after submission (optional)
@@ -45,14 +80,12 @@ function Auth() {
 
   return (
     <div className="auth-container">
-      {/* Header section with the image and description */}
       <header className="auth-header">
-        <img src={loghead} className="loghead" alt="logheader" /> {/* Matches the hero tagline from your homepage */}
+        <img src={loghead} className="loghead" alt="logheader" />
         <p>{isLogin ? 'Log In to your account' : 'Create a new account'}</p>
       </header>
 
       <form onSubmit={handleSubmit} className="auth-form">
-        {/* Show these fields only during Sign Up */}
         {!isLogin && (
           <>
             <div className="form-group">
@@ -101,7 +134,6 @@ function Auth() {
             </div>
           </>
         )}
-        {/* Common fields for both login and sign up */}
         <div className="form-group">
           <label htmlFor="email">Email Address:</label>
           <input
@@ -124,7 +156,6 @@ function Auth() {
             placeholder="Enter your password"
           />
         </div>
-        {/* Confirm Password Field moved right after Password */}
         {!isLogin && (
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password:</label>
@@ -138,7 +169,6 @@ function Auth() {
             />
           </div>
         )}
-        {/* Display error message if passwords do not match */}
         {error && <p className="error-message">{error}</p>}
 
         <button type="submit" className="btn submit-btn">
