@@ -1,4 +1,3 @@
-// src/components/UserProfile.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // For navigating between pages
 import { auth, db } from '../firebase/firebase';
@@ -10,11 +9,9 @@ function UserProfile() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if the user is logged in
-    const fetchUserData = async () => {
-      const user = auth.currentUser; // Get the current authenticated user
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        // Fetch user profile from Firestore
+        console.log("User is logged in:", user.uid);
         const userRef = doc(db, 'users', user.uid); // Get the user's document from Firestore
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
@@ -23,13 +20,13 @@ function UserProfile() {
           console.error('No such document!');
         }
       } else {
-        // If not logged in, redirect to login page
-        navigate('/login');
+        console.log("User not logged in, redirecting...");
+        navigate('/login'); // If not logged in, redirect to login page
       }
       setLoading(false);
-    };
+    });
 
-    fetchUserData();
+    return () => unsubscribe(); // Clean up subscription on component unmount
   }, [navigate]);
 
   if (loading) {
