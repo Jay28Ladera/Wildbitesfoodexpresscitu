@@ -1,37 +1,36 @@
 import React, { useState } from 'react';
-import logo from './logo.svg'; // Corrected the variable name
-import cat from './cat.svg'; 
+import logo from '../assets/logo.svg';
+import cat from '../assets/cat.svg'; 
 import './homepage.css';
 import { FaShoppingCart } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import landing from './landingpage.svg';
+import landing from '../assets/landingpage.svg';
 
 function Homepage() {
     const [cartCount, setCartCount] = useState(0);
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
 
-    // Example function to add items to the cart
     const addToCart = () => {
         setCartCount(cartCount + 1);
     };
 
-    // Function to navigate to the login page
     const handleOrderClick = () => {
-        navigate('/login'); // Navigate to the login page
+        navigate('/login');
     };
+    const handleLoginClick = () => {
+        navigate('/login');
+    }
 
     return (
         <div className="App">
-            {/* Navigation Bar */}
+
             <nav className="navbar">
-                {/* Logo and Brand Name */}
                 <div className="navbar-logo">
                     <img src={logo} className="App-logo" alt="WildBites Logo" />
                 </div>
 
-                {/* Authentication Buttons and Cart Icon */}
                 <div className="navbar-actions">
-                    <button className="btn login-btn">Log In</button>
+                    <button className="btn login-btn" onClick={handleLoginClick}>Log In</button>
                     <button className="btn signup-btn">Sign Up</button>
                     <button className="btn cart-btn" aria-label="View Cart">
                         <FaShoppingCart size={20} />
@@ -40,7 +39,6 @@ function Homepage() {
                 </div>
             </nav>
 
-            {/* Hero Section */}
             <header className="hero">
                 <div className="hero-content">
                     <div className="hero-text">

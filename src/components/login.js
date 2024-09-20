@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './login.css'; // Ensure this file contains styling for the form
-import loghead from './loginhead.svg'; // Corrected the variable name
+import loghead from '../assets/loginhead.svg'; // Corrected the variable name
+import {useNavigate } from 'react-router-dom';
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +16,10 @@ function Auth() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
+  const navigate = useNavigate();
+  const handleForgotPasswordClick = () => {
+    navigate('/forgotpassword')
+};
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -147,10 +152,25 @@ function Auth() {
       </form>
 
       <p>
-        {isLogin ? 'Don’t have an account?' : 'Already have an account?'}{' '}
-        <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="btn toggle-btn">
-          {isLogin ? 'Sign Up' : 'Log In'}
-        </button>
+        {isLogin ? (
+          <>
+            Don’t have an account?{' '}
+            <button onClick={() => { setIsLogin(false); setError(''); }} className="btn toggle-btn">
+              Sign Up
+            </button>
+            <br />
+            <button onClick ={handleForgotPasswordClick} className="btn toggle-btn">
+              Forgot Password?
+            </button>
+          </>
+        ) : (
+          <>
+            Already have an account?{' '}
+            <button onClick={() => { setIsLogin(true); setError(''); }} className="btn toggle-btn">
+              Log In
+            </button>
+          </>
+        )}
       </p>
     </div>
   );
