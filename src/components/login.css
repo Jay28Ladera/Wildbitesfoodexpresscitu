@@ -68,10 +68,26 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+/* login.css */
+.forgot-password-btn {
+    background: none;
+    border: none;
+    color: rgba(163, 19, 19, 1);
+    cursor: pointer;
+
+    font-size: 0.9em;
+    text-decoration: underline;
+  }
+  
+  .forgot-password-btn:hover {
+    color: rgb(251, 49, 49);
+  }
+  
 
 .btn.submit-btn:hover {
     background-color: #f99626; /* Orange hover effect */
 }
+
 
 /* Toggle button for switching between login and sign-up */
 .btn.toggle-btn {
