@@ -44,8 +44,12 @@ function Homepage() {
             <header className="hero">
                 <div className="hero-content">
                     <div className="hero-text">
+                    <h1>
+                    WildBites</h1>
+                    <h2>
+                    CIT-U Food Express</h2>
                       
-                        <img src={landing} alt="WildBites Logo" className="hero-logo-image" />
+                      
                         <p>Fast. Fresh. Fierce.</p>
                         <button className="btn order-btn" onClick={handleOrderClick}>Order Now</button>
                     </div>

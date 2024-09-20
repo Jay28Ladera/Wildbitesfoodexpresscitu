@@ -1,61 +1,159 @@
 import React, { useState } from 'react';
-import logo from './logo.svg'; // Corrected the variable name
-import cat from './cat.svg'; 
-import './login.css';
-import { FaShoppingCart } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import landing from './landingpage.svg';
+import './login.css'; // Ensure this file contains styling for the form
+import loghead from './loginhead.svg'; // Corrected the variable name
 
-function Homepage() {
-    const [cartCount, setCartCount] = useState(0);
-    const navigate = useNavigate(); // Initialize useNavigate
+function Auth() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-    // Example function to add items to the cart
-    const addToCart = () => {
-        setCartCount(cartCount + 1);
-    };
+  // Additional state for Sign Up fields
+  const [name, setName] = useState('');
+  const [course, setCourse] = useState('');
+  const [address, setAddress] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
 
-    // Function to navigate to the login page
-    const handleOrderClick = () => {
-        navigate('/login'); // Navigate to the login page
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-    return (
-        <div className="App">
-            {/* Navigation Bar */}
-            <nav className="navbar">
-                {/* Logo and Brand Name */}
-                <div className="navbar-logo">
-                    <img src={logo} className="App-logo" alt="WildBites Logo" />
-                </div>
+    if (!isLogin) {
+      // Check if password and confirm password match
+      if (password !== confirmPassword) {
+        setError('Passwords do not match.');
+        return;
+      }
+      // Reset error if passwords match
+      setError('');
+      // Handle sign-up logic here
+      console.log('Signing up...', { name, course, address, contactNumber, email, password });
+    } else {
+      // Handle login logic here
+      console.log('Logging in...', { email, password });
+    }
 
-                {/* Authentication Buttons and Cart Icon */}
-                <div className="navbar-actions">
-                    <button className="btn login-btn">Log In</button>
-                    <button className="btn signup-btn">Sign Up</button>
-                    <button className="btn cart-btn" aria-label="View Cart">
-                        <FaShoppingCart size={20} />
-                        <span className="cart-count">{cartCount}</span>
-                    </button>
-                </div>
-            </nav>
+    // Reset form fields after submission (optional)
+    setEmail('');
+    setPassword('');
+    setName('');
+    setCourse('');
+    setAddress('');
+    setContactNumber('');
+    setConfirmPassword('');
+  };
 
-            {/* Hero Section */}
-            <header className="hero">
-                <div className="hero-content">
-                    <div className="hero-text">
-                      
-                        <img src={landing} alt="WildBites Logo" className="hero-logo-image" />
-                        <p>Fast. Fresh. Fierce.</p>
-                        <button className="btn order-btn" onClick={handleOrderClick}>Order Now</button>
-                    </div>
-                    <div className="hero-logo">
-                        <img src={cat} alt="WildBites Logo" className="hero-logo-image" />
-                    </div>
-                </div>
-            </header>
+  return (
+    <div className="auth-container">
+      {/* Header section with the image and description */}
+      <header className="auth-header">
+        <img src={loghead} className="loghead" alt="logheader" /> {/* Matches the hero tagline from your homepage */}
+        <p>{isLogin ? 'Log In to your account' : 'Create a new account'}</p>
+      </header>
+
+      <form onSubmit={handleSubmit} className="auth-form">
+        {/* Show these fields only during Sign Up */}
+        {!isLogin && (
+          <>
+            <div className="form-group">
+              <label htmlFor="name">Complete Name:</label>
+              <input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required={!isLogin}
+                placeholder="Enter your full name"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="course">Course/Year:</label>
+              <input
+                type="text"
+                id="course"
+                value={course}
+                onChange={(e) => setCourse(e.target.value)}
+                required={!isLogin}
+                placeholder="e.g., B.Tech / 3rd Year"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="address">Address:</label>
+              <input
+                type="text"
+                id="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required={!isLogin}
+                placeholder="Enter your address"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="contactNumber">Contact Number:</label>
+              <input
+                type="tel"
+                id="contactNumber"
+                value={contactNumber}
+                onChange={(e) => setContactNumber(e.target.value)}
+                required={!isLogin}
+                placeholder="e.g., +1234567890"
+              />
+            </div>
+          </>
+        )}
+        {/* Common fields for both login and sign up */}
+        <div className="form-group">
+          <label htmlFor="email">Email Address:</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="Enter your email"
+          />
         </div>
-    );
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            placeholder="Enter your password"
+          />
+        </div>
+        {/* Confirm Password Field moved right after Password */}
+        {!isLogin && (
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password:</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required={!isLogin}
+              placeholder="Re-enter your password"
+            />
+          </div>
+        )}
+        {/* Display error message if passwords do not match */}
+        {error && <p className="error-message">{error}</p>}
+
+        <button type="submit" className="btn submit-btn">
+          {isLogin ? 'Log In' : 'Sign Up'}
+        </button>
+      </form>
+
+      <p>
+        {isLogin ? 'Don’t have an account?' : 'Already have an account?'}{' '}
+        <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="btn toggle-btn">
+          {isLogin ? 'Sign Up' : 'Log In'}
+        </button>
+      </p>
+    </div>
+  );
 }
 
-export default Homepage;
+export default Auth;

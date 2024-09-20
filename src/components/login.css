@@ -1,0 +1,165 @@
+/* Container for the entire authentication form */
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    max-width: 400px;
+    margin: 50px auto 0; /* margin-top: 50px and horizontally centered */
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header section with the main heading and description */
+.auth-header h1 {
+    font-size: 3rem;
+    color: rgba(163, 19, 19, 1); /* Matching the hero section color */
+    margin-bottom: 10px;
+}
+
+.auth-header p {
+    font-size: 1.25rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Form styling */
+.auth-form {
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.form-group input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    transition: border 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #f99626; /* Matching the color of the "Order Now" button */
+}
+
+/* Submit button */
+.btn.submit-btn {
+    background-color: #a31313; /* Matching the red color from the homepage */
+    color: white;
+    padding: 12px;
+    font-size: 1.25rem;
+    border: none;
+    border-radius: 4px;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn.submit-btn:hover {
+    background-color: #f99626; /* Orange hover effect */
+}
+
+/* Toggle button for switching between login and sign-up */
+.btn.toggle-btn {
+    background: none;
+    border: none;
+    color: #f99626;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: color 0.3s ease;
+}
+
+.btn.toggle-btn:hover {
+    color: #a31313;
+}
+
+/* Text for the account toggle link */
+p {
+    margin-top: 20px;
+    font-size: 1rem;
+    color: #333;
+}
+
+/* Media Queries for Mobile Responsiveness */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 20px;
+        max-width: 90%; /* Adjust width to take up more space on smaller screens */
+        margin: 20px auto; /* Reduce margin for smaller screens */
+    }
+
+    .auth-header h1 {
+        font-size: 2rem; /* Adjust heading size for smaller screens */
+    }
+
+    .auth-header p {
+        font-size: 1rem;
+        margin-bottom: 15px;
+    }
+
+    .form-group input {
+        padding: 8px; /* Adjust padding for smaller screen inputs */
+        font-size: 1rem;
+    }
+
+    .btn.submit-btn {
+        padding: 10px;
+        font-size: 1rem; /* Reduce button font size */
+    }
+
+    .btn.toggle-btn {
+        font-size: 0.9rem; /* Slightly reduce the toggle button size */
+    }
+
+    p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 15px;
+        max-width: 100%; /* Take full width on very small screens */
+    }
+
+    .auth-header h1 {
+        font-size: 1.75rem; /* Smaller header font for mobile */
+    }
+
+    .auth-header p {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .form-group input {
+        padding: 6px; /* Further reduce padding for smaller screens */
+    }
+
+    .btn.submit-btn {
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn.toggle-btn {
+        font-size: 0.85rem;
+    }
+
+    p {
+        font-size: 0.85rem;
+    }
+}

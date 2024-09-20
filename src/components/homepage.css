@@ -2,10 +2,12 @@
 
 /* Reset some default styles */
 body, html, #root, .App {
+  body, html, #root, .App {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', sans-serif; /* Apply Inter font here */
+}
   }
   
   /* Navigation Bar Styles */
@@ -25,8 +27,12 @@ body, html, #root, .App {
   .navbar-logo {
     display: flex;
     align-items: center;
-    margin-left: 90px;
+    
   }
+  .navbar-logo span {
+    margin: 0;
+    padding: 0;
+}
   
   .navbar-logo img {
     height: 50px;
@@ -146,7 +152,7 @@ body, html, #root, .App {
     align-items: center;
     justify-content: space-between;
     background: rgba(255, 255, 255, 0.85);
-    padding: 40px;
+    
     border-radius: 10px;
     max-width: 1200px;
     width: 90%;
@@ -157,28 +163,31 @@ body, html, #root, .App {
     flex: 1;
     margin-right: 20px;
     margin-bottom: 300px;
+    margin-top: 100px;
     
   }
   
   .hero-text h1 {
-    font-size: 4.5rem;
+    font-size: 7.5rem;
     color: rgba(163, 19, 19, 1);
-    margin-top: 10px;
-    margin-bottom: 2px; /* Add this to create space between h1 and h2 */
+    margin-top: 20px;
+    margin-bottom: 10px; /* Add this to create space between h1 and h2 */
    
   }
   .hero-text h2 {
-    font-size: 1.5rem;
-    color: rgb(249, 150, 38);
-    margin-bottom: 10px;
+    font-size: 2.1rem;
+    color: rgba(242, 181, 76, 1);
+    margin-bottom: 20px;
+    margin-top: 5px;
+    margin-left: 10px;
     
   }
   
   .hero-text p {
-    font-size: 2.1rem;
+    font-size: 1.5rem;
     color: rgba(163, 19, 19, 1);
     margin-bottom: 20px;
-    margin-top: 5px;
+    margin-top: 10px;
     margin-left: 10px;
   }
   
