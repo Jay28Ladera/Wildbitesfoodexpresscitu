@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './login.css'; // Ensure this file contains styling for the form
 import loghead from './loginhead.svg'; // Corrected the variable name
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import { auth, db } from '../firebase/firebase';
-import { doc, setDoc } from 'firebase/firestore'; // Import Firestore functions
+import { doc, setDoc, getDoc } from 'firebase/firestore'; // Import Firestore functions
 
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Additional state for Sign Up fields
   const [name, setName] = useState('');
@@ -21,7 +23,7 @@ function Auth() {
   const [error, setError] = useState('');
   const navigate = useNavigate(); 
 
-  
+
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
@@ -50,14 +52,38 @@ function Auth() {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      navigate('/profile'); // Redirect to profile page on successful login
-    } catch (error) {
-      setError(error.message);
+  e.preventDefault();
+  try {
+    console.log("Attempting to log in...");
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    console.log("Login successful:", userCredential);
+    navigate('/profile'); // Redirect to profile page on successful login
+  } catch (error) {
+    setError(error.message);
+    console.error("Login error:", error.message);
+  }
+};
+
+useEffect(() => {
+  const fetchUserData = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      console.log("User is logged in:", user.uid);
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setUserData(userSnap.data());
+      } else {
+        console.error('No such document!');
+      }
+    } else {
+      console.log("User not logged in, redirecting...");
+      navigate('/login');
     }
+    setLoading(false);
   };
+  fetchUserData();
+}, [navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
