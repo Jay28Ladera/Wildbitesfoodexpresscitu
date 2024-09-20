@@ -288,7 +288,10 @@ body, html, #root, .App {
     }
   
     .hero-text h1 {
-      font-size: 3rem;
+      font-size: 4rem;
+    }
+    .hero-text h2 {
+      font-size: 1.5rem;
     }
   
     .hero-text p {
