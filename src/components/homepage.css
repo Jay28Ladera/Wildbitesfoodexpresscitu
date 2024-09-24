@@ -1,301 +1,301 @@
-/* src/App.css */
+/* Add animation keyframes for bounce effect */
+@keyframes bounce {
+  0%, 100% {
+      transform: translateY(0);
+  }
+  50% {
+      transform: translateY(-5px);
+  }
+}
 
-/* Reset some default styles */
+
+
+.App-logo {
+  height: 50px;
+}
+
+
+/* Existing CSS for the Homepage */
 body, html, #root, .App {
-  body, html, #root, .App {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: 'Inter', sans-serif; /* Apply Inter font here */
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
 }
-  }
-  
-  /* Navigation Bar Styles */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-  }
-  
-  .navbar-logo {
-    display: flex;
-    align-items: center;
-    
-  }
-  .navbar-logo span {
-    margin: 0;
-    padding: 0;
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
 }
-  
-  .navbar-logo img {
-    height: 50px;
-    margin-right: 10px;
-    animation: App-logo-spin infinite 20s linear;
-  }
-  
-  .navbar-logo span {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color:rgba(163, 19, 19, 1); /* Tomato color for prominence */
-  }
-  
-  .navbar-links {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-  }
-  
-  .navbar-links li a {
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-    transition: color 0.3s;
-  }
-  
-  .navbar-links li a:hover {
-    color: #FF6347;
-  }
-  
-  .navbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-right: 50PX;
-  }
-  
-  .btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.3s, color 0.3s;
-  }
-  
-  .login-btn {
-    background-color: transparent;
-    color: rgba(163, 19, 19, 1);
-    border: 2px solid rgba(163, 19, 19, 1);
-  }
-  
-  .login-btn:hover {
-    background-color: rgb(239, 48, 48);
-    color: #fff;
-  }
-  
-  .signup-btn {
-    background-color: rgba(163, 19, 19, 1);
-    color: #fff;
-  }
-  
-  .signup-btn:hover {
-    background-color: rgb(237, 57, 57);
-  }
-  
-  .cart-btn {
-    position: relative;
-    background-color: transparent;
-    color: rgba(163, 19, 19, 1);
-    border: 2px solid rgba(163, 19, 19, 1);
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    border-radius: 25px;
-    transition: background-color 0.3s, color 0.3s;
-  }
-  
-  .cart-btn:hover {
-    background-color: rgb(237, 57, 57);
-    color: #fff;
-  }
-  
-  .cart-count {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: #fff;
-    color: rgba(163, 19, 19, 1);
-    border-radius: 50%;
-    padding: 2px 6px;
-    font-size: 0.7rem;
-    font-weight: bold;
-    border: 1px solid #FF6347;
-  }
-  
-  /* Cart Icon Hover Effect */
-  .cart-btn:hover .cart-count {
-    background-color: #fff;
-    color: #fff;
-  }
-  
-  /* Hero Section Styles */
-  .hero {
-    background-image: url('https://images.unsplash.com/photo-1604908177525-6421000c4e5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80'); /* Replace with your desired image */
-    background-size: cover;
-    background-position: center;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: 80px; /* To offset the fixed navbar */
-  }
-  
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo img {
+  height: 50px;
+  margin-right: 10px;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-right: 50px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.login-btn {
+  background-color: transparent;
+  color: rgba(163, 19, 19, 1);
+  border: 2px solid rgba(163, 19, 19, 1);
+}
+
+.login-btn:hover {
+  background-color: rgb(239, 48, 48);
+  color: #fff;
+}
+
+.signup-btn {
+  background-color: rgba(163, 19, 19, 1);
+  color: #fff;
+}
+
+.signup-btn:hover {
+  background-color: rgb(237, 57, 57);
+}
+
+.cart-btn {
+  position: relative;
+  background-color: transparent;
+  color: rgba(163, 19, 19, 1);
+  border: 2px solid rgba(163, 19, 19, 1);
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 25px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.cart-btn:hover {
+  background-color: rgb(237, 57, 57);
+  color: #fff;
+}
+
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #fff;
+  color: rgba(163, 19, 19, 1);
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border: 1px solid #FF6347;
+}
+
+/* Hero Section Styles */
+.hero {
+  background-image: url('https://images.unsplash.com/photo-1604908177525-6421000c4e5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  max-width: 1200px;
+  width: 90%;
+}
+
+.hero-text {
+  flex: 1;
+  margin-right: 20px;
+  margin-bottom: 300px;
+  margin-top: 100px;
+}
+
+.hero-text h1 {
+  font-size: 7.5rem;
+  color: rgba(163, 19, 19, 1);
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.hero-text h2 {
+  font-size: 2.1rem;
+  color: rgba(242, 181, 76, 1);
+  margin-bottom: 20px;
+  margin-top: 5px;
+  margin-left: 10px;
+}
+
+.hero-text p {
+  font-size: 1.5rem;
+  color: rgba(163, 19, 19, 1);
+  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.order-btn {
+  background-color: rgba(163, 19, 19, 1);
+  color: #fff;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.order-btn:hover {
+  background-color: #E5533D;
+}
+
+.hero-logo {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-logo-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
   .hero-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.85);
-    
-    border-radius: 10px;
-    max-width: 1200px;
-    width: 90%;
-    
-  }
-  
-  .hero-text {
-    flex: 1;
-    margin-right: 20px;
-    margin-bottom: 300px;
-    margin-top: 100px;
-    
-  }
-  
-  .hero-text h1 {
-    font-size: 7.5rem;
-    color: rgba(163, 19, 19, 1);
-    margin-top: 20px;
-    margin-bottom: 10px; /* Add this to create space between h1 and h2 */
-   
-  }
-  .hero-text h2 {
-    font-size: 2.1rem;
-    color: rgba(242, 181, 76, 1);
-    margin-bottom: 20px;
-    margin-top: 5px;
-    margin-left: 10px;
-    
-  }
-  
-  .hero-text p {
-    font-size: 1.5rem;
-    color: rgba(163, 19, 19, 1);
-    margin-bottom: 20px;
-    margin-top: 10px;
-    margin-left: 10px;
-  }
-  
-  .order-btn {
-    background-color: rgba(163, 19, 19, 1);
-    color: #fff;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 25px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .order-btn:hover {
-    background-color: #E5533D;
-  }
-  
-  .hero-logo {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .hero-logo-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
-    
-  }
-  
-  /* Keyframes for Logo Animation */
-  
-  
-  
-  
-  /* Responsive Design */
-  @media (max-width: 992px) {
-    .hero-content {
       flex-direction: column;
       text-align: center;
-    }
-  
-    .hero-text {
+  }
+
+  .hero-text {
       margin-right: 0;
       margin-bottom: 20px;
-    }
-  
-    .hero-logo {
-      justify-content: center;
-    }
   }
-  
-  @media (max-width: 768px) {
-    .navbar {
+
+  .hero-logo {
+      justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
       flex-direction: column;
       align-items: flex-start;
       padding: 15px 20px;
-    }
-  
-    .navbar-logo {
+  }
+
+  .navbar-logo {
       margin-bottom: 10px;
-    }
-  
-    .navbar-links {
-      flex-direction: column;
-      width: 100%;
-      display: none; /* Hide links on small screens, can be toggled with a hamburger menu */
-    }
-  
-    .navbar-links li {
-      margin-bottom: 10px;
-    }
-  
-    .navbar-actions {
+  }
+
+  .navbar-actions {
       gap: 10px;
-    }
-  
-    .btn {
+  }
+
+  .btn {
       padding: 6px 12px;
       font-size: 0.8rem;
-    }
-  
-    .cart-btn {
+  }
+
+  .cart-btn {
       padding: 6px 10px;
-    }
-  
-    .cart-count {
+  }
+
+  .cart-count {
       top: -3px;
       right: -3px;
       padding: 1px 4px;
       font-size: 0.6rem;
-    }
-  
-    .hero-content {
-      padding: 20px;
-    }
-  
-    .hero-text h1 {
-      font-size: 4rem;
-    }
-    .hero-text h2 {
-      font-size: 1.5rem;
-    }
-  
-    .hero-text p {
-      font-size: 1rem;
-    }
   }
-  
+
+  .hero-content {
+      padding: 20px;
+  }
+
+  .hero-text h1 {
+      font-size: 4rem;
+  }
+
+  .hero-text h2 {
+      font-size: 1.5rem;
+  }
+
+  .hero-text p {
+      font-size: 1.2rem;
+  }
+
+  .order-btn {
+      padding: 10px 25px;
+      font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+      padding: 10px 15px;
+  }
+
+  .navbar-logo img {
+      height: 40px;
+  }
+
+  .btn {
+      padding: 4px 8px;
+      font-size: 0.7rem;
+  }
+
+  .cart-btn {
+      padding: 4px 8px;
+  }
+
+  .hero-text h1 {
+      font-size: 3rem;
+  }
+
+  .hero-text h2 {
+      font-size: 1.2rem;
+  }
+
+  .hero-text p {
+      font-size: 1rem;
+  }
+
+  .order-btn {
+      padding: 8px 20px;
+      font-size: 0.8rem;
+  }
+}
