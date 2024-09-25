@@ -1,0 +1,20 @@
+.menu-container {
+    display: flex;
+    justify-content: center; /* Center the buttons */
+    margin: 1rem 0; /* Space above and below menu */
+}
+
+.menu-btn {
+    margin: 0 0.5rem; /* Space between menu buttons */
+    padding: 0.5rem 1rem; /* Button padding */
+    border: none;
+    border-radius: 5px;
+    background-color: #2ecc71; /* Green color for menu buttons */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.menu-btn:hover {
+    background-color: #27ae60; /* Darker green on hover */
+}

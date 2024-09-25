@@ -4,7 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import Homepage from "./components/homepage";
 import Login from "./components/login";
 import Signup from "./components/signup";
-import UserProfile from "./components/UserProfile";
+import UserProfile from "./components/UserProfile"; 
 import ForgotPassword from "./components/forgotpassword";
 
 function App() {
