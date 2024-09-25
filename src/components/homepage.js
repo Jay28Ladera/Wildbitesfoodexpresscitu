@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import logo from '../assets/logo.svg';
-import cat from '../assets/cat.svg'; 
+import cat from '../assets/cat.svg';
 import './homepage.css';
 import { FaShoppingCart } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import landing from '../assets/landingpage.svg';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion'; 
 
 function Homepage() {
     const [cartCount, setCartCount] = useState(0);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const addToCart = () => {
         setCartCount(cartCount + 1);
@@ -17,46 +18,83 @@ function Homepage() {
     const handleOrderClick = () => {
         navigate('/login');
     };
+
     const handleLoginClick = () => {
         navigate('/login');
-    }
+    };
+
+    const handleSignupClick = () => {
+        navigate('/signup');
+    };
+
+    const bounceTransition = {
+        duration: 0.5,
+        yoyo: 2, 
+        ease: 'easeOut',
+    };
 
     return (
-        <div className="App">
-
+        <motion.div
+            className="App"
+            initial={location.state?.fromSignup ? { opacity: 0, x: -100 } : { opacity: 0, y: -100 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            exit={{ opacity: 0, y: 100 }} 
+            transition={{ duration: 0.5 }}
+        >
             <nav className="navbar">
                 <div className="navbar-logo">
                     <img src={logo} className="App-logo" alt="WildBites Logo" />
                 </div>
 
                 <div className="navbar-actions">
-                    <button className="btn login-btn" onClick={handleLoginClick}>Log In</button>
-                    <button className="btn signup-btn">Sign Up</button>
-                    <button className="btn cart-btn" aria-label="View Cart">
+                    <motion.button
+                        className="btn login-btn"
+                        whileHover={{ scale: 1.1, y: ['0%', '-30%', '0%'] }}
+                        transition={bounceTransition}
+                        onClick={handleLoginClick}
+                    >
+                        Log In
+                    </motion.button>
+                    <motion.button
+                        className="btn signup-btn"
+                        whileHover={{ scale: 1.1, y: ['0%', '-30%', '0%'] }}
+                        transition={bounceTransition}
+                        onClick={handleSignupClick}
+                    >
+                        Sign Up
+                    </motion.button>
+                    <motion.button
+                        className="btn cart-btn"
+                        whileHover={{ scale: 1.1, y: ['0%', '-30%', '0%'] }}
+                        transition={bounceTransition}
+                        aria-label="View Cart"
+                    >
                         <FaShoppingCart size={20} />
                         <span className="cart-count">{cartCount}</span>
-                    </button>
+                    </motion.button>
                 </div>
             </nav>
 
             <header className="hero">
                 <div className="hero-content">
                     <div className="hero-text">
-                    <h1>
-                    WildBites</h1>
-                    <h2>
-                    CIT-U Food Express</h2>
-                      
-                      
+                        <h1>WildBites</h1>
+                        <h2>CIT-U Food Express</h2>
                         <p>Fast. Fresh. Fierce.</p>
-                        <button className="btn order-btn" onClick={handleOrderClick}>Order Now</button>
+                        <motion.button
+                            className="btn order-btn"
+                            whileHover={{ scale: 1.1, y: ['0%', '-30%', '0%'] }}
+                            transition={bounceTransition}
+                            onClick={handleOrderClick}
+                        >
+                            Order Now
+                        </motion.button>
                     </div>
-                    <div className="hero-logo">
-                        <img src={cat} alt="WildBites Logo" className="hero-logo-image" />
-                    </div>
+                    
+                    <img src={cat} alt="WildBites Logo" className="hero-logo-image" />
                 </div>
             </header>
-        </div>
+        </motion.div>
     );
 }
 
