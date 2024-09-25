@@ -11,7 +11,7 @@ function ForgotPassword() {
         
         <div className="forgotPassword">
             <header className="Header">
-                <img src={logo} className="App-logo" alt="WildBites Logo" />
+                <a href="/"><img src={logo} className="App-logo" alt="WildBites Logo" /></a>
 
             </header>
 

@@ -26,7 +26,7 @@ function Homepage() {
 
             <nav className="navbar">
                 <div className="navbar-logo">
-                    <img src={logo} className="App-logo" alt="WildBites Logo" />
+                    <a href='/'><img src={logo} className="App-logo" alt="WildBites Logo" /></a>
                 </div>
 
                 <div className="navbar-actions">
