@@ -36,9 +36,9 @@ function Homepage() {
     return (
         <motion.div
             className="App"
-            initial={location.state?.fromSignup ? { opacity: 0, x: -100 } : { opacity: 0, y: -100 }}
+            initial={location.state?.fromSignup ? { opacity: 0, x: 0 } : { opacity: 0, y: 0 }}
             animate={{ opacity: 1, x: 0, y: 0 }}
-            exit={{ opacity: 0, y: 100 }} 
+            exit={{ opacity: 0, y: 0 }} 
             transition={{ duration: 0.5 }}
         >
             <nav className="navbar">

@@ -47,10 +47,10 @@ function Login() {
   return (
     <motion.div
       className="login-auth-container"
-      initial={{ opacity: 0, x: 100 }}
+      initial={{ opacity: 0, x: 0}}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -100 }}
-      transition={{ duration: 0.5 }}
+      exit={{ opacity: 0, x: 0 }}
+      transition={{ duration: 0.1 }}
     >
       <header className="login-auth-header">
         <Link to="/">
