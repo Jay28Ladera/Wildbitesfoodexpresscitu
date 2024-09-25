@@ -16,11 +16,8 @@ function ForgotPassword() {
             transition={{ duration: 0.5 }}
         >
             <header className="Header">
-                <img src={logo} className="App-logo" alt="WildBites Logo" />
+                <a href="/"><img src={logo} className="App-logo" alt="WildBites Logo" /> </a>
 
-                <button className="cartbtn" aria-label="View Cart">
-                    <FaShoppingCart size={20} />
-                </button>
             </header>
 
             <hr />
