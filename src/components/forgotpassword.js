@@ -31,8 +31,8 @@ function ForgotPassword() {
                     <form>
                         <input
                             type="text"
-                            placeholder="Enter Code"
-                            className="code-input"
+                            placeholder="Enter Email"
+                            className="email-input"
                         />
                         <br />
                         <button type="submit" className="continue-btn">Continue</button>
