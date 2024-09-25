@@ -1,23 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import spinner from '../assets/sp.svg'; // Adjust the path as needed
+import './spinnerloader.css';
 
 export default function SPLoader() {
     const [showImg, setShowImg] = useState(true);
-    const [text, setText] = useState('');
+    const [text, setText] = useState('Loading...'); // Default loading text
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setShowImg(false);
-            setText('I waited for 3 seconds to be loaded, did you see the spinner?');
-        }, 3000);
+            setText('Please wait...'); // Set text to display after the image
+        }, 1000); // Change the timeout to a reasonable duration (1 second)
 
         return () => clearTimeout(timer);
     }, []);
 
     return (
-        <div>
+        <div className="loader-container">
             {
                 showImg ? (
-                    <img src="./sp.svg" alt="Loading spinner" />
+                    <img src={spinner} alt="Loading spinner" />
                 ) : (
                     <h3>{text}</h3>
                 )
