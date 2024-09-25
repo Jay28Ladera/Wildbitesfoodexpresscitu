@@ -13,9 +13,6 @@ function ForgotPassword() {
             <header className="Header">
                 <img src={logo} className="App-logo" alt="WildBites Logo" />
 
-                    <button className="cartbtn" aria-label="View Cart">
-                        <FaShoppingCart size={20} />
-                    </button>
             </header>
 
             <hr></hr>
