@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth, db } from '../firebase/firebase';
-import { doc, getDoc, deleteDoc, collection, getDocs, addDoc } from 'firebase/firestore';
+import { auth, db, storage } from '../firebase/firebase'; // Ensure storage is imported correctly
+import { doc, getDoc, deleteDoc, collection, getDocs, addDoc, updateDoc } from 'firebase/firestore';
 import SPLoader from './spinnerloader';
 import { FaShoppingCart } from 'react-icons/fa';
 import './UserProfile.css';
-import logo from '../assets/logo.svg';
+import logo from '../assets/maindash.svg';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import Firebase Storage functions
 
 function UserProfile() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [menuItem, setMenuItem] = useState({
     name: '',
     stock: '',
@@ -18,8 +20,10 @@ function UserProfile() {
     image: null,
   });
   const [menuItems, setMenuItems] = useState([]);
+  const [currentItemId, setCurrentItemId] = useState(null);
   const navigate = useNavigate();
 
+  // Track authentication state and fetch user data
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -42,6 +46,7 @@ function UserProfile() {
     return () => unsubscribe();
   }, [navigate]);
 
+  // Fetch menu items from Firestore
   const fetchMenuItems = async () => {
     const menuItemsRef = collection(db, 'menuItems');
     const menuItemsSnap = await getDocs(menuItemsRef);
@@ -49,14 +54,13 @@ function UserProfile() {
     setMenuItems(items);
   };
 
+  // Handle deletion of menu items
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this menu item?")) {
       try {
         const menuItemRef = doc(db, 'menuItems', id);
         await deleteDoc(menuItemRef);
         console.log("Menu item deleted successfully!");
-
-        // Refresh menu items after deletion
         fetchMenuItems();
       } catch (error) {
         console.error("Error deleting menu item: ", error);
@@ -64,6 +68,7 @@ function UserProfile() {
     }
   };
 
+  // Handle form input change
   const handleMenuItemChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'image') {
@@ -73,45 +78,96 @@ function UserProfile() {
     }
   };
 
+  // Handle new menu item submission
   const handleAddMenuSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
+    e.preventDefault();
     if (!menuItem.name || !menuItem.stock || !menuItem.price) {
       alert("Please fill in all fields.");
       return;
     }
 
     try {
-      // Handle image upload if necessary
       let imageUrl = null;
       if (menuItem.image) {
-        // Implement your image upload logic here, if needed
-        // imageUrl = await uploadImage(menuItem.image);
+        // Upload the image to Firebase Storage
+        const imageRef = ref(storage, `menuImages/${menuItem.image.name}`);
+        const uploadSnapshot = await uploadBytes(imageRef, menuItem.image);
+        imageUrl = await getDownloadURL(uploadSnapshot.ref); // Get image URL
       }
 
-      // Prepare menu item data
+      // Add new menu item data to Firestore
       const newMenuItem = {
         name: menuItem.name,
         stock: Number(menuItem.stock),
         price: Number(menuItem.price),
-        image: imageUrl // or use the URL from the upload
+        image: imageUrl,
       };
-
-      // Add new menu item to Firestore
-      const menuItemsRef = collection(db, 'menuItems');
-      await addDoc(menuItemsRef, newMenuItem);
-      console.log("Menu item added successfully!");
-
-      fetchMenuItems(); // Refresh menu items
-      setModalOpen(false); // Close the modal
-      setMenuItem({ name: '', stock: '', price: '', image: null }); // Reset form
+      await addDoc(collection(db, 'menuItems'), newMenuItem);
+      fetchMenuItems();
+      setModalOpen(false);
+      setMenuItem({ name: '', stock: '', price: '', image: null });
     } catch (error) {
       console.error("Error adding menu item: ", error);
     }
   };
 
+  // Handle editing of menu items
+  const handleEditMenuItem = (item) => {
+    setCurrentItemId(item._id);
+    setMenuItem({
+      name: item.name,
+      stock: item.stock,
+      price: item.price,
+      image: null,
+    });
+    setEditModalOpen(true);
+  };
+
+  // Handle updated menu item submission
+  const handleEditMenuSubmit = async (e) => {
+    e.preventDefault();
+    if (!menuItem.name || !menuItem.stock || !menuItem.price) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    try {
+      let imageUrl = null;
+      if (menuItem.image) {
+        // Upload the new image to Firebase Storage
+        const imageRef = ref(storage, `menuImages/${menuItem.image.name}`);
+        const uploadSnapshot = await uploadBytes(imageRef, menuItem.image);
+        imageUrl = await getDownloadURL(uploadSnapshot.ref); // Get image URL
+      }
+
+      // Update menu item data in Firestore
+      const menuItemRef = doc(db, 'menuItems', currentItemId);
+      await updateDoc(menuItemRef, {
+        name: menuItem.name,
+        stock: Number(menuItem.stock),
+        price: Number(menuItem.price),
+        image: imageUrl || null, // Use the new image URL or keep it the same
+      });
+
+      fetchMenuItems();
+      setEditModalOpen(false);
+      setMenuItem({ name: '', stock: '', price: '', image: null });
+    } catch (error) {
+      console.error("Error updating menu item: ", error);
+    }
+  };
+
+  // Open and close modal for adding menu items
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
 
+  // Open and close modal for editing menu items
+  const closeEditModal = () => {
+    setEditModalOpen(false);
+    setMenuItem({ name: '', stock: '', price: '', image: null });
+  };
+
+  // Handle navigation between different tabs
   const handleTabChange = (tab) => {
     switch(tab) {
       case "menu":
@@ -203,53 +259,81 @@ function UserProfile() {
                 name="price"
                 value={menuItem.price}
                 onChange={handleMenuItemChange}
-                placeholder="Enter price"
+                placeholder="Enter item price"
                 required
               />
 
-              <button type="submit" className="btn submit-btn">Submit</button>
+              <button type="submit" className="btn submit-btn">Add Item</button>
               <button type="button" className="btn cancel-btn" onClick={closeModal}>Cancel</button>
             </form>
           </div>
         </div>
       )}
 
-      <div className="menu-items">
-        {menuItems.length > 0 ? (
-          menuItems.map((item) => (
-            <div className="menu-item" key={item._id}>
-              <div className="menu-image-container">
-                {item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="menu-image"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "path/to/placeholder/image.jpg"; // Change to your placeholder image path
-                    }}
-                  />
-                ) : (
-                  <div className="menu-image-placeholder">No Image</div>
-                )}
-              </div>
-              <div className="menu-details">
-                <p className="menu-name">{item.name}</p>
-                <p className="menu-price">₱{item.price.toFixed(2)}</p>
-                <p className={`menu-quantity ${item.stock === 0 ? "sold-out" : ""}`}>
-                  {item.stock > 0 ? `Available: ${item.stock}` : "Sold Out"}
-                </p>
-              </div>
-              <div className="menu-actions">
-                <button onClick={() => openModal(item)} className="action-link">edit</button>
-                <button onClick={() => handleDelete(item._id)} className="action-link">delete</button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="no-results">No menu item/s added.</p>
-        )}
+      {editModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Edit Menu Item</h2>
+            <form onSubmit={handleEditMenuSubmit}>
+              <label htmlFor="menuImage">Upload New Image (optional)</label>
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleMenuItemChange}
+              />
+              
+              <label htmlFor="menuName">Item Name</label>
+              <input
+                type="text"
+                name="name"
+                value={menuItem.name}
+                onChange={handleMenuItemChange}
+                placeholder="Enter item name"
+                required
+              />
+
+              <label htmlFor="menuStock">Maximum Stock</label>
+              <input
+                type="number"
+                name="stock"
+                value={menuItem.stock}
+                onChange={handleMenuItemChange}
+                placeholder="Enter maximum stock"
+                required
+              />
+
+              <label htmlFor="menuPrice">Price</label>
+              <input
+                type="number"
+                name="price"
+                value={menuItem.price}
+                onChange={handleMenuItemChange}
+                placeholder="Enter item price"
+                required
+              />
+
+              <button type="submit" className="btn submit-btn">Update Item</button>
+              <button type="button" className="btn cancel-btn" onClick={closeEditModal}>Cancel</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+<div className="menu-items">
+  {menuItems.map(item => (
+    <div key={item._id} className="menu-item">
+      <img src={item.image || 'placeholder.png'} alt={item.name} className="menu-item-image" />
+      <h3>{item.name}</h3>
+      <p className="stock">Stock: {item.stock}</p>
+      <p className="price">Price: ${item.price.toFixed(2)}</p>
+      <div className="button-container">
+        <button className="btn edit-button" onClick={() => handleEditMenuItem(item)}>Edit</button>
+        <button className="btn delete-button" onClick={() => handleDelete(item._id)}>Delete</button>
       </div>
+    </div>
+  ))}
+</div>
     </div>
   );
 }

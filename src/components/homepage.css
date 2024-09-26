@@ -11,7 +11,7 @@
 
 
 .App-logo {
-  height: 100px;
+  height: 50px;
 }
 
 
@@ -43,7 +43,9 @@ body, html, #root, .App {
 
 .navbar-logo img {
   height: 50px;
-  margin-right: 10px;
+  margin-left: 50px;
+  margin-top: 10px;
+  margin-bottom: 0px;
 }
 
 .navbar-actions {
