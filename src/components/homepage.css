@@ -11,7 +11,7 @@
 
 
 .App-logo {
-  height: 50px;
+  height: 100px;
 }
 
 
@@ -52,6 +52,7 @@ body, html, #root, .App {
   gap: 15px;
   margin-right: 50px;
 }
+
 
 .btn {
   padding: 8px 16px;
@@ -174,6 +175,7 @@ body, html, #root, .App {
   cursor: pointer;
   transition: background-color 0.3s;
 }
+
 
 .order-btn:hover {
   background-color: #E5533D;

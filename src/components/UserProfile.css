@@ -1,20 +1,340 @@
-.menu-container {
-    display: flex;
-    justify-content: center; /* Center the buttons */
-    margin: 1rem 0; /* Space above and below menu */
+/* UserProfile.css */
+
+/* Navigation and header styling */
+body {
+    font-family: 'Inter', sans-serif; /* Set Inter as the default font */
 }
 
-.menu-btn {
-    margin: 0 0.5rem; /* Space between menu buttons */
-    padding: 0.5rem 1rem; /* Button padding */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5em 1em;
+    border-bottom: 2px solid rgb(139, 139, 139);
+    position: relative;
+    background-color: white;
+  }
+  .navbar-buttons {
+    display: flex;
+    justify-content: flex-start; /* Aligns buttons to the left */
+    gap: 0px; /* Space between buttons */
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    color: #990000; /* Color for the links */
+    font-weight: bold;
+    padding: 10px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .nav-link:hover {
+    font-weight: bold;
+    color: #fff; /* White on hover */
+    background-color: #990000; /* Maroon on hover */
+    border-radius: 4px; /* Rounded corners */
+  }
+  
+  
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .btn {
+    margin-left: 10px;
+    padding: 8px 16px;
+    background-color: #f04;
+    color: white;
     border: none;
     border-radius: 5px;
-    background-color: #2ecc71; /* Green color for menu buttons */
-    color: white;
     cursor: pointer;
-    transition: background-color 0.3s;
+  }
+  /* Add to your existing UserProfile.css */
+.navbar-buttons {
+    display: flex;
+    justify-content: left; /* Center the buttons */
+    margin-top: 10px; /* Add some spacing from the logo */
+  }
+  .App-logo {
+    
+    align-items: center; /* Keep this to maintain the vertical alignment */
+    margin-left: -20PX; /* Push the logo to the left */
+    margin-bottom: 10PX;
 }
 
-.menu-btn:hover {
-    background-color: #27ae60; /* Darker green on hover */
+.navbar-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items vertically */
+    margin-right: auto; /* Pushes the logo to the left */}
+  
+  .nav-link {
+    margin: 0 10px; /* Space out the buttons */
+    padding: 10px 15px;
+    background-color: #f0f0f0; /* Example background color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .nav-link:hover {
+    background-color: #e0e0e0; /* Change on hover */
+  }
+  
+  
+  .btn:hover {
+    background-color: #c00;
+  }
+  
+  /* Profile picture and name styling */
+  .user-profile {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+  }
+  
+  .profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .menu-items {
+    margin-top: 60px; /* Reduced margin for mobile */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Smaller columns for mobile */
+    gap: 20px; /* Slight gap */
+    width: 100%; /* Full width */
+    padding: 10px; /* Reduced padding */
 }
+
+.menu-item {
+    display: flex;
+    flex-direction: column; /* Stack items */
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px; /* Reduced padding */
+    margin: 5px 0; /* Reduced margin */
+    width: 90%; /* Wider on mobile */
+    max-width: 300px; /* Max width for larger screens */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+  
+  .menu-image-container {
+    width: 100%; /* Full width for image container */
+    display: flex; /* Flexbox for centering the image */
+    justify-content: center; /* Center image horizontally */
+     flex-direction: column
+  }
+  
+  .menu-image {
+    max-width: 100%; /* Responsive image */
+    max-height: 150px; /* Set a max height */
+    object-fit: cover; /* Cover the image while maintaining aspect ratio */
+    border-radius: 5px; /* Rounded corners for the image */
+  }
+  
+  .menu-details {
+    text-align: center; /* Center the text details */
+  }
+  
+  .menu-name {
+    font-size: 18px; /* Font size for item name */
+    font-weight: bold; /* Bold font */
+  }
+  
+  .menu-price {
+    font-size: 16px; /* Font size for price */
+    color: #28a745; /* Green color for price */
+  }
+  
+  .menu-quantity {
+    font-size: 14px; /* Font size for stock/quantity */
+  }
+  
+  .sold-out {
+    color: red; /* Red color for sold out items */
+  }
+  
+  .menu-actions {
+    display: flex; /* Flexbox for action buttons */
+    justify-content: space-between; /* Space buttons evenly */
+    margin-top: 10px; /* Space above action buttons */
+  }
+  
+  .action-link {
+    cursor: pointer;
+    color: #007bff; /* Blue color for action links */
+    text-decoration: underline; /* Underline for links */
+  }
+  
+  .no-results {
+    text-align: center; /* Center align no results message */
+    font-size: 18px; /* Font size for message */
+    margin: 20px 0; /* Margin above and below message */
+  }
+  
+  
+  /* Add New Menu button */
+  .add-menu-button {
+    position: absolute;
+    top: 150px; /* Adjusted to ensure it appears below the header */
+    left: 20px;
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 2; /* Ensure the button is on top */
+  }
+  
+  /* Modal styling */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    flex-direction: column;
+    align-items: center;
+  }
+  /* Modal Overlay */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center; /* Center the modal */
+    align-items: center; /* Center the modal vertically */
+    z-index: 1000; /* Ensure it sits above other content */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fff; /* White background for modal */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; /* Padding inside the modal */
+    width: 400px; /* Fixed width for the modal */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+}
+
+/* Modal Title */
+/* UserProfile.css */
+
+/* Add this to your existing modal content styles */
+.modal-content {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center;    /* Center align items horizontally */
+}
+
+/* Button Styles */
+button[type="button"]:first-of-type {
+    background-color: rgba(163, 19, 19, 1);
+    color: white; /* White text */
+    margin-bottom: 5px; /* Use lowercase 'px' */
+    width: 100px; /* Use lowercase 'px' */
+}
+
+button[type="button"]:last-of-type {
+    background-color: rgba(163, 19, 19, 1); /* Red background for cancel */
+    color: white; /* White text */
+    width: 100px; /* Use lowercase 'px' */
+}
+
+/* Center buttons within a flex container */
+.button-container {
+    display: flex;
+    justify-content: center; /* Center buttons horizontally */
+    gap: 10px; /* Optional: space between buttons */
+}
+
+
+/* Form Elements */
+form {
+    display: flex;
+    flex-direction: column; /* Stack the inputs vertically */
+}
+
+label {
+    margin-bottom: 5px; /* Spacing below each label */
+    font-weight: bold; /* Make labels bold */
+}
+
+input[type="file"],
+input[type="text"],
+input[type="number"] {
+    font-family: 'Inter', sans-serif;
+    padding: 10px; /* Padding inside input fields */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 4px; /* Rounded corners */
+    margin-bottom: 15px; /* Space between inputs */
+}
+
+/* Buttons */
+button {
+    padding: 10px; /* Padding for buttons */
+    border: none; /* Remove default border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Transition for hover effect */
+    font-family: 'Inter', sans-serif;
+    font-weight: 500; /* Medium weight */
+}
+
+/* Submit Button */
+button[type="button"]:first-of-type {
+    background-color: rgba(163, 19, 19, 1);
+    color: white; /* White text */
+    margin-bottom: 5PX;
+    width: 100PX;
+    
+}
+
+/* Cancel Button */
+button[type="button"]:last-of-type {
+    background-color: rgba(163, 19, 19, 1); /* Red background for cancel */
+    color: white; /* White text */
+    width: 100px;
+    
+    ;
+}
+
+/* Button Hover Effects */
+button:hover {
+    opacity: 0.9; /* Slightly dim buttons on hover */
+}
+/* UserProfile.css */
+
+.App {
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  
+  
+  
+  
+ 

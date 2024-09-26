@@ -10,7 +10,7 @@ export default function SPLoader() {
         const timer = setTimeout(() => {
             setShowImg(false);
             setText('Please wait...'); // Set text to display after the image
-        }, 1000); // Change the timeout to a reasonable duration (1 second)
+        }, 3000); // Change the timeout to a reasonable duration (1 second)
 
         return () => clearTimeout(timer);
     }, []);

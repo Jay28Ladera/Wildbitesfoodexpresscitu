@@ -43,7 +43,7 @@ function ForgotPassword() {
             transition={{ duration: 0.5 }}
         >
             <header className="Header">
-                <a href="/"><img src={logo} className="App-logo" alt="WildBites Logo" /> </a>
+                <a href="/"><img src={logo} className="homelogo" alt="WildBites Logo" /> </a>
 
             </header>
 
