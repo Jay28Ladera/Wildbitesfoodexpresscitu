@@ -43,8 +43,7 @@ function ForgotPassword() {
             transition={{ duration: 0.5 }}
         >
             <header className="Header">
-                <a href="/"><img src={logo} className="homelogo" alt="WildBites Logo" /> </a>
-
+                <a href="/"><img src={logo} className="homelogo" alt="WildBites Logo" /></a>
             </header>
 
             <hr />
@@ -56,7 +55,7 @@ function ForgotPassword() {
                     <p className="p1">Enter your email address, and we'll send you a link to reset your password.</p>
                     <p className="p2">Please check your inbox for further instructions.</p>
                     <form onSubmit={handleForgotPassword}>
-                    <input
+                        <input
                             type="email"
                             placeholder="Enter Email"
                             className="email-input"
@@ -64,7 +63,6 @@ function ForgotPassword() {
                             onChange={(e) => setEmail(e.target.value)} // Update email state
                             required
                         />
-                        <br />
                         <button type="submit" className="continue-btn">Continue</button>
                         <a href="/login">Back to Login</a>
                     </form>
