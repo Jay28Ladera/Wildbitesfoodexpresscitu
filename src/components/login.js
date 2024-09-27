@@ -34,7 +34,7 @@ function Login() {
       
       // Check if the email is the admin email
       if (user.email === "admin@admin.com") {
-        navigate("/profile");
+        navigate("/admin");
       } else {
         navigate("/onlineclient");
       }
@@ -81,7 +81,7 @@ function Login() {
   
       // Check if the email is the admin email
       if (user.email === "admin@admin.com") {
-        navigate("/profile");
+        navigate("/admin");
       } else {
         navigate("/onlineclient");
       }

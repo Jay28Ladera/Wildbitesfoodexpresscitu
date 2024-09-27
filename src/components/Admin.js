@@ -4,11 +4,11 @@ import { auth, db, storage } from '../firebase/firebase'; // Ensure storage is i
 import { doc, getDoc, deleteDoc, collection, getDocs, addDoc, updateDoc } from 'firebase/firestore';
 import SPLoader from './spinnerloader';
 import { FaShoppingCart } from 'react-icons/fa';
-import './UserProfile.css';
+import './Admin.css';
 import logo from '../assets/maindash.svg';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import Firebase Storage functions
 
-function UserProfile() {
+function Admin() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -340,4 +340,4 @@ function UserProfile() {
   );
 }
 
-export default UserProfile;
+export default Admin;

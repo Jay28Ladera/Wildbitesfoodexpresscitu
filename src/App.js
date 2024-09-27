@@ -4,9 +4,9 @@ import { AnimatePresence } from 'framer-motion';
 import Homepage from "./components/homepage";
 import Login from "./components/login";
 import Signup from "./components/signup";
-import UserProfile from "./components/UserProfile"; 
 import ForgotPassword from "./components/forgotpassword";
 import OnlineClient from "./components/onlineclient";
+import Admin from "./components/Admin";
 
 function App() {
   const location = useLocation(); // useLocation hook needs to be inside a Router
@@ -18,9 +18,9 @@ function App() {
         <Route path="/" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/profile" element={<UserProfile />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/onlineclient" element={<OnlineClient/>}/>
+        <Route path="/admin" element={<Admin/>}/>
       </Routes>
     </AnimatePresence>
   );
