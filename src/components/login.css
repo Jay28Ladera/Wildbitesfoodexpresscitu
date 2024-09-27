@@ -1,4 +1,13 @@
-/* Container for the entire authentication form */
+/* Main container for the entire authentication form */
+.login-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh; /* Full viewport height */
+    background-color: #f5f5f5; /* Light background for the whole page */
+}
+
+/* Authentication form container */
 .login-auth-container {
     display: flex;
     flex-direction: column;
@@ -9,9 +18,9 @@
     margin: 50px auto 0; /* margin-top: 50px and horizontally centered */
     background-color: #ffffff;
     border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Add this line for shadow */
     /* Removed the box-shadow and background-color to eliminate the border */
 }
-
 
 .login-auth-header h1 {
     font-size: 3rem;
