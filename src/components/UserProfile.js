@@ -131,33 +131,33 @@ function UserProfile() {
       alert("Please fill in all fields.");
       return;
     }
-
+  
     try {
-      let imageUrl = null;
+      let imageUrl = menuItems.find(item => item._id === currentItemId)?.image || null; // Get the existing image URL
+  
       if (menuItem.image) {
-        // Upload the new image to Firebase Storage
+        // If a new image is provided, upload the new image to Firebase Storage
         const imageRef = ref(storage, `menuImages/${menuItem.image.name}`);
         const uploadSnapshot = await uploadBytes(imageRef, menuItem.image);
-        imageUrl = await getDownloadURL(uploadSnapshot.ref); // Get image URL
+        imageUrl = await getDownloadURL(uploadSnapshot.ref); // Get the new image URL
       }
-
+  
       // Update menu item data in Firestore
       const menuItemRef = doc(db, 'menuItems', currentItemId);
       await updateDoc(menuItemRef, {
         name: menuItem.name,
         stock: Number(menuItem.stock),
         price: Number(menuItem.price),
-        image: imageUrl || null, // Use the new image URL or keep it the same
+        image: imageUrl // Use the new or existing image URL
       });
-
-      fetchMenuItems();
+  
+      fetchMenuItems(); // Refresh the menu items
       setEditModalOpen(false);
-      setMenuItem({ name: '', stock: '', price: '', image: null });
+      setMenuItem({ name: '', stock: '', price: '', image: null }); // Reset form fields
     } catch (error) {
       console.error("Error updating menu item: ", error);
     }
   };
-
   // Open and close modal for adding menu items
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
@@ -198,7 +198,7 @@ function UserProfile() {
         <div className="navbar-logo">
           <a href="/"><img src={logo} className="App-logo" alt="WildBites Logo" /></a>
           <div className="navbar-buttons" style={{ marginTop: '10px' }}>
-            <button onClick={() => handleTabChange("menu")} className="nav-link">Menu</button>
+            <button onClick={() => handleTabChange("UserProfile")} className="nav-link">Menu</button>
             <button onClick={() => handleTabChange("orders")} className="nav-link">Orders</button>
             <button onClick={() => handleTabChange("reports")} className="nav-link">Reports</button>
             <button onClick={() => handleTabChange("userRoles")} className="nav-link">User Roles</button>
@@ -217,7 +217,16 @@ function UserProfile() {
             <FaShoppingCart size={20} />
           </button>
 
-          <button className="btn logout-btn" onClick={() => auth.signOut()}>Log Out</button>
+          <button 
+  className="btn logout-btn" 
+  onClick={() => {
+    if (window.confirm("Are you sure you want to log out?")) {
+      auth.signOut();
+    }
+  }}
+>
+  Log Out
+</button>
         </div>
       </nav>
 
@@ -327,7 +336,7 @@ function UserProfile() {
       <img src={item.image || 'placeholder.png'} alt={item.name} className="menu-item-image" />
       <h3>{item.name}</h3>
       <p className="stock">Stock: {item.stock}</p>
-      <p className="price">Price: ${item.price.toFixed(2)}</p>
+      <p className="price">Price: Php {item.price.toFixed(2)}</p>
       <div className="button-container">
         <button className="btn edit-button" onClick={() => handleEditMenuItem(item)}>Edit</button>
         <button className="btn delete-button" onClick={() => handleDelete(item._id)}>Delete</button>
