@@ -30,8 +30,14 @@ function Login() {
         email,
         password
       );
-      console.log("Login successful:", userCredential);
-      navigate("/profile");
+      const user = userCredential.user;
+      
+      // Check if the email is the admin email
+      if (user.email === "admin@admin.com") {
+        navigate("/profile");
+      } else {
+        navigate("/onlineclient");
+      }
     } catch (error) {
       let errorMessage = "";
       switch (error.code) {
@@ -51,18 +57,19 @@ function Login() {
       console.error("Login error:", errorMessage);
     }
   };
+  
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-
+  
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-
+  
       // Check if the user is new and create a profile in Firestore
       const userDoc = doc(db, "users", user.uid);
       const userSnapshot = await getDoc(userDoc);
-
+  
       if (!userSnapshot.exists()) {
         await setDoc(userDoc, {
           name: user.displayName,
@@ -71,14 +78,19 @@ function Login() {
           // Add other fields as necessary
         });
       }
-
-      // Navigate to the profile page
-      navigate("/profile");
+  
+      // Check if the email is the admin email
+      if (user.email === "admin@admin.com") {
+        navigate("/profile");
+      } else {
+        navigate("/onlineclient");
+      }
     } catch (error) {
       console.error("Error during Google sign-in:", error);
       setError("Sign in with Google failed. Please try again.");
     }
   };
+  
 
   return (
     <motion.div

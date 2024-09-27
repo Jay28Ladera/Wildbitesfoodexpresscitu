@@ -6,6 +6,7 @@ import Login from "./components/login";
 import Signup from "./components/signup";
 import UserProfile from "./components/UserProfile"; 
 import ForgotPassword from "./components/forgotpassword";
+import OnlineClient from "./components/onlineclient";
 
 function App() {
   const location = useLocation(); // useLocation hook needs to be inside a Router
@@ -19,6 +20,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/onlineclient" element={<OnlineClient/>}/>
       </Routes>
     </AnimatePresence>
   );
