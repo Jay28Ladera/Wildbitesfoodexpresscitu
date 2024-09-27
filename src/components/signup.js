@@ -1,23 +1,26 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import InputMask from 'react-input-mask';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../firebase/firebase';
-import { doc, setDoc } from 'firebase/firestore';
-import signInWithGoogle from './signInWithGoogle';
-import { motion } from 'framer-motion';
-import './signup.css';
-import loghead from '../assets/loginhead.svg';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import InputMask from "react-input-mask";
+import {
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import { auth, db } from "../firebase/firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { motion } from "framer-motion";
+import "./signup.css";
+import loghead from "../assets/loginhead.svg";
 
 function Signup() {
-  const [name, setName] = useState('');
-  const [course, setCourse] = useState('');
-  const [schoolIDNumber, setSchoolIDNumber] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [course, setCourse] = useState("");
+  const [schoolIDNumber, setSchoolIDNumber] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const [schoolIDValid, setSchoolIDValid] = useState(true);
@@ -25,11 +28,11 @@ function Signup() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     const schoolIDRegex = /^\d{2}-\d{4}-\d{3}$/;
     if (!schoolIDRegex.test(schoolIDNumber)) {
-      setError('School ID Number must be in the format ##-####-###.');
+      setError("School ID Number must be in the format ##-####-###.");
       setSchoolIDValid(false);
       return;
     } else {
@@ -38,7 +41,7 @@ function Signup() {
 
     const contactNumberRegex = /^\+63\s\d{10}$/;
     if (!contactNumberRegex.test(contactNumber)) {
-      setError('Contact Number must be in the format +63 ##########.');
+      setError("Contact Number must be in the format +63 ##########.");
       setContactNumberValid(false);
       return;
     } else {
@@ -46,15 +49,19 @@ function Signup() {
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError("Passwords do not match.");
       return;
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
-      await setDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(db, "users", user.uid), {
         name,
         course,
         schoolIDNumber,
@@ -63,24 +70,53 @@ function Signup() {
         uid: user.uid,
       });
 
-      window.alert('Account created successfully!');
-      navigate('/login');
+      window.alert("Account created successfully!");
+      navigate("/login");
     } catch (error) {
-      let errorMessage = '';
+      let errorMessage = "";
       switch (error.code) {
-        case 'auth/email-already-in-use':
-          errorMessage = 'This email is already in use.';
+        case "auth/email-already-in-use":
+          errorMessage = "This email is already in use.";
           break;
-        case 'auth/invalid-email':
-          errorMessage = 'Invalid email address.';
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address.";
           break;
-        case 'auth/weak-password':
-          errorMessage = 'Password is too weak. It should be at least 6 characters.';
+        case "auth/weak-password":
+          errorMessage =
+            "Password is too weak. It should be at least 6 characters.";
           break;
         default:
-          errorMessage = 'Registration failed. Please try again.';
+          errorMessage = "Registration failed. Please try again.";
       }
       setError(errorMessage);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if the user is new and create a profile in Firestore
+      const userDoc = doc(db, "users", user.uid);
+      const userSnapshot = await getDoc(userDoc);
+
+      if (!userSnapshot.exists()) {
+        await setDoc(userDoc, {
+          name: user.displayName,
+          email: user.email,
+          uid: user.uid,
+          // Add other fields as necessary
+        });
+      }
+
+      // Navigate to the profile page
+      navigate("/profile");
+    } catch (error) {
+      console.error("Error during Google sign-in:", error);
+      setError("Sign in with Google failed. Please try again.");
     }
   };
 
@@ -136,11 +172,15 @@ function Signup() {
               <input
                 {...inputProps}
                 type="text"
-                className={!schoolIDValid ? 'signup-invalid' : ''}
+                className={!schoolIDValid ? "signup-invalid" : ""}
               />
             )}
           </InputMask>
-          {!schoolIDValid && <span className="signup-error-text">Invalid School ID Number format.</span>}
+          {!schoolIDValid && (
+            <span className="signup-error-text">
+              Invalid School ID Number format.
+            </span>
+          )}
         </div>
         <div className="signup-form-group">
           <label htmlFor="contactNumber">Contact Number:</label>
@@ -157,11 +197,15 @@ function Signup() {
               <input
                 {...inputProps}
                 type="tel"
-                className={!contactNumberValid ? 'signup-invalid' : ''}
+                className={!contactNumberValid ? "signup-invalid" : ""}
               />
             )}
           </InputMask>
-          {!contactNumberValid && <span className="signup-error-text">Invalid Contact Number format.</span>}
+          {!contactNumberValid && (
+            <span className="signup-error-text">
+              Invalid Contact Number format.
+            </span>
+          )}
         </div>
         <div className="signup-form-group">
           <label htmlFor="email">Email:</label>
@@ -206,12 +250,19 @@ function Signup() {
       <p className="signup-continue-p">-- Or continue with --</p>
 
       <button onClick={signInWithGoogle} className="signup-google-signin-btn">
-        <img src={require("../assets/google.png")} alt="Sign in with Google" width="60%" />
+        <img
+          src={require("../assets/google.png")}
+          alt="Sign in with Google"
+          width="60%"
+        />
       </button>
 
       <p className="signup-account-container">
-        Already have an account?{' '}
-        <button onClick={() => navigate('/login')} className="signup-toggle-btn">
+        Already have an account?{" "}
+        <button
+          onClick={() => navigate("/login")}
+          className="signup-toggle-btn"
+        >
           Log In
         </button>
       </p>
@@ -220,4 +271,3 @@ function Signup() {
 }
 
 export default Signup;
-
