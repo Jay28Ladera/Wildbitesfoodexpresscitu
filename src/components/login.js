@@ -53,9 +53,7 @@ function Login() {
       transition={{ duration: 0.1 }}
     >
       <header className="login-auth-header">
-        <Link to="/">
-          <img src={loghead} className="login-loghead" alt="logheader" />
-        </Link>
+          <a href="/"><img src={loghead} className="login-loghead" alt="logheader" /></a>
       </header>
 
       <form onSubmit={handleLogin} className="login-auth-form">

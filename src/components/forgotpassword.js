@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth, db } from "../firebase/firebase";
-import { collection, addDoc } from "firebase/firestore"; // Firestore imports for database operations
+import { collection, addDoc } from "firebase/firestore";
 import logo from '../assets/logo.svg';
 import logo2 from '../assets/logo.png';
 import { motion } from 'framer-motion'; 
@@ -11,6 +11,8 @@ function ForgotPassword() {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [showNotification, setShowNotification] = useState(false); // State for notification visibility
+    const [notificationType, setNotificationType] = useState(""); // Success or error type
 
     // Function to handle password reset
     const handleForgotPassword = async (e) => {
@@ -28,10 +30,23 @@ function ForgotPassword() {
 
             setMessage("Password reset email sent. Please check your inbox.");
             setError(""); // Clear error if successful
+
+            // Show success notification
+            setNotificationType("success");
+            setShowNotification(true);
         } catch (error) {
             setError(`Failed to send reset email: ${error.message}`);
             setMessage(""); // Clear message if there's an error
+
+            // Show error notification
+            setNotificationType("error");
+            setShowNotification(true);
         }
+    };
+
+    // Function to close notification
+    const closeNotification = () => {
+        setShowNotification(false);
     };
     
     return (
@@ -44,7 +59,6 @@ function ForgotPassword() {
         >
             <header className="Header">
                 <a href="/"><img src={logo} className="homelogo" alt="WildBites Logo" /> </a>
-
             </header>
 
             <hr />
@@ -56,7 +70,7 @@ function ForgotPassword() {
                     <p className="p1">Enter your email address, and we'll send you a link to reset your password.</p>
                     <p className="p2">Please check your inbox for further instructions.</p>
                     <form onSubmit={handleForgotPassword}>
-                    <input
+                        <input
                             type="email"
                             placeholder="Enter Email"
                             className="email-input"
@@ -73,6 +87,14 @@ function ForgotPassword() {
                     {error && <p className="error-message">{error}</p>}
                 </div>
             </div>
+
+            {/* Custom Notification */}
+            {showNotification && (
+                <div className={`notification ${notificationType}`}>
+                    <p>{notificationType === "success" ? "Password reset email sent successfully!" : `Failed to send reset email: ${error}`}</p>
+                    <button className="close-btn" onClick={closeNotification}>X</button>
+                </div>
+            )}
         </motion.div>
     );
 }
