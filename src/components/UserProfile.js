@@ -196,12 +196,13 @@ function UserProfile() {
     <div className="App">
       <nav className="navbar">
         <div className="navbar-logo">
-          <a href="/"><img src={logo} className="App-logo" alt="WildBites Logo" /></a>
+          <a href="/"><img src={logo} className="App-verylog" alt="WildBites Logo" /></a>
           <div className="navbar-buttons" style={{ marginTop: '10px' }}>
             <button onClick={() => handleTabChange("UserProfile")} className="nav-link">Menu</button>
             <button onClick={() => handleTabChange("orders")} className="nav-link">Orders</button>
             <button onClick={() => handleTabChange("reports")} className="nav-link">Reports</button>
             <button onClick={() => handleTabChange("userRoles")} className="nav-link">User Roles</button>
+            <button onClick={() => handleTabChange("userRoles")} className="nav-link">Staff Management</button>
           </div>
         </div>
 
@@ -217,16 +218,7 @@ function UserProfile() {
             <FaShoppingCart size={20} />
           </button>
 
-          <button 
-  className="btn logout-btn" 
-  onClick={() => {
-    if (window.confirm("Are you sure you want to log out?")) {
-      auth.signOut();
-    }
-  }}
->
-  Log Out
-</button>
+          <button className="btn logout-btn" onClick={() => auth.signOut()}>Log Out</button>
         </div>
       </nav>
 
