@@ -106,6 +106,7 @@ function UserProfile() {
       fetchMenuItems();
       setModalOpen(false);
       setMenuItem({ name: '', stock: '', price: '', image: null });
+      window.location.reload();
     } catch (error) {
       console.error("Error adding menu item: ", error);
     }
