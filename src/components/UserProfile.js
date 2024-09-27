@@ -196,7 +196,7 @@ function UserProfile() {
     <div className="App">
       <nav className="navbar">
         <div className="navbar-logo">
-          <a href="/"><img src={logo} className="App-verylog" alt="WildBites Logo" /></a>
+          <img src={logo} className="App-verylog" alt="WildBites Logo" />
           <div className="navbar-buttons" style={{ marginTop: '10px' }}>
             <button onClick={() => handleTabChange("UserProfile")} className="nav-link">Menu</button>
             <button onClick={() => handleTabChange("orders")} className="nav-link">Orders</button>

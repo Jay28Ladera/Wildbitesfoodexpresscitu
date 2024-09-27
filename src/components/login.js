@@ -90,7 +90,7 @@ function Login() {
     >
       <header className="login-auth-header">
         <Link to="/">
-          <img src={loghead} className="login-loghead" alt="logheader" />
+          <a href="/"><img src={loghead} className="login-loghead" alt="logheader" /></a>
         </Link>
       </header>
 
