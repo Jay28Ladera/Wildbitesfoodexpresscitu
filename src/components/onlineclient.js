@@ -206,10 +206,16 @@ function OnlineClient() {
         </div>
 
         <div className="navbar-actions">
-          <div className="user-profile">
-            <img src={userData?.profilePic || 'defaultPic.png'} alt="Profile" className="profile-pic" />
-            <span className="user-name">{userData?.name}</span>
-          </div>
+        <div className="user-profile">
+          {userData?.profilePic ? (
+            <img src={userData.profilePic} alt="Profile" className="profile-pic" />
+          ) : (
+            <div className="initials-circle">
+              {userData?.name ? userData.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+          )}
+          <span className="user-name">{userData?.name}</span>
+        </div>
 
           
           
