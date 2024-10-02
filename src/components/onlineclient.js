@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth, db, storage } from '../firebase/firebase'; // Ensure storage is imported correctly
+import { auth, db, storage } from '../firebase/firebase';
 import { doc, getDoc, deleteDoc, collection, getDocs, addDoc, updateDoc } from 'firebase/firestore';
 import SPLoader from './spinnerloader';
 import { FaShoppingCart } from 'react-icons/fa';
 import './onlineclient.css';
+import './Admin.css';
 import logo from '../assets/maindash.svg';
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import Firebase Storage functions
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 function OnlineClient() {
   const [userData, setUserData] = useState(null);
@@ -89,13 +90,11 @@ function OnlineClient() {
     try {
       let imageUrl = null;
       if (menuItem.image) {
-        // Upload the image to Firebase Storage
         const imageRef = ref(storage, `menuImages/${menuItem.image.name}`);
         const uploadSnapshot = await uploadBytes(imageRef, menuItem.image);
-        imageUrl = await getDownloadURL(uploadSnapshot.ref); // Get image URL
+        imageUrl = await getDownloadURL(uploadSnapshot.ref);
       }
 
-      // Add new menu item data to Firestore
       const newMenuItem = {
         name: menuItem.name,
         stock: Number(menuItem.stock),
@@ -131,44 +130,39 @@ function OnlineClient() {
       alert("Please fill in all fields.");
       return;
     }
-  
+
     try {
-      let imageUrl = menuItems.find(item => item._id === currentItemId)?.image || null; // Get the existing image URL
-  
+      let imageUrl = menuItems.find(item => item._id === currentItemId)?.image || null;
+
       if (menuItem.image) {
-        // If a new image is provided, upload the new image to Firebase Storage
         const imageRef = ref(storage, `menuImages/${menuItem.image.name}`);
         const uploadSnapshot = await uploadBytes(imageRef, menuItem.image);
-        imageUrl = await getDownloadURL(uploadSnapshot.ref); // Get the new image URL
+        imageUrl = await getDownloadURL(uploadSnapshot.ref);
       }
-  
-      // Update menu item data in Firestore
+
       const menuItemRef = doc(db, 'menuItems', currentItemId);
       await updateDoc(menuItemRef, {
         name: menuItem.name,
         stock: Number(menuItem.stock),
         price: Number(menuItem.price),
-        image: imageUrl // Use the new or existing image URL
+        image: imageUrl
       });
-  
-      fetchMenuItems(); // Refresh the menu items
+
+      fetchMenuItems();
       setEditModalOpen(false);
-      setMenuItem({ name: '', stock: '', price: '', image: null }); // Reset form fields
+      setMenuItem({ name: '', stock: '', price: '', image: null });
     } catch (error) {
       console.error("Error updating menu item: ", error);
     }
   };
-  // Open and close modal for adding menu items
+
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
-
-  // Open and close modal for editing menu items
   const closeEditModal = () => {
     setEditModalOpen(false);
     setMenuItem({ name: '', stock: '', price: '', image: null });
   };
 
-  // Handle navigation between different tabs
   const handleTabChange = (tab) => {
     switch(tab) {
       case "menu":
@@ -201,24 +195,21 @@ function OnlineClient() {
             <button onClick={() => handleTabChange("UserProfile")} className="nav-link">Food Menu</button>
             <button onClick={() => handleTabChange("orders")} className="nav-link">My Orders</button>
             <button onClick={() => handleTabChange("reports")} className="nav-link">Payment</button>
-            
           </div>
         </div>
 
         <div className="navbar-actions">
-        <div className="user-profile">
-          {userData?.profilePic ? (
-            <img src={userData.profilePic} alt="Profile" className="profile-pic" />
-          ) : (
-            <div className="initials-circle">
-              {userData?.name ? userData.name.charAt(0).toUpperCase() : 'U'}
-            </div>
-          )}
-          <span className="user-name">{userData?.name}</span>
-        </div>
+          <div className="user-profile">
+            {userData?.profilePic ? (
+              <img src={userData.profilePic} alt="Profile" className="profile-pic" />
+            ) : (
+              <div className="initials-circle">
+                {userData?.name ? userData.name.charAt(0).toUpperCase() : 'U'}
+              </div>
+            )}
+            <span className="user-name">{userData?.name}</span>
+          </div>
 
-          
-          
           <button className="btn cart-btn" aria-label="View Cart">
             <FaShoppingCart size={20} />
           </button>
@@ -227,21 +218,21 @@ function OnlineClient() {
         </div>
       </nav>
 
-  
-
-<div className="menu-items">
-  {menuItems.map(item => (
-    <div key={item._id} className="menu-item">
-      <img src={item.image || 'placeholder.png'} alt={item.name} className="menu-item-image" />
-      <h3>{item.name}</h3>
-      <p className="stock">Stock: {item.stock}</p>
-      <p className="price">Price: Php {item.price.toFixed(2)}</p>
-      <div className="button-container">
-        <button className="btn delete-button" >Add to Cart</button>
+      <div className="menu-container"> {/* Added container for menu items */}
+        <div className="menu-items">
+          {menuItems.map(item => (
+            <div key={item._id} className="menu-item">
+              <img src={item.image || 'placeholder.png'} alt={item.name} className="menu-item-image" />
+              <h3>{item.name}</h3>
+              <p className="stock">Stock: {item.stock}</p>
+              <p className="price">Price: Php {item.price.toFixed(2)}</p>
+              <div className="button-container">
+                <button className="btn delete-button">Add to Cart</button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  ))}
-</div>
     </div>
   );
 }
