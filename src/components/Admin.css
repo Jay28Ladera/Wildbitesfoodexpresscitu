@@ -119,10 +119,12 @@ body {
 
 /* Menu Items */
 .menu-items {
-  margin-left: 20px;
-  margin-top: 70px; /* Reduced margin for mobile */
+  margin-left: auto; /* Center the grid container */
+  margin-right: auto; /* Center the grid container */
+  max-width: 95%;
+  margin-top: 50px; /* Reduced margin for mobile */
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Smaller columns for mobile */
+  grid-template-columns: repeat(9, minmax(150px, 1fr)); /* Smaller columns for mobile */
   gap: 20px; /* Slight gap */
   width: 100%; /* Full width */
   height: auto;
