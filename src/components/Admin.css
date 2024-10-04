@@ -10,83 +10,80 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0.5em 1em;
-  border-bottom: 2px solid rgb(139, 139, 139);
+  box-shadow: 0 4px 8px rgba(165, 151, 151, 0.5); 
   position: relative;
   background-color: white;
+  border-radius: 20px; 
+  max-width: 100%;
+  
 }
 
 .navbar-buttons {
-  display: flex;
+  
   justify-content: flex-start; /* Aligns buttons to the left */
-  gap: 0px; /* Space between buttons */
+  
+  margin-left: -200px;
+  margin-bottom: 20px;
+  
 }
 
-.nav-link {
-  text-decoration: none;
-  color: #990000; /* Color for the links */
-  font-weight: bold;
-  padding: 10px;
-  transition: background-color 0.3s, color 0.3s;
-}
 
 .nav-link:hover {
   font-weight: bold;
-  color: #fff; /* White on hover */
+  color: #ffffff; /* White on hover */
   background-color: #990000; /* Maroon on hover */
-  border-radius: 4px; /* Rounded corners */
+  border-radius: 10px; /* Rounded corners */
+}
+.logout-btn {
+  white-space: nowrap; /* Prevent text wrapping */
+  position: relative;
+ max-width: 300px;
+  font-size: 16px; /* Font size */
+  border: none; /* Remove default border */
+  border-radius: 10px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s, transform 0.3s; 
+  background-color:rgba(163, 19, 19, 1);/* Red background color */
+  color: white; /* White text color */
 }
 
-.navbar-actions {
-  display: flex;
-  align-items: center;
+/* Hover effect */
+.logout-btn:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+  transform: scale(1.05); /* Slightly enlarge button on hover */
 }
 
-.btn {
-  margin-left: 10px;
-  padding: 8px 16px;
-  background-color: rgba(163, 19, 19, 1);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* Add to your existing UserProfile.css */
-.navbar-buttons {
-  display: flex;
-  justify-content: left; /* Center the buttons */
-  margin-top: 10px; /* Add some spacing from the logo */
-}
-
-.App-logo {
-  align-items: center; /* Keep this to maintain the vertical alignment */
-  margin-left: -50px; /* Push the logo to the left */
-  margin-bottom: 10px;
+/* Active effect */
+.logout-btn:active {
+  transform: scale(0.95); /* Slightly shrink button on click */
 }
 
 .App-verylog{
-  height: 10000px;
-  max-width: 10000px;
+  margin-right: 35%;
+  
+  
 }
 .navbar-logo {
   display: flex;
   flex-direction: column;
   align-items: center; /* Center items vertically */
-  margin-right: auto; /* Pushes the logo to the left */
+ 
+}
+.navbar-buttons {
+  display: flex;
+  gap: 10px; /* Adjust the gap between buttons as needed */
 }
 
 .nav-link {
-  margin: 0 10px; /* Space out the buttons */
   padding: 10px 15px;
-  background-color: #f0f0f0; /* Example background color */
+  border-radius: 10px; 
+  background-color: rgba(163, 19, 19, 1); /* Optional: for button styling */
   border: none;
-  border-radius: 5px;
   cursor: pointer;
+  color: #ffffff;
+  
 }
 
-.nav-link:hover {
-  background-color: #e0e0e0; /* Change on hover */
-}
 
 .btn:hover {
   background-color: rgba(163, 19, 19, 1);
@@ -122,7 +119,7 @@ body {
   margin-left: auto; /* Center the grid container */
   margin-right: auto; /* Center the grid container */
   max-width: 95%;
-  margin-top: 50px; /* Reduced margin for mobile */
+  margin-top: 70px; /* Reduced margin for mobile */
   display: grid;
   grid-template-columns: repeat(9, minmax(150px, 1fr)); /* Smaller columns for mobile */
   gap: 20px; /* Slight gap */
@@ -147,7 +144,7 @@ body {
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 10px; /* Reduced padding */
-  margin: 5px 0; /* Reduced margin */
+  margin: 15px 0; /* Reduced margin */
   width: 90%; /* Wider on mobile */
   max-width: 500px; /* Max width for larger screens */
   max-height: 300px;
@@ -166,17 +163,7 @@ body {
     color: #666; /* Lighter color for stock and price text */
   }
   
-  .btn {
-    display: inline-block; /* Inline block for buttons */
-    padding: 10px 15px; /* Padding for buttons */
-    margin: 5px 0; /* Margin for spacing */
-    border: none; /* Remove default border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 0.9em; /* Font size for buttons */
-    transition: background-color 0.2s; /* Smooth background color change */
-  }
-
+  
   .menu-item {
     display: flex; /* Use flexbox for layout */
     flex-direction: column; /* Arrange items in a column */
@@ -304,12 +291,13 @@ body {
 /* Add New Menu button */
 .add-menu-button {
   position: absolute;
-  top: 150px; /* Adjusted to ensure it appears below the header */
-  left: 20px;
+  margin-top: 300px;
+ 
+  left: 50px;
   background-color:rgba(163, 19, 19, 1);
   color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
+  
+  border-radius: 10px;
   cursor: pointer;
   z-index: 2; /* Ensure the button is on top */
 }
@@ -381,14 +369,6 @@ input[type="number"]:focus {
   outline: none; /* Remove outline */
 }
 
-.btn {
-  display: inline-block; /* Inline buttons */
-  padding: 10px 15px; /* Padding for buttons */
-  border: none; /* Remove default border */
-  border-radius: 4px; /* Rounded corners */
-  cursor: pointer; /* Pointer on hover */
-  transition: background-color 0.3s; /* Smooth background transition */
-}
 
 .submit-btn {
   background-color:rgba(242, 181, 76, 1); /* Primary button color */

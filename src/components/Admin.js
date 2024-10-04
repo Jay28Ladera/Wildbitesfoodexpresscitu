@@ -195,9 +195,11 @@ function Admin() {
   return (
     <div className="App">
       <nav className="navbar">
+      
         <div className="navbar-logo">
-          <img src={logo} className="App-verylog" alt="WildBites Logo" />
-          <div className="navbar-buttons" style={{ marginTop: '10px' }}>
+          <img src={logo} className="App-verylog" alt="WildBites Logo" 
+          style={{ width: '650px', height: 'auto', marginRight: '7%' }}/>
+          <div className="navbar-buttons" style={{ marginTop: '20px',marginRight: '-60px' }}>
             <button onClick={() => handleTabChange("UserProfile")} className="nav-link">Menu</button>
             <button onClick={() => handleTabChange("orders")} className="nav-link">Orders</button>
             <button onClick={() => handleTabChange("reports")} className="nav-link">Reports</button>
