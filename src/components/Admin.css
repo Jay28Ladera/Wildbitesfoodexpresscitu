@@ -40,7 +40,7 @@ body {
  max-width: 300px;
   font-size: 16px; /* Font size */
   border: none; /* Remove default border */
-  border-radius: 10px; /* Rounded corners */
+  border-radius: 20px; /* Rounded corners */
   cursor: pointer; /* Pointer cursor on hover */
   transition: background-color 0.3s, transform 0.3s; 
   background-color:rgba(163, 19, 19, 1);/* Red background color */
@@ -174,9 +174,6 @@ body {
     display: flex; /* Flexbox for button layout */
     justify-content: space-between; /* Space out buttons evenly */
     width: 100%; /* Full width of the parent */
-  }
-  
-  .btn {
     flex: 1; /* Allow buttons to grow equally */
     padding: 10px 15px; /* Padding for buttons */
     margin: 5px; /* Margin for spacing */
@@ -188,15 +185,33 @@ body {
     text-align: center; /* Center text inside buttons */
   }
   
+  
+  
   /* Optional: Specific styles for each button type */
   .edit-button {
-    background-color: #ff6600; /* Blue for edit button */
-    color: white; /* White text */
+    flex: 1; /* Allow buttons to grow equally */
+    padding: 10px 15px; /* Padding for buttons */
+    margin: 5px; /* Margin for spacing */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 0.9em; /* Font size for buttons */
+    transition: background-color 0.2s; /* Smooth background color change */
+    text-align: center; /* Center text inside buttons */
   }
   
   .delete-button {
     background-color: #dc3545; /* Red for delete button */
     color: white; /* White text */
+    flex: 1; /* Allow buttons to grow equally */
+    padding: 10px 15px; /* Padding for buttons */
+    margin: 5px; /* Margin for spacing */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 0.9em; /* Font size for buttons */
+    transition: background-color 0.2s; /* Smooth background color change */
+    text-align: center; /* Center text inside buttons */
   }
   
   /* Hover effects */
