@@ -227,7 +227,7 @@ function OnlineClient() {
               <p className="stock">Stock: {item.stock}</p>
               <p className="price">Price: Php {item.price.toFixed(2)}</p>
               <div className="client-button-container">
-                <button className="btn add-button">Add to Cart</button>
+                <button className="client-btn add-button">Add to Cart</button>
               </div>
             </div>
           ))}
@@ -241,7 +241,7 @@ function OnlineClient() {
             {/* Add other items here */}
           </ul>
           <p>Total: Php 200.00</p>
-          <button className="btn checkout-btn">Checkout</button>
+          <button className="client-btn checkout-btn">Checkout</button>
         </div>
       </div>
     </div>
