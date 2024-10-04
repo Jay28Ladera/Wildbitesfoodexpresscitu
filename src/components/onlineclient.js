@@ -218,19 +218,30 @@ function OnlineClient() {
         </div>
       </nav>
 
-      <div className="menu-container"> {/* Added container for menu items */}
-        <div className="menu-items">
+      <div className="client-menu-container"> {/* Added container for menu items */}
+        <div className="client-menu-items ">
           {menuItems.map(item => (
-            <div key={item._id} className="menu-item">
-              <img src={item.image || 'placeholder.png'} alt={item.name} className="menu-item-image" />
+            <div key={item._id} className="client-menu-item">
+              <img src={item.image || 'placeholder.png'} alt={item.name} className="client-menu-item-image" />
               <h3>{item.name}</h3>
               <p className="stock">Stock: {item.stock}</p>
               <p className="price">Price: Php {item.price.toFixed(2)}</p>
-              <div className="button-container">
-                <button className="btn delete-button">Add to Cart</button>
+              <div className="client-button-container">
+                <button className="btn add-button">Add to Cart</button>
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="cart-summary"> {/* New section for the cart */}
+          <h2>Cart Summary</h2>
+          <ul>
+            {/* Dynamically render cart items */}
+            <li>Item 1 - Quantity: 2 - Price: Php 100.00</li>
+            {/* Add other items here */}
+          </ul>
+          <p>Total: Php 200.00</p>
+          <button className="btn checkout-btn">Checkout</button>
         </div>
       </div>
     </div>
