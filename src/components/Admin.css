@@ -2,7 +2,7 @@
 
 /* Navigation and header styling */
 body {
-  font-family: 'Inter', sans-serif; /* Set Inter as the default font */
+  font-family: "Inter", sans-serif; /* Set Inter as the default font */
 }
 
 .navbar {
@@ -10,23 +10,19 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0.5em 1em;
-  box-shadow: 0 4px 8px rgba(165, 151, 151, 0.5); 
+  box-shadow: 0 4px 8px rgba(165, 151, 151, 0.5);
   position: relative;
   background-color: white;
-  border-radius: 20px; 
+  border-radius: 20px;
   max-width: 100%;
-  
 }
 
 .navbar-buttons {
-  
   justify-content: flex-start; /* Aligns buttons to the left */
-  
+
   margin-left: -200px;
   margin-bottom: 20px;
-  
 }
-
 
 .nav-link:hover {
   font-weight: bold;
@@ -37,13 +33,13 @@ body {
 .logout-btn {
   white-space: nowrap; /* Prevent text wrapping */
   position: relative;
- max-width: 300px;
+  max-width: 300px;
   font-size: 16px; /* Font size */
   border: none; /* Remove default border */
   border-radius: 20px; /* Rounded corners */
   cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s, transform 0.3s; 
-  background-color:rgba(163, 19, 19, 1);/* Red background color */
+  transition: background-color 0.3s, transform 0.3s;
+  background-color: rgba(163, 19, 19, 1); /* Red background color */
   color: white; /* White text color */
 }
 
@@ -58,16 +54,13 @@ body {
   transform: scale(0.95); /* Slightly shrink button on click */
 }
 
-.App-verylog{
+.App-verylog {
   margin-right: 35%;
-  
-  
 }
 .navbar-logo {
   display: flex;
   flex-direction: column;
   align-items: center; /* Center items vertically */
- 
 }
 .navbar-buttons {
   display: flex;
@@ -76,17 +69,72 @@ body {
 
 .nav-link {
   padding: 10px 15px;
-  border-radius: 10px; 
+  border-radius: 10px;
   background-color: rgba(163, 19, 19, 1); /* Optional: for button styling */
   border: none;
   cursor: pointer;
   color: #ffffff;
-  
 }
-
 
 .btn:hover {
   background-color: rgba(163, 19, 19, 1);
+}
+
+.admin-option {
+  position: relative;
+  top: 55px;
+  left: 40px;
+  font-family: "Inter", sans-serif;
+  font-size: 25px;
+}
+
+.hamburger-icon {
+  position: relative;
+  top: 55px;
+  left: 30px;
+}
+
+.hamburger-menu {
+  position: absolute;
+  top: 88%; /* Position the dropdown below the hamburger icon */
+  right: 30px; /* Ensure this value has a unit */
+  transform: translateX(-48px); /* Move the dropdown 75px to the left */
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.dropdown-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-item {
+  margin: 5px 0;
+}
+
+.dropdown-item .btn {
+  width: 100%;
+  font-family: "Inter", sans-serif;
+  text-align: right;
+  padding: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.dropdown-item .btn:hover {
+  background-color: #f0f0f0;
+}
+
+.logout-btn {
+  color: red;
 }
 
 /* Profile picture and name styling */
@@ -97,7 +145,8 @@ body {
   margin-left: 20px;
 }
 
-.profile-pic, .initials-circle {
+.profile-pic,
+.initials-circle {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -121,7 +170,10 @@ body {
   max-width: 95%;
   margin-top: 70px; /* Reduced margin for mobile */
   display: grid;
-  grid-template-columns: repeat(9, minmax(150px, 1fr)); /* Smaller columns for mobile */
+  grid-template-columns: repeat(
+    9,
+    minmax(150px, 1fr)
+  ); /* Smaller columns for mobile */
   gap: 20px; /* Slight gap */
   width: 100%; /* Full width */
   height: auto;
@@ -134,7 +186,7 @@ body {
   max-height: 150px; /* Set a maximum height for the image */
   height: 150px; /* Set a fixed height to ensure cropping */
   object-fit: cover; /* Crop the image to fit while maintaining aspect ratio */
-  border-radius: 5px;/* Optional: Add border radius for rounded corners */
+  border-radius: 5px; /* Optional: Add border radius for rounded corners */
 }
 
 .menu-item {
@@ -155,87 +207,85 @@ body {
   font-size: 1em; /* Larger font for item name */
   margin: 10px 0; /* Margin for spacing */
   text-align: center;
-  color: #333; /* Darker color for text */}
+  color: #333; /* Darker color for text */
+}
 
-  .menu-item p {
-    font-size: .8em; /* Standard font size for stock and price */
-    margin: 5px 0; /* Margin for spacing */
-    color: #666; /* Lighter color for stock and price text */
-  }
-  
-  
-  .menu-item {
-    display: flex; /* Use flexbox for layout */
-    flex-direction: column; /* Arrange items in a column */
-    align-items: center; /* Center align all items */
-  }
-  
-  .button-container {
-    display: flex; /* Flexbox for button layout */
-    justify-content: space-between; /* Space out buttons evenly */
-    width: 100%; /* Full width of the parent */
-    flex: 1; /* Allow buttons to grow equally */
-    padding: 10px 15px; /* Padding for buttons */
-    margin: 5px; /* Margin for spacing */
-    border: none; /* Remove default border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 0.9em; /* Font size for buttons */
-    transition: background-color 0.2s; /* Smooth background color change */
-    text-align: center; /* Center text inside buttons */
-  }
-  
-  
-  
-  /* Optional: Specific styles for each button type */
-  .edit-button {
-    flex: 1; /* Allow buttons to grow equally */
-    padding: 10px 15px; /* Padding for buttons */
-    margin: 5px; /* Margin for spacing */
-    border: none; /* Remove default border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 0.9em; /* Font size for buttons */
-    transition: background-color 0.2s; /* Smooth background color change */
-    text-align: center; /* Center text inside buttons */
-  }
-  
-  .delete-button {
-    background-color: #dc3545; /* Red for delete button */
-    color: white; /* White text */
-    flex: 1; /* Allow buttons to grow equally */
-    padding: 10px 15px; /* Padding for buttons */
-    margin: 5px; /* Margin for spacing */
-    border: none; /* Remove default border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 0.9em; /* Font size for buttons */
-    transition: background-color 0.2s; /* Smooth background color change */
-    text-align: center; /* Center text inside buttons */
-  }
-  
-  /* Hover effects */
-  .btn:hover {
-    opacity: 0.9; /* Slightly transparent on hover */
-  }
-  
-  .edit-button {
-    background-color: rgba(242, 181, 76, 1); /* Blue background for edit button */
-    color: #fff; /* White text color */
-  }
-  
-  .edit-button:hover {
-    background-color: rgb(255, 204, 115); /* Darker blue on hover */
-  }
-  
-  .delete-button {
-    background-color: rgba(163, 19, 19, 1); /* Red background for delete button */
-    color: #fff; /* White text color */
-  }
-  
-  .delete-button:hover {
-    background-color: rgb(161, 31, 31); /* Darker red on hover */
-  }
+.menu-item p {
+  font-size: 0.8em; /* Standard font size for stock and price */
+  margin: 5px 0; /* Margin for spacing */
+  color: #666; /* Lighter color for stock and price text */
+}
+
+.menu-item {
+  display: flex; /* Use flexbox for layout */
+  flex-direction: column; /* Arrange items in a column */
+  align-items: center; /* Center align all items */
+}
+
+.button-container {
+  display: flex; /* Flexbox for button layout */
+  justify-content: space-between; /* Space out buttons evenly */
+  width: 100%; /* Full width of the parent */
+  flex: 1; /* Allow buttons to grow equally */
+  padding: 10px 15px; /* Padding for buttons */
+  margin: 5px; /* Margin for spacing */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 0.9em; /* Font size for buttons */
+  transition: background-color 0.2s; /* Smooth background color change */
+  text-align: center; /* Center text inside buttons */
+}
+
+/* Optional: Specific styles for each button type */
+.edit-button {
+  flex: 1; /* Allow buttons to grow equally */
+  padding: 10px 15px; /* Padding for buttons */
+  margin: 5px; /* Margin for spacing */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 0.9em; /* Font size for buttons */
+  transition: background-color 0.2s; /* Smooth background color change */
+  text-align: center; /* Center text inside buttons */
+}
+
+.delete-button {
+  background-color: #dc3545; /* Red for delete button */
+  color: white; /* White text */
+  flex: 1; /* Allow buttons to grow equally */
+  padding: 10px 15px; /* Padding for buttons */
+  margin: 5px; /* Margin for spacing */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 0.9em; /* Font size for buttons */
+  transition: background-color 0.2s; /* Smooth background color change */
+  text-align: center; /* Center text inside buttons */
+}
+
+/* Hover effects */
+.btn:hover {
+  opacity: 0.9; /* Slightly transparent on hover */
+}
+
+.edit-button {
+  background-color: rgba(242, 181, 76, 1); /* Blue background for edit button */
+  color: #fff; /* White text color */
+}
+
+.edit-button:hover {
+  background-color: rgb(255, 204, 115); /* Darker blue on hover */
+}
+
+.delete-button {
+  background-color: rgba(163, 19, 19, 1); /* Red background for delete button */
+  color: #fff; /* White text color */
+}
+
+.delete-button:hover {
+  background-color: rgb(161, 31, 31); /* Darker red on hover */
+}
 
 .menu-image-container {
   width: 100%; /* Full width for image container */
@@ -262,7 +312,6 @@ body {
 .menu-name {
   font-size: 18px; /* Font size for item name */
   font-weight: bold; /* Bold font */
-  
 }
 
 .menu-price {
@@ -307,11 +356,11 @@ body {
 .add-menu-button {
   position: absolute;
   margin-top: 300px;
- 
+
   left: 50px;
-  background-color:rgba(163, 19, 19, 1);
+  background-color: rgba(163, 19, 19, 1);
   color: white;
-  
+
   border-radius: 10px;
   cursor: pointer;
   z-index: 2; /* Ensure the button is on top */
@@ -343,13 +392,23 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateY(-30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 .modal-content h2 {
   margin-top: 0; /* Remove margin on top */
@@ -384,14 +443,13 @@ input[type="number"]:focus {
   outline: none; /* Remove outline */
 }
 
-
 .submit-btn {
-  background-color:rgba(242, 181, 76, 1); /* Primary button color */
+  background-color: rgba(242, 181, 76, 1); /* Primary button color */
   color: white; /* Text color */
 }
 
 .submit-btn:hover {
-  background-color:rgb(237, 184, 92); /* Darker shade on hover */
+  background-color: rgb(237, 184, 92); /* Darker shade on hover */
 }
 
 .cancel-btn {
@@ -401,5 +459,138 @@ input[type="number"]:focus {
 }
 
 .cancel-btn:hover {
-  background-color:rgba(163, 19, 19, 1); /* Darker shade on hover */
+  background-color: rgba(163, 19, 19, 1); /* Darker shade on hover */
+}
+
+/*Payment Details CSS*/
+.payment-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.payment-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 500px; /* Maximum width for modal */
+  position: relative; /* To position the close button */
+  margin: 0 auto;
+}
+
+.payment-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1001;
+  background: transparent;
+  border: none;
+}
+
+.payment-close:hover {
+  color: red;
+}
+
+/* Uploaded Image Container */
+.payment-uploaded-image-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px; /* Space below the image */
+}
+
+/* Uploaded Image */
+.payment-uploaded-image {
+  width: 100%;
+  max-width: 225px; /* Set max-width for the image */
+  object-fit: contain;
+  border: 2px solid #000; /* Border matches the image dimensions */
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.payment-remove-button {
+  margin-top: 10px; /* Space above the remove button */
+}
+
+.payment-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* Darker background */
+  z-index: 1001;
+}
+
+.payment-image-content {
+  position: relative;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.payment-large-image {
+  width: 100%;
+  max-width: 800px;
+  max-height: 80vh;
+  object-fit: contain;
+  border: 2px solid #000; /* Border matches image size */
+  border-radius: 8px;
+}
+
+.payment-button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 20px; /* Space above buttons */
+}
+
+.payment-submit-btn,
+.payment-cancel-btn {
+  background-color: rgba(163, 19, 19, 1); /* Red background color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s;
+  text-align: center;
+  margin-left: 10px; /* Space between buttons */
+  padding: 10px 20px;
+}
+
+.payment-cancel-btn {
+  background-color: rgba(242, 181, 76, 1); /* Yellow for cancel */
+}
+
+.payment-cancel-btn:hover {
+  background-color: rgb(255, 204, 115); /* Darker yellow on hover */
+}
+
+.payment-submit-btn:hover {
+  background-color: rgb(161, 31, 31); /* Darker red on hover */
+}
+
+.payment-label {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: rgb(161, 31, 31);
 }
