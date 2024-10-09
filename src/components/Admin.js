@@ -221,11 +221,11 @@ function Admin() {
             src={logo}
             className="App-verylog"
             alt="WildBites Logo"
-            style={{ width: "650px", height: "auto", marginRight: "7%" }}
+            style={{ width: "650px", height: "auto", marginRight: "7%", marginTop: "0px"}}
           />
           <div
             className="navbar-buttons"
-            style={{ marginTop: "20px", marginRight: "-60px" }}
+            style={{ marginTop: "20px", marginRight: "-150px" }}
           >
             <button
               onClick={() => handleTabChange("UserProfile")}
