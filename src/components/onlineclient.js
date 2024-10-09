@@ -190,8 +190,8 @@ function OnlineClient() {
     <div className="App">
       <nav className="navbar">
         <div className="navbar-logo">
-          <a href="/onlineclient"><img src={logo} className="App-verylog" alt="WildBites Logo" /></a>
-          <div className="client-navbar-buttons" style={{ marginTop: '10px' }}>
+          <a href="/onlineclient"><img src={logo} className="App-verylog" alt="WildBites Logo" style={{ width: "550px", height: "auto", marginRight: "7%", marginTop: "0px"}}/></a>
+          <div className="client-navbar-buttons" style={{ marginTop: "20px", marginRight: "150px" }}>
             <button onClick={() => handleTabChange("UserProfile")} className="nav-link">Food Menu</button>
             <button onClick={() => handleTabChange("orders")} className="nav-link">My Orders</button>
             <button onClick={() => handleTabChange("reports")} className="nav-link">Payment</button>
