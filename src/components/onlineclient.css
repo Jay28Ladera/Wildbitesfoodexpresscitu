@@ -15,7 +15,7 @@ body {
     background-color: white;
   }
   
-  .navbar-buttons {
+  .client-navbar-buttons {
     display: flex;
     justify-content: flex-start; /* Aligns buttons to the left */
     gap: 0px; /* Space between buttons */
