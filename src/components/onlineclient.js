@@ -380,8 +380,10 @@ function OnlineClient() {
                   </span>
                   <span className="cart-item-quantity">
                     <button onClick={() => decreaseQuantity(item._id)}>-</button>
+
                     {item.quantity}
-                    <button onClick={() => increaseQuantity(item._id)}>+</button>
+
+                    <button onClick={() => increaseQuantity(item._id)}> +</button>
                   </span>
 
                 </li>
