@@ -135,23 +135,11 @@ body {
     gap: 20px;
     width: 10px;
     max-width: 100%; /* Fixed height for the menu */
-    overflow-y: auto; /* Enable vertical scrolling */
+    
     padding-right: 10px; /* Space for the scrollbar */
   }
 
-  /*Styling for scrollbar */
-.client-menu-items::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .client-menu-items::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 10px;
-  }
-  
-  .client-menu-items::-webkit-scrollbar-thumb:hover {
-    background-color: #999;
-  }
+
   
   .client-menu-item-image {
     width: 100%; /* Makes the image responsive to the container width */
@@ -290,14 +278,15 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 500px;
+    width: 400px;
     padding: 20px;
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 15px;
     background-color: #fff;
-    min-height: 400px; /* Keep a minimum height */
-    max-height: 80vh; /* Set a maximum height relative to viewport */
+ height: auto;
+  
     overflow-y: visible; /* No scrollbar */
+    text-align: center; /* Center the text inside the container */
     overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
@@ -321,8 +310,11 @@ body {
     display: flex; /* Use flex for alignment */
     align-items: center; /* Center items vertically */
     justify-content: space-between; /* Space between text and buttons */
+    border-bottom: 1px solid #bdbdbd; /* Add a light gray line below each item */
 }
-
+.cart-summary ul li:last-child {
+  border-bottom: none; /* Remove the border from the last item */
+}
 .cart-summary ul li button {
     padding: 5px 10px; /* Padding for buttons */
     background-color: #990000; /* Maroon background */
@@ -360,6 +352,7 @@ body {
   font-size: 1.2em; /* Larger font size for total */
   margin-top: 300px; /* Increased space above the total */
   margin-bottom: 1px; /* Add space below if needed */
+  text-align: left;
 }
 /* Button container */
 .cart-buttons {
