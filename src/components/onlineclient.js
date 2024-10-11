@@ -392,7 +392,7 @@ function OnlineClient() {
           )}
           <p className="total-price">Total: Php {getTotalPrice().toFixed(2)}</p>
           <div className="cart-buttons">
-            <button className="checkout-btn">Checkout</button>
+            <button className="checkout-btn" onClick={handleCheckout}>Checkout</button>
             <button className="cancel-btn" onClick={cancelOrder}>Cancel Order</button>
           </div>
         </div>
