@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db, storage } from '../firebase/firebase';
 import { doc, getDoc, deleteDoc, collection, getDocs, addDoc, updateDoc } from 'firebase/firestore';
 import SPLoader from './spinnerloader';
 import { FaShoppingCart } from 'react-icons/fa';
 import './onlineclient.css';
-import './Admin.css';
 import logo from '../assets/maindash.svg';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 function OnlineClient() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [menuItem, setMenuItem] = useState({
     name: '',
     stock: '',
@@ -22,6 +19,9 @@ function OnlineClient() {
   });
   const [menuItems, setMenuItems] = useState([]);
   const [currentItemId, setCurrentItemId] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
+  const [isUpdating, setIsUpdating] = useState(false); 
+  const increaseButtonLock = useRef({});  // For tracking individual item locks
   const navigate = useNavigate();
 
   // Track authentication state and fetch user data
@@ -55,113 +55,6 @@ function OnlineClient() {
     setMenuItems(items);
   };
 
-  // Handle deletion of menu items
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this menu item?")) {
-      try {
-        const menuItemRef = doc(db, 'menuItems', id);
-        await deleteDoc(menuItemRef);
-        console.log("Menu item deleted successfully!");
-        fetchMenuItems();
-      } catch (error) {
-        console.error("Error deleting menu item: ", error);
-      }
-    }
-  };
-
-  // Handle form input change
-  const handleMenuItemChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'image') {
-      setMenuItem({ ...menuItem, image: files[0] });
-    } else {
-      setMenuItem({ ...menuItem, [name]: value });
-    }
-  };
-
-  // Handle new menu item submission
-  const handleAddMenuSubmit = async (e) => {
-    e.preventDefault();
-    if (!menuItem.name || !menuItem.stock || !menuItem.price) {
-      alert("Please fill in all fields.");
-      return;
-    }
-
-    try {
-      let imageUrl = null;
-      if (menuItem.image) {
-        const imageRef = ref(storage, `menuImages/${menuItem.image.name}`);
-        const uploadSnapshot = await uploadBytes(imageRef, menuItem.image);
-        imageUrl = await getDownloadURL(uploadSnapshot.ref);
-      }
-
-      const newMenuItem = {
-        name: menuItem.name,
-        stock: Number(menuItem.stock),
-        price: Number(menuItem.price),
-        image: imageUrl,
-      };
-      await addDoc(collection(db, 'menuItems'), newMenuItem);
-      fetchMenuItems();
-      setModalOpen(false);
-      setMenuItem({ name: '', stock: '', price: '', image: null });
-      window.location.reload();
-    } catch (error) {
-      console.error("Error adding menu item: ", error);
-    }
-  };
-
-  // Handle editing of menu items
-  const handleEditMenuItem = (item) => {
-    setCurrentItemId(item._id);
-    setMenuItem({
-      name: item.name,
-      stock: item.stock,
-      price: item.price,
-      image: null,
-    });
-    setEditModalOpen(true);
-  };
-
-  // Handle updated menu item submission
-  const handleEditMenuSubmit = async (e) => {
-    e.preventDefault();
-    if (!menuItem.name || !menuItem.stock || !menuItem.price) {
-      alert("Please fill in all fields.");
-      return;
-    }
-
-    try {
-      let imageUrl = menuItems.find(item => item._id === currentItemId)?.image || null;
-
-      if (menuItem.image) {
-        const imageRef = ref(storage, `menuImages/${menuItem.image.name}`);
-        const uploadSnapshot = await uploadBytes(imageRef, menuItem.image);
-        imageUrl = await getDownloadURL(uploadSnapshot.ref);
-      }
-
-      const menuItemRef = doc(db, 'menuItems', currentItemId);
-      await updateDoc(menuItemRef, {
-        name: menuItem.name,
-        stock: Number(menuItem.stock),
-        price: Number(menuItem.price),
-        image: imageUrl
-      });
-
-      fetchMenuItems();
-      setEditModalOpen(false);
-      setMenuItem({ name: '', stock: '', price: '', image: null });
-    } catch (error) {
-      console.error("Error updating menu item: ", error);
-    }
-  };
-
-  const openModal = () => setModalOpen(true);
-  const closeModal = () => setModalOpen(false);
-  const closeEditModal = () => {
-    setEditModalOpen(false);
-    setMenuItem({ name: '', stock: '', price: '', image: null });
-  };
 
   const handleTabChange = (tab) => {
     switch(tab) {
@@ -180,6 +73,246 @@ function OnlineClient() {
       default:
         break;
     }
+  };
+
+   // Add item to cart
+   const addToCart = async (item) => {
+    if (isUpdating) return;  // Prevent multiple clicks
+  
+    if (item.stock <= 0) {
+      alert("Sorry, this item is out of stock.");
+      return;
+    }
+  
+    setIsUpdating(true);  // Disable further updates
+  
+    try {
+      // Decrease stock in Firestore
+      const menuItemRef = doc(db, 'menuItems', item._id);
+      const menuItemSnap = await getDoc(menuItemRef);
+      const currentStock = menuItemSnap.data().stock;
+  
+      if (currentStock > 0) {
+        await updateDoc(menuItemRef, {
+          stock: currentStock - 1  // Update stock in Firestore
+        });
+  
+        // Update the cart locally
+        setCartItems(prevItems => {
+          const itemInCart = prevItems.find(cartItem => cartItem._id === item._id);
+          if (itemInCart) {
+            return prevItems.map(cartItem =>
+              cartItem._id === item._id
+                ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                : cartItem
+            );
+          } else {
+            return [...prevItems, { ...item, quantity: 1 }];
+          }
+        });
+  
+        // Update local menu items state
+        setMenuItems(prevItems =>
+          prevItems.map(menuItem =>
+            menuItem._id === item._id
+              ? { ...menuItem, stock: currentStock - 1 }
+              : menuItem
+          )
+        );
+      } else {
+        alert("Item is out of stock!");
+      }
+    } catch (error) {
+      console.error("Error adding item to cart: ", error);
+    } finally {
+      setIsUpdating(false);  // Re-enable updates
+    }
+  };
+
+  // Increase quantity of an item in the cart
+  const increaseQuantity = async (itemId) => {
+    const item = cartItems.find(cartItem => cartItem._id === itemId);
+  
+    if (!item || isUpdating || increaseButtonLock.current[itemId]) return;  // Prevent concurrent updates
+  
+    // Set the lock for this item
+    increaseButtonLock.current[itemId] = true;
+    setIsUpdating(true);
+  
+    try {
+      // Optimistically update the cart UI
+      setCartItems(prevItems =>
+        prevItems.map(cartItem =>
+          cartItem._id === itemId ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem
+        )
+      );
+  
+      // Fetch the latest stock from Firestore
+      const menuItemRef = doc(db, 'menuItems', itemId);
+      const menuItemSnap = await getDoc(menuItemRef);
+      const currentStock = menuItemSnap.data().stock;
+  
+      if (currentStock > 0) {
+        // Decrease stock in Firestore
+        await updateDoc(menuItemRef, {
+          stock: currentStock - 1
+        });
+  
+        // Update local menu items state with updated stock value
+        setMenuItems(prevItems =>
+          prevItems.map(menuItem =>
+            menuItem._id === itemId ? { ...menuItem, stock: currentStock - 1 } : menuItem
+          )
+        );
+      } else {
+        alert("Item is out of stock!");
+        // Revert the optimistic UI update if no stock
+        setCartItems(prevItems =>
+          prevItems.map(cartItem =>
+            cartItem._id === itemId ? { ...cartItem, quantity: cartItem.quantity - 1 } : cartItem
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating quantity: ", error);
+      // Revert the UI change in case of an error
+      setCartItems(prevItems =>
+        prevItems.map(cartItem =>
+          cartItem._id === itemId ? { ...cartItem, quantity: cartItem.quantity - 1 } : cartItem
+        )
+      );
+      alert("Failed to update item quantity. Please try again.");
+    } finally {
+      // Unlock after operation is complete
+      increaseButtonLock.current[itemId] = false;
+      setIsUpdating(false);
+    }
+  };
+
+
+  // Decrease quantity of an item in the cart
+  const decreaseQuantity = async (itemId) => {
+    const item = cartItems.find(cartItem => cartItem._id === itemId);
+    
+    if (item) {
+      if (item.quantity > 1) {
+        // Decrease the quantity if more than 1
+        setCartItems(prevItems =>
+          prevItems.map(cartItem =>
+            cartItem._id === itemId
+              ? { ...cartItem, quantity: cartItem.quantity - 1 }
+              : cartItem
+          )
+        );
+  
+        // Fetch the latest stock from Firestore
+        const menuItemRef = doc(db, 'menuItems', itemId);
+        const menuItemSnap = await getDoc(menuItemRef);
+        const currentStock = menuItemSnap.data().stock;
+  
+        // Restore stock in Firestore
+        await updateDoc(menuItemRef, {
+          stock: currentStock + 1  // Use the latest stock from Firestore
+        });
+  
+        // Update local menu items state with the correct stock value
+        setMenuItems((prevItems) =>
+          prevItems.map(menuItem =>
+            menuItem._id === itemId
+              ? { ...menuItem, stock: currentStock + 1 }
+              : menuItem
+          )
+        );
+      } else {
+        // If quantity is 1, remove the item from the cart
+        setCartItems(prevItems =>
+          prevItems.filter(cartItem => cartItem._id !== itemId)
+        );
+  
+        // Fetch the latest stock from Firestore
+        const menuItemRef = doc(db, 'menuItems', itemId);
+        const menuItemSnap = await getDoc(menuItemRef);
+        const currentStock = menuItemSnap.data().stock;
+  
+        // Restore stock in Firestore
+        await updateDoc(menuItemRef, {
+          stock: currentStock + 1  // Use the latest stock from Firestore
+        });
+  
+        // Update local menu items state with the correct stock value
+        setMenuItems((prevItems) =>
+          prevItems.map(menuItem =>
+            menuItem._id === itemId
+              ? { ...menuItem, stock: currentStock + 1 }
+              : menuItem
+          )
+        );
+      }
+    }
+  };
+
+  // Calculate total price of items in the cart
+  const getTotalPrice = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+
+  // Save cart details to Firestore on checkout
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    const order = {
+      userId: userData.uid,
+      userName: userData.name,
+      items: cartItems.map(item => ({
+        foodName: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        totalPrice: item.price * item.quantity
+      })),
+      orderTotal: getTotalPrice(),
+      orderDate: new Date().toISOString()
+    };
+
+    try {
+      await addDoc(collection(db, 'orders'), order);
+      alert("Order placed successfully!");
+      setCartItems([]);  // Clear the cart after successful checkout
+    } catch (error) {
+      console.error("Error placing order: ", error);
+      alert("Failed to place order. Please try again.");
+    }
+  };
+
+   // Function to handle canceling the order
+   const cancelOrder = async () => {
+    // Restore stock locally and in Firestore
+    for (const item of cartItems) {
+      const menuItemRef = doc(db, 'menuItems', item._id);
+  
+      // Fetch the current stock from Firestore
+      const menuItemSnap = await getDoc(menuItemRef);
+      const currentStock = menuItemSnap.data().stock;
+  
+      // Update the stock by adding back the item.quantity
+      await updateDoc(menuItemRef, {
+        stock: currentStock + item.quantity  // Use the latest stock from Firestore
+      });
+  
+      // Update local menu items state
+      setMenuItems((prevItems) =>
+        prevItems.map((menuItem) =>
+          menuItem._id === item._id
+            ? { ...menuItem, stock: currentStock + item.quantity }
+            : menuItem
+        )
+      );
+    }
+  
+    // Clear the cart
+    setCartItems([]);
   };
 
   if (loading) {
@@ -218,8 +351,8 @@ function OnlineClient() {
         </div>
       </nav>
 
-      <div className="client-menu-container"> {/* Added container for menu items */}
-        <div className="client-menu-items ">
+      <div className="client-menu-container">
+        <div className="client-menu-items">
           {menuItems.map(item => (
             <div key={item._id} className="client-menu-item">
               <img src={item.image || 'placeholder.png'} alt={item.name} className="client-menu-item-image" />
@@ -227,22 +360,43 @@ function OnlineClient() {
               <p className="stock">Stock: {item.stock}</p>
               <p className="price">Price: Php {item.price.toFixed(2)}</p>
               <div className="client-button-container">
-                <button className="client-btn add-button">Add to Cart</button>
+                <button onClick={() => addToCart(item)} className="client-btn add-button">Add to Cart</button>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="cart-summary"> {/* New section for the cart */}
-          <h2>Cart Summary</h2>
-          <ul>
-            {/* Dynamically render cart items */}
-            <li>Item 1 - Quantity: 2 - Price: Php 100.00</li>
-            {/* Add other items here */}
-          </ul>
-          <p>Total: Php 200.00</p>
-          <button className="client-btn checkout-btn">Checkout</button>
+        <div className="cart-summary">
+          <h2>Order Summary</h2>
+          {cartItems.length === 0 ? (
+            <p className="empty-cart-msg">Your cart is empty. Add some items!</p>
+          ) : (
+            <ul>
+              {cartItems.map((item) => (
+                <li key={item._id} className="cart-item">
+                  <span className="cart-item-name">{item.name}</span>
+                  <span className="cart-item-price">
+                    Php {(item.price * item.quantity).toFixed(2)}
+                  </span>
+                  <span className="cart-item-quantity">
+                    <button onClick={() => decreaseQuantity(item._id)}>-</button>
+
+                    {item.quantity}
+
+                    <button onClick={() => increaseQuantity(item._id)}> +</button>
+                  </span>
+
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="total-price">Total: Php {getTotalPrice().toFixed(2)}</p>
+          <div className="cart-buttons">
+            <button className="checkout-btn" onClick={handleCheckout}>Checkout</button>
+            <button className="cancel-btn" onClick={cancelOrder}>Cancel Order</button>
+          </div>
         </div>
+        
       </div>
     </div>
   );
