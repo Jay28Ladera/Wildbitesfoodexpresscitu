@@ -24,6 +24,7 @@ function Admin() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false); // State for Payment Details modal
+  const [userRolesModalOpen, setUserRolesModalOpen] = useState(false); // State for User Roles modal
   const [menuItem, setMenuItem] = useState({
     name: "",
     stock: "",
@@ -189,6 +190,18 @@ function Admin() {
   const openPaymentModal = () => setPaymentModalOpen(true);
   const closePaymentModal = () => setPaymentModalOpen(false);
 
+  // Open and close modal for user roles
+  const openUserRolesModal = () => setUserRolesModalOpen(true);
+  const closeUserRolesModal = () => setUserRolesModalOpen(false);
+
+  // Handle changing user role to Client
+  const handleChangeToClient = () => {
+    // Add your logic to change the user role to "Client" here
+    console.log("User role changed to Client");
+    closeUserRolesModal();
+    navigate("/walkinclient");
+  };
+
   // Handle navigation between different tabs
   const handleTabChange = (tab) => {
     switch (tab) {
@@ -221,7 +234,12 @@ function Admin() {
             src={logo}
             className="App-verylog"
             alt="WildBites Logo"
-            style={{ width: "650px", height: "auto", marginRight: "7%", marginTop: "0px"}}
+            style={{
+              width: "650px",
+              height: "auto",
+              marginRight: "7%",
+              marginTop: "0px",
+            }}
           />
           <div
             className="navbar-buttons"
@@ -245,10 +263,7 @@ function Admin() {
             >
               Reports
             </button>
-            <button
-              onClick={() => handleTabChange("userRoles")}
-              className="nav-link"
-            >
+            <button onClick={openUserRolesModal} className="nav-link">
               User Roles
             </button>
             <button
@@ -259,6 +274,30 @@ function Admin() {
             </button>
           </div>
         </div>
+
+        {/* User Roles Modal */}
+        {userRolesModalOpen && (
+          <div className="modal">
+            <div className="modal-content">
+              <h2>User Roles</h2>
+              <p>Would you like to change this user role to Client?</p>
+              <div className="button-container">
+                <button
+                  className="btn cancel-btn-roles"
+                  onClick={closeUserRolesModal}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn change-btn-roles"
+                  onClick={handleChangeToClient}
+                >
+                  Change to Client
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="navbar-actions">
           <button onClick={openModal} className="btn add-menu-button">
