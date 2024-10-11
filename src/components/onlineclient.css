@@ -324,5 +324,149 @@ body {
   .checkout-btn:hover {
     background-color: #700000;
   }
-  
-  
+
+
+  /*Cart Summary */
+
+  .cart-summary {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Arrange items vertically */
+    justify-content: space-between; /* Space between items */
+    width: 500px; /* Fixed width for cart */
+    padding: 20px; /* Increased padding for better spacing */
+    border: 1px solid #ccc; /* Border for the summary */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #fff; /* White background */
+    height: auto; /* Allow the height to adjust automatically */
+    min-height: 560px; /* Optional: Set a minimum height */
+    overflow-y: visible; /* Ensure no scrollbar appears */
+}
+.cart-summary h2 {
+    font-size: 1.5em; /* Header font size */
+    margin-bottom: 15px; /* Space below the header */
+    color: #990000; /* Maroon color for header */
+}
+
+.cart-summary ul {
+    list-style-type: none; /* Remove default list styling */
+    padding: 0; /* No padding */
+    margin: 0; /* Remove default margin */
+    flex-grow: 1; /* Allow the list to grow and fill the space */
+    overflow-y: auto; /* Enable scrolling for long lists */
+}
+
+.cart-summary ul li {
+    padding: 10px 0; /* Spacing for each list item */
+    font-size: 1em; /* Font size for items */
+    display: flex; /* Use flex for alignment */
+    align-items: center; /* Center items vertically */
+    justify-content: space-between; /* Space between text and buttons */
+}
+
+.cart-summary ul li button {
+    padding: 5px 10px; /* Padding for buttons */
+    background-color: #990000; /* Maroon background */
+    color: white; /* White text */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 1em; /* Font size */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    margin: 0 5px; /* Space around buttons */
+}
+
+.cart-summary ul li button:hover {
+    background-color: #700000; /* Darker maroon on hover */
+}
+
+.cart-summary p {
+    font-weight: bold; /* Bold text for total */
+    margin-top: 15px; /* Space above the total */
+    font-size: 1.2em; /* Larger font size for total */
+}
+
+.cart-summary .empty-cart-msg {
+  color: rgb(173, 172, 172);
+  font-size: 1em; /* Smaller font size */
+  margin-top: 20px;
+  text-align: center;
+  padding: 20px;
+  font-weight: normal;
+}
+
+/* Total Price */
+.cart-summary .total-price {
+  font-weight: bold; /* Bold text for total */
+  font-size: 1.2em; /* Larger font size for total */
+  margin-top: 300px; /* Increased space above the total */
+  margin-bottom: 1px; /* Add space below if needed */
+}
+/* Button container */
+.cart-buttons {
+    display: flex; /* Use flexbox for alignment */
+    justify-content: space-between; /* Space buttons evenly */
+    margin-top: 20px; /* Space above the buttons */
+}
+
+.checkout-btn, .cancel-btn {
+    width: 48%; /* Set width for buttons */
+    padding: 10px; /* Padding for buttons */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 1em; /* Font size */
+}
+
+.checkout-btn {
+    background-color: #990000; /* Maroon background */
+    color: #fff; /* White text */
+}
+
+.checkout-btn:hover {
+    background-color: #700000; /* Darker maroon on hover */
+}
+
+.cancel-btn {
+    background-color: rgba(163, 19, 19, 1); /* Darker red for cancel */
+    color: #fff; /* White text */
+}
+
+.cancel-btn:hover {
+    background-color: #a52a2a; /* Darker red on hover */
+}
+
+/* Ensure buttons are always at the bottom */
+.cart-summary-content {
+    flex-grow: 1; /* Allow content to grow */
+    display: flex;
+    flex-direction: column; /* Stack content */
+}
+
+.cart-summary ul li {
+  padding: 10px 0;
+  font-size: 1em;
+  display: flex;
+  justify-content: space-between; /* Space between the item sections */
+  align-items: center;
+}
+
+.cart-summary ul li div {
+  display: flex;
+  justify-content: space-between;
+  width: 100%; /* Make the item container take full width */
+}
+
+.cart-summary ul li .item-name {
+  flex: 2; /* Allocate more space for the name */
+  text-align: left; /* Align text to the left */
+}
+
+.cart-summary ul li .item-quantity {
+  flex: 1; /* Allocate moderate space for quantity */
+  text-align: center; /* Center the quantity */
+}
+
+.cart-summary ul li .item-price {
+  flex: 1; /* Allocate less space for price */
+  text-align: right; /* Align price to the right */
+}
