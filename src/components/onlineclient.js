@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db, storage } from '../firebase/firebase';
 import { doc, getDoc, deleteDoc, collection, getDocs, addDoc, updateDoc } from 'firebase/firestore';
@@ -21,6 +21,7 @@ function OnlineClient() {
   const [currentItemId, setCurrentItemId] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false); 
+  const increaseButtonLock = useRef({});  // For tracking individual item locks
   const navigate = useNavigate();
 
   // Track authentication state and fetch user data
@@ -129,13 +130,65 @@ function OnlineClient() {
   };
 
   // Increase quantity of an item in the cart
-  const increaseQuantity = (itemId) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item._id === itemId ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
+  const increaseQuantity = async (itemId) => {
+    const item = cartItems.find(cartItem => cartItem._id === itemId);
+  
+    if (!item || isUpdating || increaseButtonLock.current[itemId]) return;  // Prevent concurrent updates
+  
+    // Set the lock for this item
+    increaseButtonLock.current[itemId] = true;
+    setIsUpdating(true);
+  
+    try {
+      // Optimistically update the cart UI
+      setCartItems(prevItems =>
+        prevItems.map(cartItem =>
+          cartItem._id === itemId ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem
+        )
+      );
+  
+      // Fetch the latest stock from Firestore
+      const menuItemRef = doc(db, 'menuItems', itemId);
+      const menuItemSnap = await getDoc(menuItemRef);
+      const currentStock = menuItemSnap.data().stock;
+  
+      if (currentStock > 0) {
+        // Decrease stock in Firestore
+        await updateDoc(menuItemRef, {
+          stock: currentStock - 1
+        });
+  
+        // Update local menu items state with updated stock value
+        setMenuItems(prevItems =>
+          prevItems.map(menuItem =>
+            menuItem._id === itemId ? { ...menuItem, stock: currentStock - 1 } : menuItem
+          )
+        );
+      } else {
+        alert("Item is out of stock!");
+        // Revert the optimistic UI update if no stock
+        setCartItems(prevItems =>
+          prevItems.map(cartItem =>
+            cartItem._id === itemId ? { ...cartItem, quantity: cartItem.quantity - 1 } : cartItem
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating quantity: ", error);
+      // Revert the UI change in case of an error
+      setCartItems(prevItems =>
+        prevItems.map(cartItem =>
+          cartItem._id === itemId ? { ...cartItem, quantity: cartItem.quantity - 1 } : cartItem
+        )
+      );
+      alert("Failed to update item quantity. Please try again.");
+    } finally {
+      // Unlock after operation is complete
+      increaseButtonLock.current[itemId] = false;
+      setIsUpdating(false);
+    }
   };
+
 
   // Decrease quantity of an item in the cart
   const decreaseQuantity = async (itemId) => {
@@ -316,24 +369,29 @@ function OnlineClient() {
         <div className="cart-summary">
           <h2>Order Summary</h2>
           {cartItems.length === 0 ? (
-                <p className="empty-cart-msg">Your cart is empty. Add some items!</p>
-            ) : (
-          <ul>
-            {cartItems.map(item => (
-              <li key={item._id}>
-                {item.name} - Quantity: 
-                <button onClick={() => decreaseQuantity(item._id)}>-</button> 
-                {item.quantity} 
-                <button onClick={() => increaseQuantity(item._id)}>+</button>
-                - Price: Php {(item.price * item.quantity).toFixed(2)}
-              </li>
-            ))}
-          </ul>
-            )}
-          <p class="total-price">Total: Php {getTotalPrice().toFixed(2)}</p>
-          <div class="cart-buttons">
-            <button class="checkout-btn">Checkout</button>
-            <button class="cancel-btn"  onClick={cancelOrder}>Cancel Order</button>
+            <p className="empty-cart-msg">Your cart is empty. Add some items!</p>
+          ) : (
+            <ul>
+              {cartItems.map((item) => (
+                <li key={item._id} className="cart-item">
+                  <span className="cart-item-name">{item.name}</span>
+                  <span className="cart-item-price">
+                    Php {(item.price * item.quantity).toFixed(2)}
+                  </span>
+                  <span className="cart-item-quantity">
+                    <button onClick={() => decreaseQuantity(item._id)}>-</button>
+                    {item.quantity}
+                    <button onClick={() => increaseQuantity(item._id)}>+</button>
+                  </span>
+
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="total-price">Total: Php {getTotalPrice().toFixed(2)}</p>
+          <div className="cart-buttons">
+            <button className="checkout-btn">Checkout</button>
+            <button className="cancel-btn" onClick={cancelOrder}>Cancel Order</button>
           </div>
         </div>
         

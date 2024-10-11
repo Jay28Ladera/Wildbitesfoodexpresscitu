@@ -335,11 +335,10 @@ body {
     border: 1px solid #ccc; /* Border for the summary */
     border-radius: 8px; /* Rounded corners */
     background-color: #fff; /* White background */
-    max-height: 80vh; /* Maximum height for the cart */
-    overflow-y: auto; /* Allow scrolling if content exceeds max height */
-    height: 560px;
+    height: auto; /* Allow the height to adjust automatically */
+    min-height: 560px; /* Optional: Set a minimum height */
+    overflow-y: visible; /* Ensure no scrollbar appears */
 }
-
 .cart-summary h2 {
     font-size: 1.5em; /* Header font size */
     margin-bottom: 15px; /* Space below the header */
@@ -439,4 +438,33 @@ body {
     flex-grow: 1; /* Allow content to grow */
     display: flex;
     flex-direction: column; /* Stack content */
+}
+
+.cart-summary ul li {
+  padding: 10px 0;
+  font-size: 1em;
+  display: flex;
+  justify-content: space-between; /* Space between the item sections */
+  align-items: center;
+}
+
+.cart-summary ul li div {
+  display: flex;
+  justify-content: space-between;
+  width: 100%; /* Make the item container take full width */
+}
+
+.cart-summary ul li .item-name {
+  flex: 2; /* Allocate more space for the name */
+  text-align: left; /* Align text to the left */
+}
+
+.cart-summary ul li .item-quantity {
+  flex: 1; /* Allocate moderate space for quantity */
+  text-align: center; /* Center the quantity */
+}
+
+.cart-summary ul li .item-price {
+  flex: 1; /* Allocate less space for price */
+  text-align: right; /* Align price to the right */
 }
