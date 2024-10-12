@@ -22,6 +22,7 @@ function OnlineClient() {
   const [cartItems, setCartItems] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false); 
   const increaseButtonLock = useRef({});  // For tracking individual item locks
+  const [searchQuery, setSearchQuery] = useState('');  // State for search query
   const navigate = useNavigate();
 
   // Track authentication state and fetch user data
@@ -315,6 +316,12 @@ function OnlineClient() {
     setCartItems([]);
   };
 
+  // Filtered menu items based on search query
+  const filteredMenuItems = menuItems.filter(item =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())  // Case-insensitive match
+  );
+
+
   if (loading) {
     return <SPLoader />;
   }
@@ -351,9 +358,22 @@ function OnlineClient() {
         </div>
       </nav>
 
+      <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Search for food..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
+
       <div className="client-menu-container">
-        <div className="client-menu-items">
-          {menuItems.map(item => (
+        
+
+      <div className="client-menu-items">
+        {filteredMenuItems.length > 0 ? (
+          filteredMenuItems.map(item => (
             <div key={item._id} className="client-menu-item">
               <img src={item.image || 'placeholder.png'} alt={item.name} className="client-menu-item-image" />
               <h3>{item.name}</h3>
@@ -363,9 +383,11 @@ function OnlineClient() {
                 <button onClick={() => addToCart(item)} className="client-btn add-button">Add to Cart</button>
               </div>
             </div>
-          ))}
-        </div>
-
+          ))
+        ) : (
+          <p>No items match your search.</p>
+        )}
+      </div>
         <div className="cart-summary">
           <h2>Order Summary</h2>
           {cartItems.length === 0 ? (
