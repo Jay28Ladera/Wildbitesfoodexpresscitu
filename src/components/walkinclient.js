@@ -91,6 +91,9 @@ function WalkinClient() {
   const filteredMenuItems = menuItems.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  const handleLogout = () => {
+    navigate("/");
+  };
 
   return (
     <div className="WalkinClient">
@@ -111,6 +114,7 @@ function WalkinClient() {
             <button className="navbutton1">Menu</button>
             <button className="navbutton2" onClick={openCartModal}>Cart ({cart.length})</button>
             <button className="navbutton3" onClick={openUserRolesModal}>User-Roles</button>
+            <button className="navbutton4" onClick={handleLogout}>Logout</button>
           </div>
         </div>
 
@@ -170,8 +174,9 @@ function WalkinClient() {
                         <h3>{cartItem.name}</h3>
                         <p>Total Price: Php {(cartItem.price * cartItem.quantity).toFixed(2)}</p>
                             <div className="quantity-and-buttons">
-                                <p>Quantity: {cartItem.quantity}</p>
+                                
                                 <button className="remove-from-cart-button" onClick={() => removeFromCart(cartItem)}>-</button>
+                                <p>{cartItem.quantity}</p>
                                 <button className="add-to-cart-button" onClick={() => addToCart(cartItem)}>+</button>
                             </div>
                     </div>
