@@ -215,7 +215,7 @@ function Admin() {
         navigate("/reports");
         break;
       case "userRoles":
-        navigate("/user-roles");
+        navigate("/walkinclient");
         break;
       default:
         break;
