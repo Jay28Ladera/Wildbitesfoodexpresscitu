@@ -4,7 +4,8 @@
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
     height: 100vh; /* Full viewport height */
-    background-color: #f5f5f5; /* Light background for the whole page */
+    background-color: #000000; /* Light background for the whole page */
+    box-shadow: #000000;
 }
 
 /* Authentication form container */
@@ -17,8 +18,8 @@
     max-width: 400px;
     margin: 50px auto 0; /* margin-top: 50px and horizontally centered */
     background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Add this line for shadow */
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2); /* Increased shadow spread */
+    z-index: 1; /* Make sure it's not hidden behind other elements */
     /* Removed the box-shadow and background-color to eliminate the border */
 }
 
