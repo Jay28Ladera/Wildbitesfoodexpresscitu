@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db, storage } from "../firebase/firebase";
 import {
@@ -351,9 +351,11 @@ function OnlineClient() {
   };
 
   // Filtered menu items based on search query
-  const filteredMenuItems = menuItems.filter(
-    (item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()) // Case-insensitive match
-  );
+  const filteredMenuItems = useMemo(() => {
+    return menuItems.filter((item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [menuItems, searchQuery]);
 
   //new code
 
@@ -469,13 +471,13 @@ function OnlineClient() {
   const FoodMenu = () => (
     <>
       <div className="online-search">
-        <input
-          type="text"
-          placeholder="Search for food..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="search-input"
-        />
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search..."
+        autoFocus
+      />
       </div>
 
       <div className="client-menu-container">
