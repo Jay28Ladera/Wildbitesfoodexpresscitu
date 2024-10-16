@@ -215,7 +215,7 @@ function Admin() {
         navigate("/reports");
         break;
       case "userRoles":
-        navigate("/user-roles");
+        navigate("/walkinclient");
         break;
       default:
         break;
@@ -319,6 +319,7 @@ function Admin() {
                 <li className="dropdown-item">
                   <button
                     className="btn logout-btn"
+                    style={{ color: "red" }}
                     onClick={() => auth.signOut()}
                   >
                     Log Out
