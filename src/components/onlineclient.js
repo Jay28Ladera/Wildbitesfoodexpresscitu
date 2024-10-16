@@ -462,7 +462,7 @@ function OnlineClient() {
   // Component for Food Menu 
   const FoodMenu = () => (
     <>
-      <div className="search-bar">
+      <div className="online-search">
         <input
           type="text"
           placeholder="Search for food..."
