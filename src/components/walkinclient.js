@@ -4,6 +4,7 @@ import logo from "../assets/maindash.svg";
 import './walkinclient.css';
 import { collection, getDocs } from "firebase/firestore"; // Import Firestore functions
 import { db } from "../firebase/firebase"; // Make sure to import your Firebase setup
+import { FaShoppingCart } from "react-icons/fa";
 
 function WalkinClient() {
   // initiate navigate
@@ -18,7 +19,8 @@ function WalkinClient() {
   const [userRolesModalOpen, setUserRolesModalOpen] = useState(false);
   const openUserRolesModal = () => setUserRolesModalOpen(true);
   const closeUserRolesModal = () => setUserRolesModalOpen(false);
-
+  const [hamburgerOpen, setHamburgerOpen] = useState(false);
+  
   //change to admin logic
   const handleChangeToAdmin = () => {
     closeUserRolesModal();
@@ -91,10 +93,11 @@ function WalkinClient() {
   const filteredMenuItems = menuItems.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const handleLogout = () => {
-    navigate("/");
-  };
 
+  const calculateTotalItemsInCart = () => {
+    return cart.reduce((total, cartItem) => total + cartItem.quantity, 0);
+  };
+  
   return (
     <div className="WalkinClient">
       <nav className="navbar">
@@ -110,26 +113,31 @@ function WalkinClient() {
               marginTop: "0px",
             }}
           />
-          <div className="navbar-buttons" style={{ marginTop: "20px", marginRight: "-150px" }}>
-            <button className="navbutton1">Menu</button>
-            <button className="navbutton2" onClick={openCartModal}>Cart ({cart.length})</button>
-            <button className="navbutton3" onClick={openUserRolesModal}>User-Roles</button>
-            <button className="navbutton4" onClick={handleLogout}>Logout</button>
-          </div>
+        
+          <div className="navbar-buttons" style={{ marginTop: "20px", marginRight: "-150px", position: "relative" }}>
+            <a href= "#" onClick={openUserRolesModal}className="ReturnToAdmin">Go to Admin</a>
+    <button className="cart-btn" aria-label="View Cart" onClick={openCartModal}>
+    <FaShoppingCart size={20} />
+    {calculateTotalItemsInCart() > 0 && (
+      <span className="cart-count">{calculateTotalItemsInCart()}</span>
+    )}
+  </button>
+</div>
         </div>
 
         {userRolesModalOpen && (
           <div className="modaluser-role">
             <div className="modal-contentuser-role">
               <h2>User Roles</h2>
-              <p>Would you like to change this user role to Client?</p>
+              <p>Would you like to change this user role to Admin?</p>
               <div className="button-container">
                 <button className="cancel-btn-roles" onClick={closeUserRolesModal}>Cancel</button>
-                <button className="change-btn-roles" onClick={handleChangeToAdmin}>Change to Admin</button>
+                <button className="change-btn-roles" onClick={handleChangeToAdmin}>Confirm</button>
               </div>
             </div>
           </div>
         )}
+      
       </nav>
 
       {/* Search Bar */}
@@ -144,18 +152,18 @@ function WalkinClient() {
       </div>
 
       {/* Display the filtered menu items */}
-      <div className="menu-items">
+      <div className="walkin-menu">
         {filteredMenuItems.map((item) => (
-          <div key={item._id} className="menu-item">
+          <div key={item._id} className="item">
             <img
               src={item.image || "placeholder.png"}
               alt={item.name}
-              className="menu-item-image"
+              className="item-image"
             />
             <h3>{item.name}</h3>
             <p className="stock">Stock: {item.stock}</p>
             <p className="price">Price: Php {item.price.toFixed(2)}</p>
-            <button className="add-to-cart-button" onClick={() => addToCart(item)}>+</button>
+            <button className="add-to-cart-button" onClick={() => addToCart(item)}>Add to Cart</button>
           </div>
         ))}
       </div>
