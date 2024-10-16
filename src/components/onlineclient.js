@@ -451,6 +451,14 @@ function OnlineClient() {
     }
   };
 
+  const handleLogout = () => {
+    const userConfirmed = window.confirm("Are you sure you want to log out?");
+    if (userConfirmed) {
+      auth.signOut();
+    }
+  };
+  
+
   // Component for Food Menu 
   const FoodMenu = () => (
     <>
@@ -642,7 +650,7 @@ function OnlineClient() {
                 style={{ display: "none" }}
                 accept="image/*"
               />
-              <button onClick={() => auth.signOut()} className="logout-btn">Logout</button>
+              
             </div>
 
             {/* Profile Details */}
@@ -658,6 +666,12 @@ function OnlineClient() {
                     className="change-password-btn"
                   >
                     Change Password
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="logout-btn"
+                  >
+                    Logout
                   </button>
                 </div>
               </div>
