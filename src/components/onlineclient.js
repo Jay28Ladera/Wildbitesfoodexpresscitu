@@ -1,42 +1,17 @@
-
-import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { auth, db, storage } from "../firebase/firebase";
-import {
-  doc,
-  getDoc,
-  deleteDoc,
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  query,
-  where,
-  onSnapshot
-} from "firebase/firestore";
-import {
-  updatePassword,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-} from "firebase/auth";
-import SPLoader from "./spinnerloader";
-import { FaCamera, FaShoppingCart } from "react-icons/fa";
-import "./onlineclient.css";
-import "./userprofile.css";
-import logo from "../assets/maindash.svg";
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { auth, db, storage } from '../firebase/firebase';
+import { doc, getDoc, deleteDoc, collection, getDocs, addDoc, updateDoc, onSnapshot } from 'firebase/firestore';
+import SPLoader from './spinnerloader';
+import { FaShoppingCart } from 'react-icons/fa';
+import './onlineclient.css';
+import logo from '../assets/maindash.svg';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 function OnlineClient() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [menuItem, setMenuItem] = useState({
-    name: "",
-    stock: "",
-    price: "",
-    image: null,
-  });
   const [menuItems, setMenuItems] = useState([]);
-  const [currentItemId, setCurrentItemId] = useState(null);
   const [cartItems, setCartItems] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false); 
   const increaseButtonLock = useRef({});  // For tracking individual item locks
@@ -68,16 +43,45 @@ function OnlineClient() {
 
   // Fetch menu items from Firestore
   const fetchMenuItems = async () => {
-    const menuItemsRef = collection(db, "menuItems");
-    const menuItemsSnap = await getDocs(menuItemsRef);
-    const items = menuItemsSnap.docs.map((doc) => ({
-      _id: doc.id,
-      ...doc.data(),
-    }));
-    setMenuItems(items);
+    const menuItemsRef = collection(db, 'menuItems');
+  
+    // Listen for real-time updates to the menuItems collection
+    const unsubscribe = onSnapshot(menuItemsRef, (snapshot) => {
+      const items = snapshot.docs
+        .map((doc) => ({ _id: doc.id, ...doc.data() }))
+        .filter((item) => item.stock > 0);  // Only include items with stock greater than 0
+      setMenuItems(items); // Update menuItems state in real-time
+    });
+  
+    // Return the unsubscribe function to stop listening when the component unmounts
+    return () => unsubscribe();
   };
 
 
+ 
+  const handleTabChange = (tab) => {
+    switch(tab) {
+      case "menu":
+        navigate('/menu');
+        break;
+      case "orders":
+        navigate('/orders');
+        break;
+      case "reports":
+        navigate('/reports');
+        break;
+      case "userRoles":
+        navigate('/user-roles');
+        break;
+      default:
+        break;
+    }
+  };
+
+   // Add item to cart
+   const addToCart = async (item) => {
+    if (isUpdating) return;  // Prevent multiple clicks
+  
     if (item.stock <= 0) {
       alert("Sorry, this item is out of stock.");
       return;
