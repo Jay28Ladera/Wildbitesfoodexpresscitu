@@ -33,7 +33,9 @@ function Admin() {
   });
   const [menuItems, setMenuItems] = useState([]);
   const [currentItemId, setCurrentItemId] = useState(null);
+  const [filteredItems, setFilteredItems] = useState([]); // Filtered menu items based on search
   const [hamburgerOpen, setHamburgerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search input
   const navigate = useNavigate();
 
   // Track authentication state and fetch user data
@@ -59,6 +61,13 @@ function Admin() {
     return () => unsubscribe();
   }, [navigate]);
 
+  useEffect(() => {
+    if (searchQuery === "") {
+      // If search query is empty, show all menu items
+      setFilteredItems(menuItems);
+    }
+  }, [menuItems]); //
+
   // Fetch menu items from Firestore
   const fetchMenuItems = async () => {
     const menuItemsRef = collection(db, "menuItems");
@@ -68,6 +77,21 @@ function Admin() {
       ...doc.data(),
     }));
     setMenuItems(items);
+  };
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query); // Update the query as the user types
+  
+    if (query === "") {
+      // If search is cleared, show all menu items
+      setFilteredItems(menuItems); // Reset to show all items
+    } else {
+      // Filter the items based on search query
+      const filtered = menuItems.filter((item) =>
+        item.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredItems(filtered); // Update filtered items
+    }
   };
 
   // Handle deletion of menu items
@@ -304,6 +328,15 @@ function Admin() {
           <button onClick={openModal} className="btn add-menu-button">
             Add New Menu
           </button>
+          <div className="menu-search-container">
+  <input
+    type="text"
+    placeholder="Search menu items..."
+    className="adminmenu-search"
+    value={searchQuery} // Bind search input value to the `searchQuery` state
+    onChange={handleSearchChange} // Handle changes when the user types
+  />
+</div>
           <span className="admin-option">Admin</span>
           <div className="hamburger-icon">
             <Squash toggled={hamburgerOpen} toggle={setHamburgerOpen} />
@@ -455,34 +488,34 @@ function Admin() {
         db={db}
       />
 
-      <div className="menu-items">
-        {menuItems.map((item) => (
-          <div key={item._id} className="menu-item">
-            <img
-              src={item.image || "placeholder.png"}
-              alt={item.name}
-              className="menu-item-image"
-            />
-            <h3>{item.name}</h3>
-            <p className="stock">Stock: {item.stock}</p>
-            <p className="price">Price: Php {item.price.toFixed(2)}</p>
-            <div className="button-container">
-              <button
-                className="btn edit-button"
-                onClick={() => handleEditMenuItem(item)}
-              >
-                Edit
-              </button>
-              <button
-                className="btn delete-button"
-                onClick={() => handleDelete(item._id)}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
+<div className="menu-items">
+  {(filteredItems.length > 0 ? filteredItems : menuItems).map((item) => (
+    <div key={item._id} className="menu-item">
+      <img
+        src={item.image || "placeholder.png"}
+        alt={item.name}
+        className="menu-item-image"
+      />
+      <h3>{item.name}</h3>
+      <p className="stock">Stock: {item.stock}</p>
+      <p className="price">Price: Php {item.price.toFixed(2)}</p>
+      <div className="button-container">
+        <button
+          className="btn edit-button"
+          onClick={() => handleEditMenuItem(item)}
+        >
+          Edit
+        </button>
+        <button
+          className="btn delete-button"
+          onClick={() => handleDelete(item._id)}
+        >
+          Delete
+        </button>
       </div>
+    </div>
+  ))}
+</div>
     </div>
   );
 }

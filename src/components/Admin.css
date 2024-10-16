@@ -134,6 +134,7 @@ body {
   font-size: 16px;
 }
 
+
 .dropdown-item .btn:hover {
   background-color: #f0f0f0;
 }
@@ -141,6 +142,42 @@ body {
 .logout-btn {
   color: rgb(255, 255, 255);
 }
+
+
+ /* Ensure the button is on top
+/* Styling for the search input */
+/* Container for search input and button */
+.adminmenusearch-container {
+  /* Makes it the reference point for positioning the button */
+  width: 100px; /* Full width or specify a width */
+  margin-top: 500px; /* Space from the top of the parent container */
+  height: 500px; /* Adjust height based on your design */
+}
+
+/* Search button */
+.adminmenu-search {
+  max-width: 700px;
+  position: absolute; /* Position it inside the container */
+  top: 220px; /* Adjust from the top of the container */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Perfectly center the button */
+  
+  padding: 10px 20px;
+  background-color: rgb(255, 255, 255);
+  color: #990000;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  z-index: 2;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: left;
+  outline: none; /* Remove the default outline */
+}
+
+
+
+
 
 /* Profile picture and name styling */
 /* Profile picture and name styling */
@@ -173,7 +210,7 @@ body {
   margin-left: auto; /* Center the grid container */
   margin-right: auto; /* Center the grid container */
   max-width: 95%;
-  margin-top: 70px; /* Reduced margin for mobile */
+  margin-top: 90px; /* Reduced margin for mobile */
   display: grid;
   grid-template-columns: repeat(
     9,
@@ -189,6 +226,8 @@ body {
   width: 100%; /* Makes the image responsive to the container width */
   max-width: 150px; /* Set a maximum width for the image */
   max-height: 150px; /* Set a maximum height for the image */
+  min-height: 150px;
+  min-width: 150px;
   height: 150px; /* Set a fixed height to ensure cropping */
   object-fit: cover; /* Crop the image to fit while maintaining aspect ratio */
   border-radius: 5px; /* Optional: Add border radius for rounded corners */
