@@ -98,6 +98,7 @@ body {
     display: flex;
     align-items: center;
     margin-left: 20px;
+    cursor: pointer;
   }
   
   .profile-pic, .initials-circle {
@@ -105,6 +106,7 @@ body {
     height: 40px;
     border-radius: 50%;
     margin-right: 10px;
+    cursor: pointer;
   }
   
   .initials-circle {
