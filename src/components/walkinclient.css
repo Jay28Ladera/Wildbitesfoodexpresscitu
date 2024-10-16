@@ -1,18 +1,22 @@
-.navbutton1, .navbutton2, .navbutton3, .navbutton4 {
+/*.navbutton{
     padding: 10px 15px;
     border-radius: 10px;
-    background-color: rgba(163, 19, 19, 1); /* Optional: for button styling */
+    background-color: rgba(163, 19, 19, 1);
     border: none;
     cursor: pointer;
     color: #ffffff;
+    margin-left: 1000px;
   }
-  .navbutton4{
+*/
+  .navbutton{
     position: absolute;
-    margin-top: 0px;
-    margin-left: 1175px;
+    margin-left: 1100px;
+    margin-top: -20px;
+    background-color: rgba(163, 19, 19, 1);
   }
+  
   .modaluser-role {
-    position: fixed; /* Fixed position to cover the entire screen */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -46,6 +50,7 @@
     height: 38px;
     text-align: center;
   }
+
   /* Cart Modal Background */
 .modal-cart {
     position: fixed;
@@ -53,57 +58,57 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Dark background */
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    animation: fadeIn 0.3s; /* Add fade-in animation */
+    animation: fadeIn 0.3s;
   }
   
   /* Cart Modal Content */
   .modal-content-cart {
-    background-color: #ffffff; /* White background for the modal */
+    background-color: #ffffff;
     border-radius: 10px;
     padding: 30px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); /* Shadow effect */
-    width: 500px; /* Set width for cart modal */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    width: 500px;
     max-width: 90%;
-    animation: slideIn 0.3s ease; /* Add slide-in animation */
+    animation: slideIn 0.3s ease;
   }
   
   /* Cart Items */
   .cart-items {
     margin-top: 20px;
-    max-height: 300px; /* Set max height for scrolling */
-    overflow-y: auto; /* Enable vertical scroll if cart is too long */
+    max-height: 300px;
+    overflow-y: auto;
   }
   
   .cart-item {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Ensure vertical alignment */
+    align-items: center;
     padding: 10px 0;
-    border-bottom: 1px solid #eee; /* Optional: Add separation between items */
+    border-bottom: 1px solid #eee;
 }
   
 .cart-item h3 {
-    flex-grow: 1; /* Take up remaining space for item name */
+    flex-grow: 1;
     margin: 0;
 }
 .cart-item .quantity-and-buttons {
     display: flex;
-    align-items: center; /* Ensure buttons are vertically aligned with the text */
+    align-items: center;
 }
   .cart-item p {
     margin: 5px 0;
     font-size: 14px;
-    color: #666; /* Subtle color for other details */
+    color: #666;
   }
   
   /* Close Cart Button */
   .close-cart-button {
-    background-color: rgba(163, 19, 19, 1); /* Dark red button */
+    background-color: rgba(163, 19, 19, 1);
     color: #ffffff;
     border: none;
     padding: 10px 20px;
@@ -111,7 +116,7 @@
     cursor: pointer;
     font-size: 15px;
     margin-top: 20px;
-    width: 100%; /* Full width button */
+    width: 100%;
     text-align: center;
   }
   
@@ -145,9 +150,10 @@
     background-color: rgba(163, 19, 19, 1);
   }
   .search-bar {
-    display: flex;
-    justify-content: center; /* Centers the search bar horizontally */
-    margin: 20px 0; /* Adds space around the search bar */
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 375px;
+    padding: 20px;
   }
   
   .search-input {
@@ -162,11 +168,115 @@
   }
   
   .search-input:focus {
-    border-color: rgba(163, 19, 19, 1); /* Highlight border on focus */
-    box-shadow: 0 2px 10px rgba(163, 19, 19, 0.3); /* Shadow on focus */
+    border-color: rgba(163, 19, 19, 1);
+    box-shadow: 0 2px 10px rgba(163, 19, 19, 0.3);
   }
   
+  .walkin-menu {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 95%;
+    margin-top: 70px;
+    display: grid;
+    grid-template-columns: repeat(
+      6,
+      minmax(150px, 1fr)
+    );
+    gap: 20px;
+    width: 100%;
+    height: auto;
+    padding: 10px;
+  }
   
+  .item-image {
+    width: 100%;
+    max-width: 150px;
+    max-height: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  
+  .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 15px 0;
+    width: 90%;
+    max-width: 500px;
+    max-height: 300px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+  .item h3 {
+    font-size: 1em;
+    margin: 10px 0;
+    text-align: center;
+    color: #333;
+  }
+  
+  .item p {
+    font-size: 0.8em;
+    margin: 5px 0;
+    color: #666;
+  }
+  
+  .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .button-container {
+    display: flex; /* Flexbox for button layout */
+    justify-content: space-between; /* Space out buttons evenly */
+    width: 100%;
+    flex: 1;
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+    text-align: center;
+  }
+  .add-to-cart-button{
+    border-radius: 10px;
+  }
+
+  .navbar-buttons .cart-btn{
+    position: absolute;
+    margin-left: 1100px;
+    margin-top: -35px;
+  }
+  .navbar-buttons .ReturnToAdmin{
+    position: absolute;
+    width: 100px;
+    margin-left: 990px;
+    margin-top: -25px;
+
+    color: maroon;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;  
+  cursor: pointer; 
+  transition: color 0.3s ease;
+  }
+
+  .cart-count {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    font-size: 12px;
+  }
 
   @keyframes fadeIn {
     from {

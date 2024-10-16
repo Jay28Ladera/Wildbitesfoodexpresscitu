@@ -266,8 +266,9 @@ function Admin() {
             <button onClick={openUserRolesModal} className="nav-link">
               User Roles
             </button>
+            
             <button
-              onClick={() => handleTabChange("userRoles")}
+              onClick={() => handleTabChange("/")}
               className="nav-link"
             >
               Staff Management
