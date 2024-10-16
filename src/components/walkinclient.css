@@ -150,9 +150,10 @@
     background-color: rgba(163, 19, 19, 1);
   }
   .search-bar {
+    width: 500px;
     position: absolute;
     margin-top: 10px;
-    margin-left: 375px;
+    margin-left: 485px;
     padding: 20px;
   }
   
