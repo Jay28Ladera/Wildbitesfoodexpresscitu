@@ -40,7 +40,7 @@ body {
   cursor: pointer; /* Pointer cursor on hover */
   transition: background-color 0.3s, transform 0.3s;
   background-color: rgba(163, 19, 19, 1); /* Red background color */
-  color: white; /* White text color */
+  color: red; /* White text color */
 }
 
 /* Hover effect */

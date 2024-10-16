@@ -319,6 +319,7 @@ function Admin() {
                 <li className="dropdown-item">
                   <button
                     className="btn logout-btn"
+                    style={{ color: "red" }}
                     onClick={() => auth.signOut()}
                   >
                     Log Out
