@@ -180,7 +180,7 @@
     margin-top: 70px;
     display: grid;
     grid-template-columns: repeat(
-      6,
+      9,
       minmax(150px, 1fr)
     );
     gap: 20px;
@@ -193,6 +193,8 @@
     width: 100%;
     max-width: 150px;
     max-height: 150px;
+    min-width: none;
+    min-height: 150px;
     height: 150px;
     object-fit: cover;
     border-radius: 5px;
