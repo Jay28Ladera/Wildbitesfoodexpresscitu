@@ -31,7 +31,7 @@ function Login() {
         password
       );
       const user = userCredential.user;
-      
+
       // Check if the email is the admin email
       if (user.email === "admin@admin.com") {
         navigate("/admin");
@@ -57,29 +57,28 @@ function Login() {
       console.error("Login error:", errorMessage);
     }
   };
-  
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-  
+
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-  
+
       // Check if the user is new and create a profile in Firestore
       const userDoc = doc(db, "users", user.uid);
       const userSnapshot = await getDoc(userDoc);
-  
+
+      //creates a profile for new users
       if (!userSnapshot.exists()) {
         await setDoc(userDoc, {
           name: user.displayName,
           email: user.email,
           uid: user.uid,
-          // Add other fields as necessary
         });
       }
-  
-      // Check if the email is the admin email
+
+      // Check if the email is the admin email if not go to onlineclient
       if (user.email === "admin@admin.com") {
         navigate("/admin");
       } else {
@@ -90,7 +89,6 @@ function Login() {
       setError("Sign in with Google failed. Please try again.");
     }
   };
-  
 
   return (
     <motion.div
@@ -102,7 +100,9 @@ function Login() {
     >
       <header className="login-auth-header">
         <Link to="/">
-          <a href="/"><img src={loghead} className="login-loghead" alt="logheader" /></a>
+          <a href="/">
+            <img src={loghead} className="login-loghead" alt="logheader" />
+          </a>
         </Link>
       </header>
 

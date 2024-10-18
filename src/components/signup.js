@@ -103,17 +103,21 @@ function Signup() {
       const userDoc = doc(db, "users", user.uid);
       const userSnapshot = await getDoc(userDoc);
 
+      //creates a profile for new users
       if (!userSnapshot.exists()) {
         await setDoc(userDoc, {
           name: user.displayName,
           email: user.email,
           uid: user.uid,
-          // Add other fields as necessary
         });
       }
 
-      // Navigate to the profile page
-      navigate("/profile");
+      // Check if the email is the admin email if not go to onlineclient
+      if (user.email === "admin@admin.com") {
+        navigate("/admin");
+      } else {
+        navigate("/onlineclient");
+      }
     } catch (error) {
       console.error("Error during Google sign-in:", error);
       setError("Sign in with Google failed. Please try again.");
