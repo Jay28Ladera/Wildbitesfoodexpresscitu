@@ -144,10 +144,12 @@ max-height:100%;
 
 
 .client-menu-item-image {
-  width: 100%; /* Makes the image responsive to the container width */
+ 
   max-width: 150px; /* Set a maximum width for the image */
   max-height: 150px; /* Set a maximum height for the image */
-  height: 150px; /* Set a fixed height to ensure cropping */
+  min-width: 150px;
+  min-height: 150px;
+
   object-fit: cover; /* Crop the image to fit while maintaining aspect ratio */
   border-radius: 5px;/* Optional: Add border radius for rounded corners */
 }
