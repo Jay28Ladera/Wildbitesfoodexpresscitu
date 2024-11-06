@@ -1,59 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { auth, db } from "../firebase/firebase";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase/firebase";
 import SPLoader from "./spinnerloader";
-import "./Admin.css";
-import logo from "../assets/maindash.svg";
-import { Squash } from "hamburger-react";
+import Navbar from "./Navbar";
+import "./orderAdmin.css";
 
 function OrderAdmin() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [hamburgerOpen, setHamburgerOpen] = useState(false);
-  const navigate = useNavigate();
+  const [orderType, setOrderType] = useState("online"); // For switching between tabs
 
   // Fetch orders from Firestore
   useEffect(() => {
     const fetchOrders = async () => {
-      const ordersRef = collection(db, "orders");
-      const ordersSnap = await getDocs(ordersRef);
-      const ordersList = ordersSnap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setOrders(ordersList);
-      setLoading(false);
+      try {
+        const ordersRef = collection(db, "orders");
+        const ordersSnap = await getDocs(ordersRef);
+        const ordersList = ordersSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log("Fetched Orders:", ordersList);
+        setOrders(ordersList);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchOrders();
   }, []);
 
-  // Handle deleting an order
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this order?")) {
-      await deleteDoc(doc(db, "orders", id));
-      setOrders(orders.filter((order) => order.id !== id));
-    }
-  };
-
-  // Navigation for tabs
-  const handleTabChange = (tab) => {
-    switch (tab) {
-      case "menu":
-        navigate("/admin");
-        break;
-      case "orders":
-        navigate("/orders");
-        break;
-      case "reports":
-        navigate("/reports");
-        break;
-      case "userRoles":
-        navigate("/walkinclient");
-        break;
-      default:
-        break;
-    }
+  // Handle switching between "Online Orders" and "Walk-in Orders"
+  const handleTabChange = (type) => {
+    setOrderType(type);
   };
 
   if (loading) {
@@ -62,122 +43,91 @@ function OrderAdmin() {
 
   return (
     <div className="App">
-      <nav className="navbar">
-        <div className="navbar-logo">
-          <img
-            src={logo}
-            className="App-verylog"
-            alt="WildBites Logo"
-            style={{
-              width: "650px",
-              height: "auto",
-              marginRight: "7%",
-              marginTop: "0px",
-            }}
-          />
-          <div
-            className="navbar-buttons"
-            style={{ marginTop: "20px", marginRight: "-150px" }}
+      <Navbar />
+      <div
+        className="orders-content"
+        style={{ paddingLeft: "20px", paddingRight: "20px" }}
+      >
+        <h2>Today's Orders</h2>
+        <div className="order-tabs">
+          <button
+            className={`order-tab ${
+              orderType === "online" ? "active-tab" : ""
+            }`}
+            onClick={() => handleTabChange("online")}
           >
-            <button
-              onClick={() => handleTabChange("menu")}
-              className="nav-link"
-            >
-              Menu
-            </button>
-            <button
-              onClick={() => handleTabChange("orders")}
-              className="nav-link"
-            >
-              Orders
-            </button>
-            <button
-              onClick={() => handleTabChange("reports")}
-              className="nav-link"
-            >
-              Reports
-            </button>
-            <button
-              onClick={() => navigate("/walkinclient")}
-              className="nav-link"
-            >
-              User Roles
-            </button>
-            <button onClick={() => handleTabChange("/")} className="nav-link">
-              Staff Management
-            </button>
-          </div>
+            Online Orders
+          </button>
+          <button
+            className={`order-tab ${
+              orderType === "walkin" ? "active-tab" : ""
+            }`}
+            onClick={() => handleTabChange("walkin")}
+          >
+            Customer Orders
+          </button>
         </div>
-
-        <div className="navbar-actions">
-          <span className="admin-option">Admin</span>
-          <div className="hamburger-icon">
-            <Squash toggled={hamburgerOpen} toggle={setHamburgerOpen} />
-          </div>
-
-          {hamburgerOpen && (
-            <div className="hamburger-menu">
-              <ul className="dropdown-menu">
-                <li className="dropdown-item">
-                  <button
-                    className="btn"
-                    onClick={() => console.log("Payment Details")}
-                  >
-                    Payment Details
-                  </button>
-                </li>
-                <li className="dropdown-item">
-                  <button
-                    className="btn logout-btn"
-                    style={{ color: "red" }}
-                    onClick={() => auth.signOut()}
-                  >
-                    Log Out
-                  </button>
-                </li>
-              </ul>
-            </div>
-          )}
-        </div>
-      </nav>
-
-      <div className="orders-content">
-        <h2>Orders Management</h2>
         <table className="orders-table">
           <thead>
             <tr>
               <th>Order ID</th>
-              <th>Customer Name</th>
-              <th>Item</th>
-              <th>Quantity</th>
+              <th>Name</th>
+              <th>Total Amount</th>
+              <th>Product</th>
               <th>Status</th>
-              <th>Actions</th>
+              <th>Assign</th>
+              <th>Proof of Payment</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
-              <tr key={order.id}>
-                <td>{order.id}</td>
-                <td>{order.customerName}</td>
-                <td>{order.item}</td>
-                <td>{order.quantity}</td>
-                <td>{order.status}</td>
-                <td>
-                  <button
-                    className="btn edit-button"
-                    onClick={() => console.log("Edit order", order.id)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn delete-button"
-                    onClick={() => handleDelete(order.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {orders
+              .filter((order) => orderType === "online") // Show only online orders
+              .map((order) => (
+                <tr key={order.id}>
+                  <td>{order.userId || "N/A"}</td>
+                  <td>{order.userName || "Unknown"}</td>
+                  <td>₱{order.orderTotal || 0}</td>
+                  <td>
+                    {order.items?.map((product, index) => (
+                      <div key={index}>
+                        {product.foodName} (x{product.quantity}) - ₱
+                        {product.price * product.quantity}
+                      </div>
+                    ))}
+                  </td>
+                  <td>
+                    <select
+                      value={order.status || "Pending"}
+                      onChange={(e) =>
+                        console.log("Status changed:", e.target.value)
+                      }
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Preparing">Preparing</option>
+                      <option value="Ready for Pickup">Ready for Pickup</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select
+                      value={order.assignTo || "Unassigned"}
+                      onChange={(e) =>
+                        console.log("Assigned to:", e.target.value)
+                      }
+                    >
+                      <option value="Staff A">Staff A</option>
+                      <option value="Staff B">Staff B</option>
+                      <option value="Staff C">Staff C</option>
+                      <option value="Unassigned">Unassigned</option>
+                    </select>
+                  </td>
+                  <td>
+                    {order.proofOfPayment
+                      ? `Reference #: ${order.proofOfPayment}`
+                      : "Not Paid"}
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
