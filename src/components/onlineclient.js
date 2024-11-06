@@ -309,6 +309,8 @@ function OnlineClient() {
       })),
       orderTotal: getTotalPrice(),
       orderDate: new Date().toISOString(),
+      status: null, // Add status field and set to null
+      assignTo: null, // Add assignTo field and set to null
     };
 
     try {
