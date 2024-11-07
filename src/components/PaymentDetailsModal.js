@@ -11,30 +11,28 @@ const PaymentDetailsModal = ({ isOpen, onClose, storage, db }) => {
   const [image, setImage] = useState(null);
   const [number, setNumber] = useState("");
   const [existingImage, setExistingImage] = useState(null);
-  const [existingNumber, setExistingNumber] = useState("");
   const [error, setError] = useState("");
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   useEffect(() => {
+    const fetchPaymentDetails = async () => {
+      try {
+        const docRef = doc(db, "paymentDetails", "default");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setExistingImage(data.image);
+          setNumber(data.number);
+        }
+      } catch (error) {
+        console.error("Error fetching payment details: ", error);
+      }
+    };
+
     if (isOpen) {
       fetchPaymentDetails();
     }
-  }, [isOpen]);
-
-  const fetchPaymentDetails = async () => {
-    try {
-      const docRef = doc(db, "paymentDetails", "default");
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setExistingImage(data.image);
-        setExistingNumber(data.number);
-        setNumber(data.number);
-      }
-    } catch (error) {
-      console.error("Error fetching payment details: ", error);
-    }
-  };
+  }, [isOpen, db]);
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);

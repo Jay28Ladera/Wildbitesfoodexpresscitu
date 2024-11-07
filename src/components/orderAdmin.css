@@ -19,15 +19,20 @@ h2 {
   cursor: pointer;
   border-radius: 5px;
   margin-right: 10px;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, opacity 0.3s;
+  opacity: 0.6; /* Faded appearance for unselected tabs */
 }
 
 .order-tab.active-tab {
-  background-color: #990000;
+  background-color: #990000; /* Darker color for the active tab */
+  opacity: 1; /* Full opacity for selected tab */
+  border-bottom: 3px solid #800000;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .order-tab:hover {
   background-color: #800000;
+  opacity: 1; /* Full opacity on hover */
 }
 
 .orders-table {
@@ -51,23 +56,4 @@ h2 {
   padding: 5px;
   border: 1px solid #ddd;
   border-radius: 5px;
-}
-
-.edit-button-orderAdmin {
-  background-color: green;
-  color: white;
-  padding: 5px 10px;
-  margin-right: 5px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.delete-button-orderAdmin {
-  background-color: red;
-  color: white;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
 }
