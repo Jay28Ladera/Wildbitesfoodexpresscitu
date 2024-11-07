@@ -67,7 +67,7 @@ function OrderAdmin() {
             Customer Orders
           </button>
         </div>
-        <table className="orders-table">
+        <table className={`orders-table ${orderType}`}>
           <thead>
             <tr>
               <th>Order ID</th>
