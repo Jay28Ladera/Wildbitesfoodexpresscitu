@@ -233,7 +233,7 @@ function Admin() {
         navigate("/admin");
         break;
       case "orders":
-        navigate("/orders");
+        navigate("/orderAdmin");
         break;
       case "reports":
         navigate("/reports");

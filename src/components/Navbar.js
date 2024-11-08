@@ -23,7 +23,7 @@ function Navbar({
         navigate("/Admin");
         break;
       case "orders":
-        navigate("/orders");
+        navigate("/OrderAdmin");
         break;
       case "reports":
         navigate("/reports");
@@ -31,6 +31,9 @@ function Navbar({
       case "userRoles":
         navigate("/walkinclient");
         break;
+        case "staffManagement":
+          navigate("/staffmanagement");
+          break;
       default:
         break;
     }
@@ -109,9 +112,9 @@ function Navbar({
           <button onClick={openUserRolesModalHandler} className="nav-link">
             User Roles
           </button>
-          <button onClick={() => handleTabChange("/")} className="nav-link">
-            Staff Management
-          </button>
+          <button onClick={() => handleTabChange("staffManagement")} className="nav-link">
+  Staff Management
+</button>
         </div>
       </div>
       <div className="navbar-actions">
