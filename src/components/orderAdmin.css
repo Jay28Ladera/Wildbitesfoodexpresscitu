@@ -57,3 +57,73 @@ h2 {
   border: 1px solid #ddd;
   border-radius: 5px;
 }
+
+/* Modal Background */
+.orderModal-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure it appears on top */
+}
+
+/* Modal Content Box */
+.orderModal-content {
+  background-color: white;
+  padding: 20px;
+  width: 300px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Modal Header */
+.orderModal-content h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Modal Text */
+.orderModal-content p {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* Cancel Button */
+.orderModal-content button.orderModal-cancelButton {
+  background-color: #b30000;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 10px;
+  transition: background-color 0.3s;
+}
+
+.orderModal-content button.orderModal-cancelButton:hover {
+  background-color: #990000;
+}
+
+/* Confirm Button */
+.orderModal-content button.orderModal-confirmButton {
+  background-color: #ffcc66;
+  color: black;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.orderModal-content button.orderModal-confirmButton:hover {
+  background-color: #e6b800;
+}
