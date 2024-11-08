@@ -212,8 +212,9 @@ function StaffManagement() {
       case "menu":
         navigate("/admin");
         break;
-      case "orders":
-        navigate("/orders");
+        case "orders":
+          navigate("/orderAdmin");
+          break;
         break;
       case "reports":
         navigate("/reports");
@@ -257,7 +258,10 @@ function StaffManagement() {
             <button onClick={() => handleTabChange("menu")} className="nav-link">
               Menu
             </button>
-            <button onClick={() => handleTabChange("orders")} className="nav-link">
+            <button
+              onClick={() => handleTabChange("orders")}
+              className="nav-link"
+            >
               Orders
             </button>
             <button onClick={() => handleTabChange("reports")} className="nav-link">
