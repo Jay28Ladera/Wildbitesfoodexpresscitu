@@ -230,7 +230,7 @@ function Admin() {
   const handleTabChange = (tab) => {
     switch (tab) {
       case "menu":
-        navigate("/menu");
+        navigate("/admin");
         break;
       case "orders":
         navigate("/orders");
@@ -238,11 +238,14 @@ function Admin() {
       case "reports":
         navigate("/reports");
         break;
-      case "userRoles":
-        navigate("/walkinclient");
-        break;
-      default:
-        break;
+        case "userRoles":
+          navigate("/walkinclient");
+          break;
+        case "staffManagement":
+          navigate("/staffmanagement");
+          break;
+        default:
+          break;
     }
   };
 
@@ -270,7 +273,7 @@ function Admin() {
             style={{ marginTop: "20px", marginRight: "-150px" }}
           >
             <button
-              onClick={() => handleTabChange("UserProfile")}
+              onClick={() => handleTabChange("menu")}
               className="nav-link"
             >
               Menu
@@ -291,12 +294,9 @@ function Admin() {
               User Roles
             </button>
             
-            <button
-              onClick={() => handleTabChange("/")}
-              className="nav-link"
-            >
-              Staff Management
-            </button>
+            <button onClick={() => handleTabChange("staffManagement")} className="nav-link">
+  Staff Management
+</button>
           </div>
         </div>
 
