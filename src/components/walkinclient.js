@@ -238,7 +238,13 @@ function WalkinClient() {
             <h3>{item.name}</h3>
             <p className="stock">Stock: {item.stock}</p>
             <p className="price">Price: Php {item.price.toFixed(2)}</p>
-            <button className="add-to-cart-button" onClick={() => addToCart(item)}>Add to Cart</button>
+            <button
+    className="add-to-cart-button"
+    onClick={() => addToCart(item)}
+    disabled={item.stock <= 0 || cart.some(cartItem => cartItem._id === item._id && cartItem.quantity >= item.stock)}
+  >
+    Add to Cart
+  </button>
           </div>
         ))}
       </div>
@@ -286,7 +292,7 @@ function WalkinClient() {
             <ul>
               {receiptContent.orderItems.map((item) => (
                 <li key={item._id}>
-                  <b>{item.name}</b> <b>{item.quantity}</b> <b>Php {(item.price * item.quantity).toFixed(2)}</b>
+                  <>{item.name}<b></b></> <>{item.quantity}<b></b></> <>Php {(item.price * item.quantity).toFixed(2)}</>
                 </li>
               ))}
             </ul>
