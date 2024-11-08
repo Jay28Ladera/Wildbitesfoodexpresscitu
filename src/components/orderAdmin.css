@@ -1,0 +1,59 @@
+.orders-content {
+  padding: 20px;
+}
+
+h2 {
+  color: #990000;
+}
+
+.order-tabs {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.order-tab {
+  padding: 10px 20px;
+  background-color: #b30000;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-right: 10px;
+  transition: background-color 0.3s, opacity 0.3s;
+  opacity: 0.6; /* Faded appearance for unselected tabs */
+}
+
+.order-tab.active-tab {
+  background-color: #990000; /* Darker color for the active tab */
+  opacity: 1; /* Full opacity for selected tab */
+  border-bottom: 3px solid #800000;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.order-tab:hover {
+  background-color: #800000;
+  opacity: 1; /* Full opacity on hover */
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.orders-table th {
+  background-color: #f2f2f2;
+  color: #990000;
+}
+
+.orders-table td select {
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}

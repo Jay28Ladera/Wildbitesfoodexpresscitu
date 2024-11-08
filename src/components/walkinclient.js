@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/maindash.svg";
 import './walkinclient.css';
-import { collection, getDocs } from "firebase/firestore"; // Import Firestore functions
-import { db } from "../firebase/firebase"; // Make sure to import your Firebase setup
+import { collection, getDocs, addDoc } from "firebase/firestore";
+import { db } from "../firebase/firebase";
 import { FaShoppingCart } from "react-icons/fa";
 
 function WalkinClient() {
+
   // initiate navigate
   const navigate = useNavigate();
 
@@ -21,6 +22,10 @@ function WalkinClient() {
   const closeUserRolesModal = () => setUserRolesModalOpen(false);
   const [hamburgerOpen, setHamburgerOpen] = useState(false);
   
+  // State for the success/failure message modal
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
+  const [messageModalContent, setMessageModalContent] = useState("");
+
   //change to admin logic
   const handleChangeToAdmin = () => {
     closeUserRolesModal();
@@ -28,7 +33,7 @@ function WalkinClient() {
   };
 
   // Fetch menu items from Firestore
-  const fetchMenuItems = async () => {
+   const fetchMenuItems = async () => {
     const menuItemsRef = collection(db, "menuItems");
     const menuItemsSnap = await getDocs(menuItemsRef);
     const items = menuItemsSnap.docs.map((doc) => ({
@@ -98,6 +103,37 @@ function WalkinClient() {
     return cart.reduce((total, cartItem) => total + cartItem.quantity, 0);
   };
   
+  const submitOrder = async () =>{
+    if(cart.length === 0) return;
+
+    const priorityNumber = Date.now();
+
+    const walkinClientOrder = {
+      priorityNumber,
+      orderItems: cart.map (({_id, name, quantity, price}) =>({
+        _id,
+        name,
+        quantity,
+        price,
+      })),
+      totalPrice: calculateTotalPrice(),
+      orderStatus: "Pending",
+      createdAt: new Date(),
+    };
+    try{
+      const walkinClientsRef = collection(db,"walkinClients");
+      await addDoc(walkinClientsRef, walkinClientOrder);
+
+      setCart([]);
+      closeCartModal();
+
+      alert(`Order submitted successfully! Priority number: ${priorityNumber}`);
+    }catch(error){
+      console.error("Error submitting walk-in client order: ", error);
+    alert("Failed to submit order. Please try again.");
+    }
+  }
+
   return (
     <div className="WalkinClient">
       <nav className="navbar">
@@ -198,7 +234,7 @@ function WalkinClient() {
               </div>
             )}
             <button className="close-cart-button" onClick={closeCartModal}>Close</button>
-            {cart.length > 0 && <button className="proceed-payment-button">Proceed to Payment</button>}
+            {cart.length > 0 && <button className="proceed-payment-button" onClick={submitOrder}>Submit Order</button>}
           </div>
         </div>
       )}

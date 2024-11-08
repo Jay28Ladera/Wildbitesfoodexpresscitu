@@ -1,0 +1,67 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5em 1em;
+  box-shadow: 0 4px 8px rgba(165, 151, 151, 0.5);
+  position: relative;
+  background-color: white;
+  border-radius: 20px;
+  max-width: 98.1%;
+}
+
+.navbar-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.navbar-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-link {
+  padding: 10px 15px;
+  border-radius: 10px;
+  background-color: rgba(163, 19, 19, 1);
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.nav-link:hover {
+  font-weight: bold;
+  background-color: #990000;
+}
+
+.add-menu-button {
+  background-color: rgba(163, 19, 19, 1);
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.hamburger-menu {
+  position: absolute;
+  top: 88%;
+  right: 30px;
+  transform: translateX(-48px);
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 10px;
+}
+
+.adminmenu-search {
+  max-width: 700px;
+  padding: 10px 20px;
+  background-color: rgb(255, 255, 255);
+  color: #990000;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
