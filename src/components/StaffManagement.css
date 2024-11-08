@@ -461,46 +461,5 @@
   background-color: rgb(221, 188, 131);/* Darker blue on hover */
 }
 
-/* Container styling */
-.p-6 {
-  padding: 1.5rem; /* 24px */
-}
-
-.max-w-6xl {
-  max-width: 72rem; /* 1152px */
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Header section styling */
-.flex {
-  display: flex;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.mb-6 {
-  margin-bottom: 1.5rem; /* 24px */
-}
-
-/* Title styling */
-.text-2xl {
-  font-size: 1.5rem; /* 24px */
-}
-
-.font-bold {
-  font-weight: 700;
-}
 
   
