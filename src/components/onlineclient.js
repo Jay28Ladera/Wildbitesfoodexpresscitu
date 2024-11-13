@@ -24,6 +24,8 @@ import "./onlineclient.css";
 import "./userprofile.css";
 import logo from "../assets/maindash.svg";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import "./myorders.css";
+
 
 
 function OnlineClient() {
@@ -551,16 +553,126 @@ function OnlineClient() {
     </>
   );
 
-  // Component for My Orders
+  // New component for My Orders
   const MyOrders = () => {
-    // Implement actual MyOrders logic here
+    const [orders, setOrders] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+  
+    useEffect(() => {
+      const fetchOrders = async () => {
+        if (userData) {
+          const ordersRef = collection(db, 'orders');
+          const q = query(ordersRef, where("userId", "==", userData.uid));
+          const querySnapshot = await getDocs(q);
+          const fetchedOrders = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+  
+          const sortedOrders = fetchedOrders.sort((a, b) =>
+            new Date(b.orderDate) - new Date(a.orderDate)
+          );
+  
+          setOrders(sortedOrders);
+        }
+      };
+  
+      fetchOrders();
+    }, [userData]);
+  
+    const formatDate = (dateString) => {
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      return new Date(dateString).toLocaleDateString('en-US', options);
+    };
+  
+    const filteredOrders = orders.filter(order =>
+      order.items.some(item => item.foodName.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  
     return (
-      <div>
-        <h2>My Orders</h2>
+      <div className="my-orders-container">
+        <div className="my-orders-header">
+          <h2 className="my-orders-title">Order History</h2>
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search orders..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+        </div>
+        {filteredOrders.length === 0 ? (
+          <div className="no-orders">
+            <p>There are no orders...</p>
+          </div>
+        ) : (
+          <div className="orders-table-container">
+            <table className="orders-table">
+              <thead>
+                <tr>
+                  <th>Order Date</th>
+                  <th>Items</th>
+                  <th>Quantity</th>
+                  <th>Price per Item</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredOrders.map((order) => (
+                  <React.Fragment key={order.id}>
+                    {order.items.map((item, itemIndex) => (
+                      <tr 
+                        key={`${order.id}-${itemIndex}`}
+                        className={`order-row ${itemIndex === order.items.length - 1 ? 'last-item' : ''}`}
+                      >
+                        {itemIndex === 0 && (
+                          <td 
+                            rowSpan={order.items.length} 
+                            className={`order-date ${itemIndex === order.items.length - 1 ? 'last-item' : ''}`}
+                          >
+                            {formatDate(order.orderDate)}
+                          </td>
+                        )}
+                        <td className="food-name">{item.foodName}</td>
+                        <td className="quantity">{item.quantity}</td>
+                        <td className="price">₱{(item.price).toFixed(2)}</td>
+                        {itemIndex === 0 && (
+                          <td 
+                            rowSpan={order.items.length} 
+                            className={`total-amount ${itemIndex === order.items.length - 1 ? 'last-item' : ''}`}
+                          >
+                            ₱{order.orderTotal.toFixed(2)}
+                          </td>
+                        )}
+                        {itemIndex === 0 && (
+                          <td 
+                            rowSpan={order.items.length} 
+                            className={`order-status ${itemIndex === order.items.length - 1 ? 'last-item' : ''}`}
+                          >
+                            <div className="status-badge status-pending">Pending</div>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     );
   };
-
+  
   // Component for Payment
   const Payment = () => {
     // Implement actual payment logic here
