@@ -11,6 +11,7 @@ import {
 import { db } from "../firebase/firebase";
 import SPLoader from "./spinnerloader";
 import Navbar from "./Navbar";
+import Notification from "./Notification"; // Import the notification component
 import "./orderAdmin.css";
 
 function OrderAdmin() {
@@ -22,6 +23,7 @@ function OrderAdmin() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [modalData, setModalData] = useState(null); // State for modal data
+  const [notification, setNotification] = useState(null); // For notifications
 
   // Fetch server staff from staff collection
   useEffect(() => {
@@ -46,10 +48,16 @@ function OrderAdmin() {
     const collectionName = orderType === "online" ? "orders" : "walkinClients";
     const ordersRef = collection(db, collectionName);
 
+    // Initialize previous orders from localStorage (optional)
+    const storedPreviousOrders = JSON.parse(
+      localStorage.getItem("previousOrders") || "[]"
+    );
+    const previousOrderSet = new Set(storedPreviousOrders);
+
     const unsubscribe = onSnapshot(
       ordersRef,
       (snapshot) => {
-        const ordersList = snapshot.docs.map((doc) => {
+        const newOrdersList = snapshot.docs.map((doc) => {
           const data = doc.data();
           const date = data.createdAt ? data.createdAt.toDate() : null;
           const formattedDate =
@@ -75,9 +83,26 @@ function OrderAdmin() {
             date: formattedDate,
           };
         });
-        setOrders(ordersList);
-        setFilteredOrders(ordersList); // Initialize filteredOrders
+
+        // Identify newly added orders
+        const newOrders = newOrdersList.filter(
+          (order) => !previousOrderSet.has(order.id)
+        );
+
+        // Update notification and previousOrders
+        if (newOrders.length > 0) {
+          setNotification(`${newOrders.length} new order(s) added!`);
+          newOrders.forEach((order) => previousOrderSet.add(order.id));
+        }
+
+        // Update state and localStorage
+        setOrders(newOrdersList);
+        setFilteredOrders(newOrdersList);
         setLoading(false);
+        localStorage.setItem(
+          "previousOrders",
+          JSON.stringify(Array.from(previousOrderSet))
+        );
       },
       (error) => {
         console.error("Error fetching orders:", error);
@@ -181,6 +206,15 @@ function OrderAdmin() {
         style={{ paddingLeft: "20px", paddingRight: "20px" }}
       >
         <h2>Today's Orders</h2>
+
+        {/* Display Notification */}
+        {notification && (
+          <Notification
+            message={notification}
+            onClose={() => setNotification(null)}
+          />
+        )}
+
         <div className="order-tabs">
           <button
             className={`order-tab ${
@@ -209,6 +243,7 @@ function OrderAdmin() {
           style={{ margin: "10px 0", padding: "6px", width: "300px" }}
         />
 
+        {/* Table */}
         <table className={`orders-table ${orderType}`}>
           <thead>
             <tr>
