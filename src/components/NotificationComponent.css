@@ -1,0 +1,54 @@
+.notification-container {
+  position: fixed;
+  top: 20px; /* Distance from top of the screen */
+  right: 20px; /* Distance from the right edge */
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+.notification {
+  background-color: rgba(
+    163,
+    19,
+    19,
+    0.8
+  ); /* Maroon background with transparency */
+  color: white; /* White text */
+  border-radius: 8px; /* Rounded corners */
+  padding: 15px 20px; /* Padding for content */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+  font-size: 16px; /* Adjust font size */
+  font-family: "Inter", sans-serif; /* Consistent font */
+  animation: slideIn 0.3s ease; /* Slide-in animation */
+  display: flex; /* Flexbox for icon and text */
+  align-items: center; /* Center items vertically */
+  gap: 10px; /* Space between icon and text */
+}
+
+.notification-icon {
+  font-size: 24px; /* Size of the bell icon */
+  animation: shake 0.5s infinite; /* Shaking animation */
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%); /* Start off-screen */
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0); /* Slide into view */
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0deg); /* Neutral position */
+  }
+  25% {
+    transform: rotate(-10deg); /* Tilt left */
+  }
+  75% {
+    transform: rotate(10deg); /* Tilt right */
+  }
+}
