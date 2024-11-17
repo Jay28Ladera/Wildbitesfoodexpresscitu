@@ -11,6 +11,7 @@ import {
 import { db } from "../firebase/firebase";
 import SPLoader from "./spinnerloader";
 import Navbar from "./Navbar";
+import NotificationComponent from "./NotificationComponent"; // Import notification component
 import "./orderAdmin.css";
 
 function OrderAdmin() {
@@ -22,6 +23,7 @@ function OrderAdmin() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [modalData, setModalData] = useState(null); // State for modal data
+  const [notification, setNotification] = useState(null); // Notification state
 
   // Fetch server staff from staff collection
   useEffect(() => {
@@ -48,33 +50,63 @@ function OrderAdmin() {
 
     const unsubscribe = onSnapshot(
       ordersRef,
-      (snapshot) => {
-        const ordersList = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const date = data.createdAt ? data.createdAt.toDate() : null;
-          const formattedDate =
-            date && !isNaN(date)
-              ? date.toISOString().split("T")[0].replace(/-/g, "/")
-              : "N/A";
+      async (snapshot) => {
+        const ordersList = await Promise.all(
+          snapshot.docs.map(async (docSnapshot) => {
+            const data = docSnapshot.data();
 
-          return {
-            id: doc.id,
-            orderId:
-              orderType === "online"
-                ? data.userId || "N/A"
-                : data.priorityNumber || "N/A",
-            name:
-              orderType === "online"
-                ? data.userName || "Unknown"
-                : "Walk-in Customer",
-            totalAmount: data.orderTotal || data.totalPrice || 0,
-            items: data.items || data.orderItems || [],
-            status: data.status || data.orderStatus || "Pending",
-            assignTo: data.assignTo || data.assign || "Unassigned",
-            proofOfPayment: data.proofOfPayment || "N/A",
-            date: formattedDate,
-          };
-        });
+            // Trigger notification for online orders with status null
+            if (orderType === "online" && data.status === null) {
+              setNotification(
+                `New online order received! Order ID: ${docSnapshot.id}`
+              );
+              const orderDoc = doc(db, collectionName, docSnapshot.id);
+              await updateDoc(orderDoc, { status: "Pending" });
+            }
+
+            // Trigger notification for walk-in orders with orderStatus null
+            if (orderType === "walkin" && data.orderStatus === null) {
+              setNotification(
+                `New walk-in order received! Order ID: ${docSnapshot.id}`
+              );
+              const orderDoc = doc(db, collectionName, docSnapshot.id);
+              await updateDoc(orderDoc, { orderStatus: "Pending" });
+            }
+
+            // Return processed order data
+            const date =
+              orderType === "online" && data.orderDate
+                ? new Date(data.orderDate)
+                : data.createdAt
+                ? data.createdAt.toDate()
+                : null;
+            const formattedDate =
+              date && !isNaN(date)
+                ? date.toISOString().split("T")[0].replace(/-/g, "/")
+                : "N/A";
+
+            return {
+              id: docSnapshot.id,
+              orderId:
+                orderType === "online"
+                  ? data.userId || "N/A"
+                  : data.priorityNumber || "N/A",
+              name:
+                orderType === "online"
+                  ? data.userName || "Unknown"
+                  : "Walk-in Customer",
+              totalAmount: data.orderTotal || data.totalPrice || 0,
+              items: data.items || data.orderItems || [],
+              status: data.status || data.orderStatus || "Pending",
+              assignTo: data.assignTo || data.assign || "Unassigned",
+              proofOfPayment: data.proofOfPayment || "N/A",
+              date: formattedDate,
+              timestamp: date, // For sorting
+            };
+          })
+        );
+
+        ordersList.sort((a, b) => b.timestamp - a.timestamp); // Sort by newest orders first
         setOrders(ordersList);
         setFilteredOrders(ordersList); // Initialize filteredOrders
         setLoading(false);
@@ -176,6 +208,12 @@ function OrderAdmin() {
   return (
     <div className="App">
       <Navbar />
+      {notification && (
+        <NotificationComponent
+          message={notification}
+          onClose={() => setNotification(null)}
+        />
+      )}
       <div
         className="orders-content"
         style={{ paddingLeft: "20px", paddingRight: "20px" }}
@@ -232,8 +270,8 @@ function OrderAdmin() {
                 <td>
                   {order.items.map((product, index) => (
                     <div key={index}>
-                      {product.name} (x{product.quantity}) - ₱
-                      {product.price * product.quantity}
+                      {product.foodName || product.name} (x{product.quantity}) -
+                      ₱{product.price * product.quantity}
                     </div>
                   ))}
                 </td>
