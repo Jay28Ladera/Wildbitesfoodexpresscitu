@@ -316,8 +316,6 @@ max-height:100%;
 }
 
 
-
-
 .cart-summary h2 {
   font-size: 1.5em; /* Header font size */
   margin-bottom: 15px; /* Space below the header */
@@ -487,3 +485,144 @@ background-color: #700000;
 }
 
 
+/* Payment Modal Overlay */
+
+.payment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Dim background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.payment-modal .button-container {
+  margin-bottom: 0px;
+  display: flex;
+  justify-content: flex-start; /* Align buttons to the left */
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.payment-modal {
+  background: #fff;
+  width: 600px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease;
+}
+
+.payment-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #990000; /* Maroon title */
+}
+
+.payment-landscape {
+  display: flex;
+  gap: 20px;
+}
+
+.order-summary {
+  flex: 1;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.order-summary h3 {
+  font-size: 1.4rem;
+  color: #990000; /* Maroon for section headers */
+  margin-bottom: 10px;
+}
+
+.order-summary ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.order-summary li {
+  font-size: 1rem;
+  margin-bottom: 5px;
+}
+
+.gcash-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.gcash-info {
+  background: rgba(163, 19, 19, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.payment-form label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #990000;
+}
+
+.payment-form input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-start; /* Align buttons to the left */
+  gap: 5px; /* Adjust space between buttons */
+  margin-top: 15px;
+}
+
+.submit-button-payment,
+.cancel-btn-payment {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.submit-button-payment {
+  background-color: #990000;
+  color: white;
+}
+
+.submit-button-payment:hover {
+  background-color: #700000;
+}
+
+.cancel-btn-payment {
+  background-color: rgba(163, 19, 19, 1);
+  color: white;
+}
+
+.cancel-btn-payment:hover {
+  background-color: #a52a2a;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
