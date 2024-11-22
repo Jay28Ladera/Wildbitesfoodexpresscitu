@@ -56,6 +56,17 @@ function OnlineClient() {
   const [activeTab, setActiveTab] = useState("foodMenu");
   const navigate = useNavigate();
 
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  const handleCheckout = () => {
+    setShowPaymentModal(true); // Show the payment modal
+  };
+
+  const closePaymentModal = () => {
+    setShowPaymentModal(false); // Hide the payment modal
+  };
+
+
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setShowProfile(false); // Close profile when navigating
@@ -294,7 +305,7 @@ function OnlineClient() {
   };
 
   // Save cart details to Firestore on checkout
-  const handleCheckout = async () => {
+    const handleSubmit= async () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty!");
       return;
@@ -323,7 +334,9 @@ function OnlineClient() {
       console.error("Error placing order: ", error);
       alert("Failed to place order. Please try again.");
     }
-  };
+  };   
+  
+
 
   // Function to handle canceling the order
   const cancelOrder = async () => {
@@ -429,6 +442,8 @@ function OnlineClient() {
     setShowChangePasswordModal(false);
     setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
   };
+  
+
 
   const handlePasswordChange = (e) => {
     setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
@@ -548,6 +563,7 @@ function OnlineClient() {
               Cancel Order
             </button>
           </div>
+          
         </div>
       </div>
     </>
@@ -673,15 +689,7 @@ function OnlineClient() {
     );
   };
   
-  // Component for Payment
-  const Payment = () => {
-    // Implement actual payment logic here
-    return (
-      <div>
-        <h2>Payment</h2>
-      </div>
-    );
-  };
+
 
   if (loading) {
     return <SPLoader />;
@@ -720,12 +728,7 @@ function OnlineClient() {
             >
               My Orders
             </button>
-            <button
-              onClick={() => handleTabChange("payment")}
-              className={`nav-link ${activeTab === "payment" ? "active" : ""}`}
-            >
-              Payment
-            </button>
+            
           </div>
         </div>
 
@@ -749,6 +752,8 @@ function OnlineClient() {
           </button>
         </div>
       </nav>
+
+    
 
       {showProfile ? (
         <div className="user-profile-container">
@@ -850,7 +855,6 @@ function OnlineClient() {
         <>
           {activeTab === "foodMenu" && <FoodMenu />}
           {activeTab === "myOrders" && <MyOrders />}
-          {activeTab === "payment" && <Payment />}
         </>
       )}
 
@@ -924,6 +928,77 @@ function OnlineClient() {
       <div className="modal-actions">
         <button onClick={handleChangePassword} className="save-btn">Change Password</button>
         <button onClick={closeChangePasswordModal} className="cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+)}
+
+{showPaymentModal && (
+  <div className="payment-modal-overlay">
+    <div className="payment-modal">
+      <h2 className="payment-title">Payment Portal</h2>
+      <div className="payment-landscape">
+        {/* Left: Order Summary */}
+        <div className="order-summary">
+          <h3>Order Summary</h3>
+          {cartItems.length === 0 ? (
+    <p>Your cart is empty. Add some items!</p>
+  ) : (
+    <ul>
+      {cartItems.map((item) => (
+        <li key={item._id} className="cart-item">
+          <span className="cart-item-name">{item.name}</span>
+          <span className="cart-item-quantity">Qty: {item.quantity}</span>
+          <span className="cart-item-price">
+            Php {(item.price * item.quantity).toFixed(2)}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )}
+  <p className="total-price">Total: Php {getTotalPrice().toFixed(2)}</p>  
+        </div>
+
+        {/* Right: GCash Information and Form */}
+        <div className="gcash-section">
+          <div className="gcash-info">
+            <h3>GCash Information</h3>
+            <p>GCash Name: Wildcats Food Express</p>
+            <p>GCash Number: 09123456789</p>
+          </div>
+          <form className="payment-form">
+            <label>
+              Order ID:
+              <input type="text" name="orderId" placeholder="Enter Order ID" />
+            </label>
+            <label>
+              Reference Number:
+              <input
+                type="text"
+                name="referenceNumber"
+                placeholder="Enter Reference Number"
+              />
+            </label>
+            <label>
+              Amount Sent:
+              <input
+                type="number"
+                name="amountSent"
+                placeholder="Enter Amount Sent"
+              />
+            </label>
+
+            {/* Buttons Container */}
+            <div className="button-container">
+              <button type="submit" className="submit-button-payment" onClick={handleSubmit}>
+                Submit Payment
+              </button>
+              <button type="button" className="cancel-btn-payment" onClick={closePaymentModal}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
