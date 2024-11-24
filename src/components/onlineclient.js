@@ -66,6 +66,14 @@ function OnlineClient() {
     setShowPaymentModal(false); // Hide the payment modal
   };
 
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      console.log("Uploaded file:", file);
+      // Handle file upload logic, e.g., set to state or upload to server
+    }
+  };
+
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -305,36 +313,74 @@ function OnlineClient() {
   };
 
   // Save cart details to Firestore on checkout
-    const handleSubmit= async () => {
-    if (cartItems.length === 0) {
-      alert("Your cart is empty!");
-      return;
-    }
+    const handleSubmit= async (event) => {
+      event.preventDefault(); // Prevent default form submission behavior
 
-    const order = {
-      userId: userData.uid,
-      userName: userData.name,
-      items: cartItems.map((item) => ({
-        foodName: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        totalPrice: item.price * item.quantity,
-      })),
-      orderTotal: getTotalPrice(),
-      orderDate: new Date().toISOString(),
-      status: null, // Add status field and set to null
-      assignTo: null, // Add assignTo field and set to null
-    };
+      if (cartItems.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
 
-    try {
-      await addDoc(collection(db, "orders"), order);
-      alert("Order placed successfully!");
-      setCartItems([]); // Clear the cart after successful checkout
-    } catch (error) {
-      console.error("Error placing order: ", error);
-      alert("Failed to place order. Please try again.");
-    }
-  };   
+      // Get values from the input fields
+      const orderId = document.querySelector('input[name="orderId"]').value.trim();
+      const referenceNumber = document.querySelector('input[name="referenceNumber"]').value.trim();
+      const amountSent = parseFloat(document.querySelector('input[name="amountSent"]').value);
+      const gcashReceipt = document.querySelector('input[name="gcashReceipt"]').files[0]; // Get the uploaded file
+      const orderTotal = getTotalPrice();
+      
+      // Validation
+        if (!orderId || !referenceNumber || !gcashReceipt) {
+          alert("Please fill in all the required fields and upload the receipt.");
+          return;
+        }
+
+        if (isNaN(amountSent)) {
+          alert("Please enter a valid amount sent.");
+          return;
+        }
+
+        if (amountSent !== orderTotal) {
+          alert(`The amount sent (Php ${amountSent.toFixed(2)}) must match the total price (Php ${orderTotal.toFixed(2)}).`);
+          return;
+        }
+
+        try {
+          // Upload receipt to Firebase Storage
+          const storageRef = ref(storage, `gcashReceipts/${Date.now()}-${gcashReceipt.name}`);
+          const snapshot = await uploadBytes(storageRef, gcashReceipt);
+          const receiptUrl = await getDownloadURL(snapshot.ref);
+      
+          // Construct the order object
+          const order = {
+            userId: userData.uid,
+            userName: userData.name,
+            items: cartItems.map((item) => ({
+              foodName: item.name,
+              price: item.price,
+              quantity: item.quantity,
+              totalPrice: item.price * item.quantity,
+            })),
+            orderTotal: getTotalPrice(),
+            orderDate: new Date().toISOString(),
+            status: null, // Add status field and set to null
+            assignTo: null, // Add assignTo field and set to null
+            paymentDetails: {
+              orderId,
+              referenceNumber,
+              amountSent,
+              receiptUrl, // Add receipt URL
+            },
+          };
+      
+          await addDoc(collection(db, "orders"), order);
+          alert("Order placed successfully!");
+          setCartItems([]); // Clear the cart after successful checkout
+          closePaymentModal(); // Close the payment modal if applicable
+        } catch (error) {
+          console.error("Error placing order: ", error);
+          alert("Failed to place order. Please try again.");
+        }
+      };
   
 
 
@@ -933,6 +979,8 @@ function OnlineClient() {
   </div>
 )}
 
+
+
 {showPaymentModal && (
   <div className="payment-modal-overlay">
     <div className="payment-modal">
@@ -985,6 +1033,14 @@ function OnlineClient() {
                 type="number"
                 name="amountSent"
                 placeholder="Enter Amount Sent"
+              />
+            </label>
+            <label>
+              GCash Receipt:
+              <input
+                type="file"
+                name="gcashReceipt"
+                accept="image/*"
               />
             </label>
 
