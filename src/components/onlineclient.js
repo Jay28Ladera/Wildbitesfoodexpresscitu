@@ -1358,7 +1358,7 @@ function OnlineClient() {
           </div>
           <form className="payment-form">
             <label>
-              Order ID:
+              Student ID:
               <input type="text" name="orderId" placeholder="Enter Order ID" />
             </label>
             <label>
