@@ -262,20 +262,44 @@
     margin-left: 1100px;
     margin-top: -35px;
   }
-  .navbar-buttons .ReturnToAdmin{
-    position: absolute;
-    width: 100px;
-    margin-left: 990px;
-    margin-top: -25px;
-
-    color: maroon;
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: bold;  
-  cursor: pointer; 
-  transition: color 0.3s ease;
+  .navbar-buttons .BackToAdmin{
+    padding: 10px 15px;
+    border-radius: 10px;
+    background-color: rgba(163, 19, 19, 1);
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+  }
+  .BacktoAdmin {
+    margin-left: -275px;
+    margin-right: 20px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    background-color: rgba(163, 19, 19, 1);
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .BacktoAdmin:hover {
+    background-color: rgba(139, 0, 0, 1);
   }
 
+  .walkinOrderStatus {
+  padding: 10px 15px;
+  border-radius: 10px;
+  background-color: rgba(163, 19, 19, 1);
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  }
+  .walkinOrderStatus:hover {
+    background-color: rgba(139, 0, 0, 1);
+  }
   .cart-count {
     position: absolute;
     top: -10px;
