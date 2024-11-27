@@ -498,6 +498,7 @@ background-color: #700000;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  overflow-y: auto;
 }
 
 .payment-modal .button-container {
@@ -569,6 +570,36 @@ background-color: #700000;
   font-size: 0.9rem;
 }
 
+.gcash-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* Spacing between elements */
+}
+
+.gcash-info {
+  flex: 1; /* Allows the info to take available space */
+  background: rgba(163, 19, 19, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center QR code horizontally */
+  justify-content: center; /* Center QR code vertically */
+  text-align: center; /* Center text if applicable */
+  flex: 0; /* Shrink QR code container to its content */
+  margin-top: 0px;
+}
+
+.gcash-qr-code {
+  max-width: 100px; /* Adjust size as needed */
+  cursor: pointer;
+  margin-top: 0px;
+}
+
 .payment-form label {
   display: block;
   margin-bottom: 10px;
@@ -626,3 +657,4 @@ background-color: #700000;
     opacity: 1;
   }
 }
+

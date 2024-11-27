@@ -58,9 +58,30 @@ function OnlineClient() {
   const navigate = useNavigate();
   const [completedOrderHistory, setCompletedOrderHistory] = useState([]);
   const [cancelledOrderHistory, setCancelledOrderHistory] = useState([]);
-
-
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [gcashNumber, setGcashNumber] = useState("");
+  const [qrCodeImage, setQRCodeImage] = useState("");
+  const [showQRCode, setShowQRCode] = useState(false);
+
+  useEffect(() => {
+    const fetchGcashDetails = async () => {
+      try {
+        const docRef = doc(db, "paymentDetails", "default");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setGcashNumber(data.number); // Set the fetched GCash number
+          setQRCodeImage(data.image); // Fetch QR code image URL
+        }
+      } catch (error) {
+        console.error("Error fetching GCash details: ", error);
+      }
+    };
+  
+    if (showPaymentModal) {
+      fetchGcashDetails();
+    }
+  }, [showPaymentModal, db]);
 
   const handleCheckout = () => {
     setUserData(userData); // userData contains logged-in user's details
@@ -1356,19 +1377,42 @@ function OnlineClient() {
             <h3>GCash Information</h3>
             <p>GCash Name: Wildcats Food Express</p>
             <p>
-    GCash Number:{" "}
-    <span
-      className="gcash-number"
-      onClick={() => {
-        navigator.clipboard.writeText("09123456789");
-        alert("GCash number copied to clipboard!");
-      }}
-      style={{ cursor: "pointer", color: "blue" }}
-    >
-      09123456789
-    </span>
-  </p>
+              GCash Number:{" "}
+              <span
+                className="gcash-number"
+                onClick={() => {
+                  navigator.clipboard.writeText(gcashNumber);
+                  alert("GCash number copied to clipboard!");
+                }}
+                style={{ cursor: "pointer", color: "blue" }}
+              >
+                {gcashNumber}
+              </span>
+            </p>
           </div>
+          <div className="qr-code-container">
+              <h4>QR Code</h4>
+              {qrCodeImage && (
+                <img
+                  src={qrCodeImage}
+                  alt="GCash QR Code"
+                  className="gcash-qr-code"
+                    onClick={(e) => {
+                      // Prevent the default anchor link behavior
+                      e.preventDefault();
+              
+                      // Open the QR code image in a new tab without navigating away from the current page
+                      window.open(qrCodeImage, '_blank'); // Open in a new tab
+              
+                      // Create an invisible link to trigger the download
+                      const link = document.createElement('a');
+                      link.href = qrCodeImage;
+                      link.download = 'GCash-QR-Code.png'; // Set the download file name
+                      link.click(); // Trigger the download
+                  }}
+                />
+              )}
+            </div>
           <form className="payment-form">
           <label>
               Student ID:
