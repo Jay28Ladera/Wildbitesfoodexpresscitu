@@ -7,11 +7,12 @@ import {
   doc,
   addDoc,
   deleteDoc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import SPLoader from "./spinnerloader";
 import Navbar from "./Navbar";
-import NotificationComponent from "./NotificationComponent"; // Import notification component
+import NotificationComponent from "./NotificationComponent";
 import "./orderAdmin.css";
 
 function OrderAdmin() {
@@ -73,7 +74,6 @@ function OrderAdmin() {
               await updateDoc(orderDoc, { orderStatus: "Pending" });
             }
 
-            // Return processed order data
             const date =
               orderType === "online" && data.orderDate
                 ? new Date(data.orderDate)
@@ -143,7 +143,6 @@ function OrderAdmin() {
       setModalData({ order, newStatus }); // Set modal data and open modal
       setShowModal(true);
     } else {
-      // Update status without confirmation for other statuses
       const collectionName =
         orderType === "online" ? "orders" : "walkinClients";
       const orderDoc = doc(db, collectionName, order.id);
@@ -164,10 +163,23 @@ function OrderAdmin() {
       newStatus === "Completed" ? "successfulOrders" : "cancelledOrders";
 
     try {
-      // Add the order data to the target collection
-      await addDoc(collection(db, targetCollection), { ...order });
-      // Delete the order from its original collection
-      await deleteDoc(doc(db, collectionName, order.id));
+      // Fetch the original document to preserve its structure
+      const orderDocRef = doc(db, collectionName, order.id);
+      const orderSnapshot = await getDoc(orderDocRef);
+
+      if (!orderSnapshot.exists()) {
+        console.error("Order does not exist.");
+        return;
+      }
+
+      const orderData = orderSnapshot.data(); // Get the exact document structure
+
+      // Add the document to the target collection
+      await addDoc(collection(db, targetCollection), orderData);
+
+      // Delete the original document
+      await deleteDoc(orderDocRef);
+
       console.log(`Moved order ${order.id} to ${targetCollection}`);
     } catch (error) {
       console.error("Error moving order:", error);
@@ -214,10 +226,7 @@ function OrderAdmin() {
           onClose={() => setNotification(null)}
         />
       )}
-      <div
-        className="orders-content"
-        style={{ paddingLeft: "20px", paddingRight: "20px" }}
-      >
+      <div className="orders-content" style={{ padding: "20px" }}>
         <h2>Today's Orders</h2>
         <div className="order-tabs">
           <button
