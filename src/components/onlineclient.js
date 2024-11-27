@@ -28,6 +28,7 @@ import "./myorders.css";
 
 
 
+
 function OnlineClient() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +56,9 @@ function OnlineClient() {
   });
   const [activeTab, setActiveTab] = useState("foodMenu");
   const navigate = useNavigate();
+  const [completedOrderHistory, setCompletedOrderHistory] = useState([]);
+  const [cancelledOrderHistory, setCancelledOrderHistory] = useState([]);
+
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
@@ -75,12 +79,14 @@ function OnlineClient() {
   };
 
 
+
+
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setShowProfile(false); // Close profile when navigating
   };
 
-  // Track authentication state and fetch user data
+  // Retain the existing authentication useEffect
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -91,7 +97,6 @@ function OnlineClient() {
         } else {
           console.error("No such document!");
         }
-
         // Fetch menu items after fetching user data
         fetchMenuItems();
       } else {
@@ -99,9 +104,80 @@ function OnlineClient() {
       }
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, [navigate]);
+  
+  useEffect(() => {
+    if (userData) {
+      // References to cleanup listeners
+      let unsubscribeCompletedOrders = null;
+      let unsubscribeCancelledOrders = null;
+  
+      try {
+        // Query for completed orders
+        const completedOrdersRef = collection(db, 'successfulOrders');
+        const completedOrdersQuery = query(completedOrdersRef, where("userId", "==", userData.uid));
+        
+        // Query for cancelled orders
+        const cancelledOrdersRef = collection(db, 'cancelledOrders');
+        const cancelledOrdersQuery = query(cancelledOrdersRef, where("userId", "==", userData.uid));
+  
+        // Set up real-time listener for completed orders
+        unsubscribeCompletedOrders = onSnapshot(completedOrdersQuery, (snapshot) => {
+          const completedOrders = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              ...data,
+              status: 'Completed',
+              items: data.items || [],
+              orderTotal: data.orderTotal || data.totalAmount || 0,
+              orderDate: data.orderDate || new Date().toISOString(),
+              orderFinishedDate: data.orderFinishedDate || new Date().toISOString()
+            };
+          });
+  
+          setCompletedOrderHistory(completedOrders);
+        }, (error) => {
+          console.error("Error fetching completed orders:", error);
+        });
+  
+        // Set up real-time listener for cancelled orders
+        unsubscribeCancelledOrders = onSnapshot(cancelledOrdersQuery, (snapshot) => {
+          const cancelledOrders = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              ...data,
+              status: 'Cancelled',
+              items: data.items || [],
+              orderTotal: data.orderTotal || data.totalAmount || 0,
+              orderDate: data.orderDate || new Date().toISOString(),
+              orderFinishedDate: data.orderFinishedDate || new Date().toISOString()
+            };
+          });
+  
+          setCancelledOrderHistory(cancelledOrders);
+        }, (error) => {
+          console.error("Error fetching cancelled orders:", error);
+        });
+  
+      } catch (error) {
+        console.error("Error setting up real-time listeners:", error);
+      }
+  
+      // Cleanup listeners on unmount or user change
+      return () => {
+        if (unsubscribeCompletedOrders) unsubscribeCompletedOrders();
+        if (unsubscribeCancelledOrders) unsubscribeCancelledOrders();
+      };
+    }
+  }, [userData]);
+  
+
+
+
+
 
   // Fetch menu items from Firestore
   const fetchMenuItems = async () => {
@@ -615,32 +691,72 @@ function OnlineClient() {
     </>
   );
 
-  // New component for My Orders
+
+
+  /*My Orders Component*/
   const MyOrders = () => {
     const [orders, setOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [orderToCancel, setOrderToCancel] = useState(null);
   
+    // Fetch orders from Firebase
     useEffect(() => {
-      const fetchOrders = async () => {
+      const fetchAndManageOrders = async () => {
         if (userData) {
           const ordersRef = collection(db, 'orders');
           const q = query(ordersRef, where("userId", "==", userData.uid));
           const querySnapshot = await getDocs(q);
+          
           const fetchedOrders = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
           }));
   
-          const sortedOrders = fetchedOrders.sort((a, b) =>
+          // Separate active and transferable orders
+          const activeOrders = [];
+          const transferOrders = [];
+  
+          fetchedOrders.forEach(order => {
+            if (order.status === 'Cancelled' || order.status === 'Completed') {
+              transferOrders.push(order);
+            } else {
+              activeOrders.push(order);
+            }
+          });
+  
+          // Sort active orders
+          const sortedActiveOrders = activeOrders.sort((a, b) =>
             new Date(b.orderDate) - new Date(a.orderDate)
           );
   
-          setOrders(sortedOrders);
+          // Transfer orders to respective collections
+          await transferOrdersToArchive(transferOrders);
+  
+          setOrders(sortedActiveOrders);
         }
       };
-  
-      fetchOrders();
-    }, [userData]);
+      // Transfer orders to appropriate archive collections
+    const transferOrdersToArchive = async (ordersToTransfer) => {
+      for (const order of ordersToTransfer) {
+        try {
+          const targetCollection = order.status === 'Completed' 
+            ? 'successfulOrders' 
+            : 'cancelledOrders';
+
+          // Add to target collection
+          await addDoc(collection(db, targetCollection), { ...order });
+
+          // Delete from original collection
+          await deleteDoc(doc(db, 'orders', order.id));
+        } catch (error) {
+          console.error(`Error transferring order ${order.id}:`, error);
+        }
+      }
+    };
+
+    fetchAndManageOrders();
+  }, [userData]);
   
     const formatDate = (dateString) => {
       const options = {
@@ -653,6 +769,60 @@ function OnlineClient() {
       return new Date(dateString).toLocaleDateString('en-US', options);
     };
   
+    // Render status badge based on order status
+    const renderStatusBadge = (status) => {
+      const statusClasses = {
+        'Pending': 'my-orders-status-pending',
+        'Preparing': 'my-orders-status-preparing',
+        'Ready for Pickup': 'my-orders-status-ready',
+        'Completed': 'my-orders-status-completed',
+        'Cancelled': 'my-orders-status-canceled'
+      };
+      return (
+        <div className={`my-orders-status-badge ${statusClasses[status] || ''}`}>
+          {status}
+        </div>
+      );
+    };
+    
+  
+    // Handle cancel modal display
+    const openCancelModal = (orderId) => {
+      setOrderToCancel(orderId);
+      setShowCancelModal(true);
+    };
+  
+    const closeCancelModal = () => {
+      setShowCancelModal(false);
+      setOrderToCancel(null);
+    };
+
+
+  
+    const cancelOrder = async () => {
+      try {
+        // Update order status to 'Cancelled' in Firestore
+        const orderDoc = doc(db, 'orders', orderToCancel);
+        await updateDoc(orderDoc, { status: 'Cancelled' });
+        
+        // Immediately remove from local state and transfer to cancelled collection
+        const updatedOrders = orders.filter(order => order.id !== orderToCancel);
+        setOrders(updatedOrders);
+        
+        // Get full order details to transfer
+        const orderToTransfer = orders.find(order => order.id === orderToCancel);
+        
+        // Transfer to cancelled collection
+        await addDoc(collection(db, 'cancelledOrders'), { ...orderToTransfer });
+        await deleteDoc(orderDoc);
+        
+        // Close modal
+        closeCancelModal();
+      } catch (error) {
+        console.error('Error cancelling order:', error);
+      }
+    };
+  
     const filteredOrders = orders.filter(order =>
       order.items.some(item => item.foodName.toLowerCase().includes(searchTerm.toLowerCase()))
     );
@@ -660,24 +830,25 @@ function OnlineClient() {
     return (
       <div className="my-orders-container">
         <div className="my-orders-header">
-          <h2 className="my-orders-title">Order History</h2>
-          <div className="search-container">
+          <h2 className="my-orders-title">Current Orders</h2>
+          <div className="my-orders-search-container">
             <input
               type="text"
               placeholder="Search orders..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
+              className="my-orders-search-input"
             />
           </div>
         </div>
+  
         {filteredOrders.length === 0 ? (
-          <div className="no-orders">
+          <div className="my-orders-no-orders">
             <p>There are no orders...</p>
           </div>
         ) : (
-          <div className="orders-table-container">
-            <table className="orders-table">
+          <div className="my-orders-table-container">
+            <table className="my-orders-table">
               <thead>
                 <tr>
                   <th>Order Date</th>
@@ -686,53 +857,114 @@ function OnlineClient() {
                   <th>Price per Item</th>
                   <th>Total Amount</th>
                   <th>Status</th>
+                  <th>Cancel Order</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map((order) => (
-                  <React.Fragment key={order.id}>
-                    {order.items.map((item, itemIndex) => (
-                      <tr 
-                        key={`${order.id}-${itemIndex}`}
-                        className={`order-row ${itemIndex === order.items.length - 1 ? 'last-item' : ''}`}
-                      >
-                        {itemIndex === 0 && (
-                          <td 
-                            rowSpan={order.items.length} 
-                            className={`order-date ${itemIndex === order.items.length - 1 ? 'last-item' : ''}`}
-                          >
-                            {formatDate(order.orderDate)}
-                          </td>
-                        )}
-                        <td className="food-name">{item.foodName}</td>
-                        <td className="quantity">{item.quantity}</td>
-                        <td className="price">₱{(item.price).toFixed(2)}</td>
-                        {itemIndex === 0 && (
-                          <td 
-                            rowSpan={order.items.length} 
-                            className={`total-amount ${itemIndex === order.items.length - 1 ? 'last-item' : ''}`}
-                          >
-                            ₱{order.orderTotal.toFixed(2)}
-                          </td>
-                        )}
-                        {itemIndex === 0 && (
-                          <td 
-                            rowSpan={order.items.length} 
-                            className={`order-status ${itemIndex === order.items.length - 1 ? 'last-item' : ''}`}
-                          >
-                            <div className="status-badge status-pending">Pending</div>
-                          </td>
-                        )}
-                      </tr>
-                    ))}
-                  </React.Fragment>
-                ))}
-              </tbody>
+  {filteredOrders.map((order) => (
+    <React.Fragment key={order.id}>
+      {order.items.map((item, itemIndex) => (
+        <tr
+          key={`${order.id}-${itemIndex}`}
+          className={`order-row ${
+            itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''
+          }`}
+        >
+          {itemIndex === 0 && (
+            <td
+              rowSpan={order.items.length}
+              className={`my-orders-date ${
+                itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''
+              }`}
+            >
+              {formatDate(order.orderDate)}
+            </td>
+          )}
+          <td className="my-orders-food-name">{item.foodName}</td>
+          <td className="my-orders-quantity">{item.quantity}</td>
+          <td className="my-orders-price">₱{item.price.toFixed(2)}</td>
+          {itemIndex === 0 && (
+            <td
+              rowSpan={order.items.length}
+              className={`my-orders-total-amount ${
+                itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''
+              }`}
+            >
+              ₱{order.orderTotal.toFixed(2)}
+            </td>
+          )}
+          {itemIndex === 0 && (
+            <td
+              rowSpan={order.items.length}
+              className="my-orders-status"
+            >
+              {renderStatusBadge(order.status || 'Pending')}
+            </td>
+          )}
+          {itemIndex === 0 && (
+            <td
+              rowSpan={order.items.length}
+              className="my-orders-cancel"
+            >
+              {order.status === 'Pending' && (
+                <button
+                  className="my-orders-cancel-button"
+                  onClick={() => openCancelModal(order.id)}
+                >
+                  X
+                </button>
+              )}
+            </td>
+          )}
+
+        </tr>
+      ))}
+    </React.Fragment>
+  ))}
+</tbody>
+
             </table>
+          </div>
+        )}
+  
+        {/* Cancel Modal */}
+        {showCancelModal && (
+          <div className="my-orders-cancel-modal">
+            <div className="my-orders-cancel-modal-content">
+              <h3>Are you sure you want to cancel this order?</h3>
+              <button 
+                className="my-orders-cancel-confirm" 
+                onClick={cancelOrder}
+              >
+                Yes, Cancel
+              </button>
+              <button 
+                className="my-orders-cancel-cancel" 
+                onClick={closeCancelModal}
+              >
+                No, Keep Order
+              </button>
+            </div>
           </div>
         )}
       </div>
     );
+  };
+  
+  
+  
+  
+  
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
   
 
@@ -802,107 +1034,217 @@ function OnlineClient() {
     
 
       {showProfile ? (
-        <div className="user-profile-container">
-          <div className="profile-content">
-            {/* Profile Picture */}
-            <div className="profile-picture">
-              {userData?.profilePic ? (
-                <img src={userData.profilePic} alt="Profile" />
-              ) : (
-                <div className="modal-initials-circle">
-                  {userData?.name ? userData.name.charAt(0).toUpperCase() : "U"}
-                </div>
-              )}
-              <div className="camera-icon" onClick={triggerFileInput}>
-                <FaCamera />
-              </div>
+  <div className="user-profile-container">
+    <div className="profile-content">
+      {/* Profile Picture */}
+      <div className="profile-picture">
+        {userData?.profilePic ? (
+          <img src={userData.profilePic} alt="Profile" />
+        ) : (
+          <div className="modal-initials-circle">
+            {userData?.name ? userData.name.charAt(0).toUpperCase() : "U"}
+          </div>
+        )}
+        <div className="camera-icon" onClick={triggerFileInput}>
+          <FaCamera />
+        </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleProfilePicChange}
+          style={{ display: "none" }}
+          accept="image/*"
+        />
+      </div>
+
+      {/* Profile Details */}
+      <div className="profile-details">
+        <div className="profile-header">
+          <h2>{userData?.name || "Test"}</h2>
+          <div className="profile-actions">
+            <button onClick={openEditModal} className="edit-btn">
+              Edit Info
+            </button>
+            <button onClick={openChangePasswordModal} className="change-password-btn">
+              Change Password
+            </button>
+            <button onClick={handleLogout} className="logout-btn">
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <div className="user-info">
+          {/* First Row: Course/Year and Contact Number */}
+          <div className="info-row">
+            <div className="info-field">
+              <label htmlFor="course">Course/Year</label>
               <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleProfilePicChange}
-                style={{ display: "none" }}
-                accept="image/*"
+                id="course"
+                type="text"
+                value={userData?.course || ""}
+                readOnly
               />
-              
             </div>
+            <div className="info-field">
+              <label htmlFor="contactNumber">Contact Number</label>
+              <input
+                id="contactNumber"
+                type="text"
+                value={userData?.contactNumber || ""}
+                readOnly
+              />
+            </div>
+          </div>
 
-            {/* Profile Details */}
-            <div className="profile-details">
-              <div className="profile-header">
-                <h2>{userData?.name || "Test"}</h2>
-                <div className="profile-actions">
-                  <button onClick={openEditModal} className="edit-btn">
-                    Edit Info
-                  </button>
-                  <button
-                    onClick={openChangePasswordModal}
-                    className="change-password-btn"
-                  >
-                    Change Password
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="logout-btn"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
-
-              <div className="user-info">
-                {/* First Row: Course/Year and Contact Number */}
-                <div className="info-row">
-                  <div className="info-field">
-                    <label htmlFor="course">Course/Year</label>
-                    <input
-                      id="course"
-                      type="text"
-                      value={userData?.course || ""}
-                      readOnly
-                    />
-                  </div>
-                  <div className="info-field">
-                    <label htmlFor="contactNumber">Contact Number</label>
-                    <input
-                      id="contactNumber"
-                      type="text"
-                      value={userData?.contactNumber || ""}
-                      readOnly
-                    />
-                  </div>
-                </div>
-
-                {/* Second Row: School ID Number and Email */}
-                <div className="info-row">
-                  <div className="info-field">
-                    <label htmlFor="schoolId">School ID Number</label>
-                    <input
-                      id="schoolId"
-                      type="text"
-                      value={userData?.schoolId || ""}
-                      readOnly
-                    />
-                  </div>
-                  <div className="info-field">
-                    <label htmlFor="email">Email</label>
-                    <input
-                      id="email"
-                      type="email"
-                      value={userData?.email || ""}
-                      readOnly
-                    />
-                  </div>
-                </div>
-              </div>
+          {/* Second Row: School ID Number and Email */}
+          <div className="info-row">
+            <div className="info-field">
+              <label htmlFor="schoolId">School ID Number</label>
+              <input
+                id="schoolId"
+                type="text"
+                value={userData?.schoolId || ""}
+                readOnly
+              />
+            </div>
+            <div className="info-field">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                value={userData?.email || ""}
+                readOnly
+              />
             </div>
           </div>
         </div>
-      ) : (
-        <>
-          {activeTab === "foodMenu" && <FoodMenu />}
-          {activeTab === "myOrders" && <MyOrders />}
-        </>
-      )}
+
+{/* Completed Orders */}
+<div className="my-orders-container">
+  <div className="my-orders-header">
+    <h3 className="my-orders-title">Completed Orders</h3>
+  </div>
+  <div className="my-orders-table-container">
+    {completedOrderHistory.length > 0 ? (
+      <table className="my-orders-table">
+        <thead>
+          <tr>
+            <th>Order Date</th>
+            <th>Order Finished</th>
+            <th>Item/s</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {completedOrderHistory.map((order) => (
+            <tr key={order.id}>
+              <td className="my-orders-date">{formatDate(order.orderDate)}</td>
+              <td className="my-orders-date">{formatDate(order.orderFinishedDate || order.orderDate)}</td>
+              <td className="my-orders-food-name">
+                {order.items 
+                  ? order.items.map(item => item.name || item.foodName || 'Unknown').join(', ')
+                  : 'No items'}
+              </td>
+              <td>
+                {order.items 
+                  ? order.items.map(item => item.quantity || 0).join(', ')
+                  : 'N/A'}
+              </td>
+              <td className="my-orders-price">
+                {order.items 
+                  ? order.items.map(item => `Php ${(item.price || 0).toFixed(2)}`).join(', ')
+                  : 'N/A'}
+              </td>
+              <td className="my-orders-total-amount">
+                Php {(order.orderTotal || order.totalAmount || 0).toFixed(2)}
+              </td>
+              <td className="my-orders-status">
+                <span className="my-orders-status-badge my-orders-status-completed">
+                  Completed
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <div className="my-orders-no-orders">No completed orders found</div>
+    )}
+  </div>
+</div>
+
+{/* Cancelled Orders */}
+<div className="my-orders-container">
+  <div className="my-orders-header">
+    <h3 className="my-orders-title">Cancelled Orders</h3>
+  </div>
+  <div className="my-orders-table-container">
+    {cancelledOrderHistory.length > 0 ? (
+      <table className="my-orders-table">
+        <thead>
+          <tr>
+            <th>Order Date</th>
+            <th>Order Cancelled</th>
+            <th>Item/s</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cancelledOrderHistory.map((order) => (
+            <tr key={order.id}>
+              <td className="my-orders-date">{formatDate(order.orderDate)}</td>
+              <td className="my-orders-date">{formatDate(order.orderFinishedDate || order.orderDate)}</td>
+              <td className="my-orders-food-name">
+                {order.items 
+                  ? order.items.map(item => item.name || item.foodName || 'Unknown').join(', ')
+                  : 'No items'}
+              </td>
+              <td>
+                {order.items 
+                  ? order.items.map(item => item.quantity || 0).join(', ')
+                  : 'N/A'}
+              </td>
+              <td className="my-orders-price">
+                {order.items 
+                  ? order.items.map(item => `Php ${(item.price || 0).toFixed(2)}`).join(', ')
+                  : 'N/A'}
+              </td>
+              <td className="my-orders-total-amount">
+                Php {(order.orderTotal || order.totalAmount || 0).toFixed(2)}
+              </td>
+              <td className="my-orders-status">
+                <span className="my-orders-status-badge my-orders-status-canceled">
+                  Cancelled
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <div className="my-orders-no-orders">No cancelled orders found</div>
+    )}
+  </div>
+</div>
+
+      </div>
+    </div>
+  </div>
+) : (
+  <>
+    {/* Conditional Rendering for Tabs */}
+    {activeTab === "foodMenu" && <FoodMenu />}
+    {activeTab === "myOrders" && <MyOrders />}
+  </>
+)}
+
 
 {showEditModal && (
   <div className="modal-overlay">

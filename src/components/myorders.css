@@ -17,22 +17,24 @@
   font-size: 1.8rem;
   font-weight: bold;
   font-family: 'Inter', sans-serif;
+  margin-bottom: 0.1rem; /* Reduce margin to decrease the gap */
 }
 
-.search-container {
+.my-orders-search-container {
   display: flex;
   align-items: center;
 }
 
-.search-input {
+.my-orders-search-input {
   padding: 0.5rem 1rem;
   border: 1px solid #FFE5E5;
   border-radius: 4px;
   font-size: 1rem;
   width: 200px;
+  margin-bottom: 0.1rem;
 }
 
-.no-orders {
+.my-orders-no-orders {
   text-align: center;
   padding: 2rem;
   background: white;
@@ -41,21 +43,21 @@
   color: #990000;
 }
 
-.orders-table-container {
+.my-orders-table-container {
   overflow-x: auto;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(209, 0, 0, 0.1);
 }
 
-.orders-table {
+.my-orders-table {
   width: 100%;
   border-collapse: collapse;
   min-width: 1200px;
   font-family: 'Inter', sans-serif;
 }
 
-.orders-table th {
+.my-orders-table th {
   background-color: #990000;
   padding: 1rem;
   text-align: center;
@@ -64,57 +66,59 @@
   border-bottom: 2px solid #990000;
 }
 
-.orders-table td {
+.my-orders-table td {
   padding: 1rem;
   color: #333;
   text-align: center;
 }
 
-/* Reset all borders first */
-.orders-table td,
-.orders-table td[rowspan] {
+.my-orders-table td,
+.my-orders-table td[rowspan] {
   border: none;
 }
 
-/* Add bottom border to the last row of each order */
-.orders-table tr:last-child td,
-.orders-table tr.last-item td {
+.my-orders-table tr:last-child td,
+.my-orders-table tr.my-orders-last-item td {
   border-bottom: 2px solid #929292;
 }
 
-/* Add bottom border to cells with rowspan that span to the last row */
-.orders-table td[rowspan] {
+.my-orders-table td[rowspan] {
+  border-bottom: 2px solid #929292;
+}
+/* Apply bottom border to the cancel column, regardless of the button */
+.my-orders-table td.my-orders-cancel {
   border-bottom: 2px solid #929292;
 }
 
-.orders-table tr:hover {
+
+.my-orders-table tr:hover {
   background-color: #FFF5F5;
 }
 
-.orders-table .order-date {
+.my-orders-date {
   font-weight: 500;
   white-space: nowrap;
 }
 
-.orders-table .food-name {
+.my-orders-food-name {
   color: #333;
   font-weight: 500;
 }
 
-.orders-table .price {
+.my-orders-price {
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   color: #097e05;
 }
 
-.orders-table .total-amount {
+.my-orders-total-amount {
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   color: #990000;
   font-weight: 600;
 }
 
-.order-status .status-badge {
+.my-orders-status .my-orders-status-badge {
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -123,45 +127,257 @@
   display: inline-block;
 }
 
-.order-status .status-pending {
+.my-orders-status .my-orders-status-pending {
   background-color: #FFD700;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .my-orders-container {
     padding: 1rem;
   }
-
-  .orders-table-container {
+  
+  .my-orders-table-container {
     margin: 0 -1rem;
     border-radius: 0;
   }
-
+  
   .my-orders-title {
     font-size: 1.5rem;
   }
-
-  .search-input {
+  
+  .my-orders-search-input {
     width: 150px;
   }
 }
 
-/* Scrollbar styling */
-.orders-table-container::-webkit-scrollbar {
+.my-orders-table-container::-webkit-scrollbar {
   height: 8px;
 }
 
-.orders-table-container::-webkit-scrollbar-track {
+.my-orders-table-container::-webkit-scrollbar-track {
   background: #FFE5E5;
   border-radius: 4px;
 }
 
-.orders-table-container::-webkit-scrollbar-thumb {
+.my-orders-table-container::-webkit-scrollbar-thumb {
   background: #990000;
   border-radius: 4px;
 }
 
-.orders-table-container::-webkit-scrollbar-thumb:hover {
+.my-orders-table-container::-webkit-scrollbar-thumb:hover {
   background: #990000;
+}
+/* Preparing Status */
+.my-orders-status .my-orders-status-preparing {
+  background-color: #FF8C00; /* Dark Orange */
+  color: white;
+}
+
+/* Ready Status */
+.my-orders-status .my-orders-status-ready {
+  background-color: #32CD32; /* Lime Green */
+  color: white;
+}
+
+/* Cancelled Status */
+.my-orders-status-canceled {
+  background-color: #e71010; /* Light red */
+  color: rgb(255, 255, 255); /* Dark red for text */
+  padding: 5px 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+
+/* Completed Status */
+.my-orders-status .my-orders-status-completed {
+  background-color: #28A745; /* Green */
+  color: white;
+}
+
+/* General Badge Styling */
+.my-orders-status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: inline-block;
+  text-transform: capitalize;
+}
+
+/*new css*/
+.my-orders-cancel-button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.my-orders-cancel-button:hover {
+  background-color: darkred;
+}
+
+.my-orders-cancel-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.my-orders-cancel-modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.my-orders-cancel-confirm,
+.my-orders-cancel-cancel {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.my-orders-cancel-confirm {
+  background-color: green;
+  color: white;
+}
+
+.my-orders-cancel-cancel {
+  background-color: grey;
+  color: white;
+}
+
+.my-orders-cancel-confirm:hover {
+  background-color: darkgreen;
+}
+
+.my-orders-cancel-cancel:hover {
+  background-color: darkgrey;
+}
+
+
+
+
+
+
+/*Order History CSS*/
+/* Container for the order history */
+/* Order History CSS for User Profile */
+.user-profile-container .order-history-section {
+  margin-top: 2rem;
+}
+
+.user-profile-container .order-history-section h3 {
+  color: #990000;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #FFE5E5;
+  padding-bottom: 0.5rem;
+}
+
+.user-profile-container .user-profile-order-history-container {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.user-profile-container .user-profile-order-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  text-align: left;
+}
+
+.user-profile-container .user-profile-order-history-table thead {
+  background-color: #990000;
+  color: #fff;
+}
+
+.user-profile-container .user-profile-order-history-table th,
+.user-profile-container .user-profile-order-history-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.user-profile-container .user-profile-order-history-table th {
+  font-weight: 600;
+  text-align: center;
+}
+
+.user-profile-container .user-profile-order-history-table tbody tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.user-profile-container .user-profile-order-history-table tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+.user-profile-container .user-profile-order-history-table td {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.user-profile-container .user-profile-order-history-table td div {
+  margin: 5px 0;
+}
+
+.user-profile-container .user-profile-status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+}
+
+.user-profile-container .user-profile-status-completed {
+  background-color: #097e05;
+}
+
+.user-profile-container .user-profile-status-cancelled {
+  background-color: #990000;
+}
+
+.user-profile-container .user-profile-no-orders {
+  text-align: center;
+  padding: 1rem;
+  color: #990000;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .user-profile-container .user-profile-order-history-container {
+    padding: 10px;
+  }
+
+  .user-profile-container .user-profile-order-history-table {
+    font-size: 12px;
+  }
+
+  .user-profile-container .user-profile-order-history-table th,
+  .user-profile-container .user-profile-order-history-table td {
+    padding: 8px;
+  }
+}
+
+.user-profile-status-completed {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.user-profile-status-cancelled {
+  background-color: #f44336;
+  color: white;
 }
