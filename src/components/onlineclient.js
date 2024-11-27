@@ -63,6 +63,7 @@ function OnlineClient() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const handleCheckout = () => {
+    setUserData(userData); // userData contains logged-in user's details
     setShowPaymentModal(true); // Show the payment modal
   };
 
@@ -398,14 +399,14 @@ function OnlineClient() {
       }
 
       // Get values from the input fields
-      const orderId = document.querySelector('input[name="orderId"]').value.trim();
+      const studentId = document.querySelector('input[name="studentId"]').value.trim();
       const referenceNumber = document.querySelector('input[name="referenceNumber"]').value.trim();
       const amountSent = parseFloat(document.querySelector('input[name="amountSent"]').value);
       const gcashReceipt = document.querySelector('input[name="gcashReceipt"]').files[0]; // Get the uploaded file
       const orderTotal = getTotalPrice();
       
       // Validation
-        if (!orderId || !referenceNumber || !gcashReceipt) {
+        if (!studentId || !referenceNumber || !gcashReceipt) {
           alert("Please fill in all the required fields and upload the receipt.");
           return;
         }
@@ -441,7 +442,7 @@ function OnlineClient() {
             status: null, // Add status field and set to null
             assignTo: null, // Add assignTo field and set to null
             paymentDetails: {
-              orderId,
+              studentId,
               referenceNumber,
               amountSent,
               receiptUrl, // Add receipt URL
@@ -787,8 +788,8 @@ function OnlineClient() {
     
   
     // Handle cancel modal display
-    const openCancelModal = (orderId) => {
-      setOrderToCancel(orderId);
+    const openCancelModal = (studentId) => {
+      setOrderToCancel(studentId);
       setShowCancelModal(true);
     };
   
@@ -1354,12 +1355,29 @@ function OnlineClient() {
           <div className="gcash-info">
             <h3>GCash Information</h3>
             <p>GCash Name: Wildcats Food Express</p>
-            <p>GCash Number: 09123456789</p>
+            <p>
+    GCash Number:{" "}
+    <span
+      className="gcash-number"
+      onClick={() => {
+        navigator.clipboard.writeText("09123456789");
+        alert("GCash number copied to clipboard!");
+      }}
+      style={{ cursor: "pointer", color: "blue" }}
+    >
+      09123456789
+    </span>
+  </p>
           </div>
           <form className="payment-form">
-            <label>
+          <label>
               Student ID:
-              <input type="text" name="orderId" placeholder="Enter Order ID" />
+              <input
+                type="text"
+                name="studentId"
+                value={userData.schoolId || ''}
+                readOnly
+              />
             </label>
             <label>
               Reference Number:
