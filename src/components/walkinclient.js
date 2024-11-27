@@ -196,7 +196,7 @@ function WalkinClient() {
   const filteredMenuItems = menuItems.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  
   return (
     <div className="WalkinClient">
       <nav className="navbar">
@@ -220,9 +220,8 @@ function WalkinClient() {
               position: "relative",
             }}
           >
-            <a href="#" onClick={openUserRolesModal} className="ReturnToAdmin">
-              Go to Admin
-            </a>
+            <button className="BacktoAdmin" onClick={openUserRolesModal}>Go to Admin</button>
+            <button className="walkinOrderStatus">Order Status</button>
             <button
               className="cart-btn"
               aria-label="View Cart"
@@ -329,6 +328,8 @@ function WalkinClient() {
                       <button
                         className="add-to-cart-button"
                         onClick={() => addToCart(cartItem)}
+                        disabled={cartItem.quantity >= cartItem.stock}
+
                       >
                         +
                       </button>
