@@ -25,6 +25,8 @@ function OrderAdmin() {
   const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [modalData, setModalData] = useState(null); // State for modal data
   const [notification, setNotification] = useState(null); // Notification state
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState("");
 
   // Fetch server staff from staff collection
   useEffect(() => {
@@ -58,8 +60,9 @@ function OrderAdmin() {
 
             // Trigger notification for online orders with status null
             if (orderType === "online" && data.status === null) {
+              const studentID = data.paymentDetails?.studentId || "Unknown";
               setNotification(
-                `New online order received! Order ID: ${docSnapshot.id}`
+                `New online order received! Order ID: ${studentID}`
               );
               const orderDoc = doc(db, collectionName, docSnapshot.id);
               await updateDoc(orderDoc, { status: "Pending" });
@@ -67,8 +70,9 @@ function OrderAdmin() {
 
             // Trigger notification for walk-in orders with orderStatus null
             if (orderType === "walkin" && data.orderStatus === null) {
+              const priorityNumber = data.priorityNumber || "Unknown";
               setNotification(
-                `New walk-in order received! Order ID: ${docSnapshot.id}`
+                `New walk-in order received! Order ID: ${priorityNumber}`
               );
               const orderDoc = doc(db, collectionName, docSnapshot.id);
               await updateDoc(orderDoc, { orderStatus: "Pending" });
@@ -89,7 +93,7 @@ function OrderAdmin() {
               id: docSnapshot.id,
               orderId:
                 orderType === "online"
-                  ? data.userId || "N/A"
+                  ? data.paymentDetails?.studentId || "N/A"
                   : data.priorityNumber || "N/A",
               name:
                 orderType === "online"
@@ -99,7 +103,7 @@ function OrderAdmin() {
               items: data.items || data.orderItems || [],
               status: data.status || data.orderStatus || "Pending",
               assignTo: data.assignTo || data.assign || "Unassigned",
-              proofOfPayment: data.proofOfPayment || "N/A",
+              proofOfPayment: data.paymentDetails?.receiptUrl || "N/A",
               date: formattedDate,
               timestamp: date, // For sorting
             };
@@ -126,12 +130,19 @@ function OrderAdmin() {
       const collectionName =
         orderType === "online" ? "orders" : "walkinClients";
       const orderDoc = doc(db, collectionName, orderId);
+
+      // Determine the fields to update
       const updateData =
         orderType === "online"
-          ? { assignTo: assignedStaffName }
-          : { assign: assignedStaffName };
+          ? { assignTo: assignedStaffName, status: "Preparing" } // Update 'status' for online orders
+          : { assign: assignedStaffName, orderStatus: "Preparing" }; // Update 'orderStatus' for walk-in clients
+
+      // Update the document in Firestore
       await updateDoc(orderDoc, updateData);
-      console.log(`Assigned ${assignedStaffName} to order ${orderId}`);
+
+      console.log(
+        `Assigned ${assignedStaffName} to order ${orderId} and updated status to Preparing`
+      );
     } catch (error) {
       console.error("Error assigning staff:", error);
     }
@@ -195,6 +206,29 @@ function OrderAdmin() {
     setModalData(null); // Reset modal data
   };
 
+  const handleImageClick = (imageUrl) => {
+    setCurrentImageUrl(imageUrl);
+    setShowImageModal(true);
+  };
+
+  const closeImageModal = () => {
+    setShowImageModal(false);
+    setCurrentImageUrl("");
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Pending":
+        return "red";
+      case "Preparing":
+        return "yellow";
+      case "Ready for Pickup":
+        return "green";
+      default:
+        return "white"; // Default background color
+    }
+  };
+
   // Filter orders based on search query
   useEffect(() => {
     const filtered = orders.filter((order) => {
@@ -208,9 +242,10 @@ function OrderAdmin() {
   }, [searchQuery, orders]);
 
   const handleTabChange = (type) => {
+    if (orderType === type) return; // Prevent reloading if the current tab is already active
     setOrderType(type);
     setLoading(true);
-    setSearchQuery("");
+    setSearchQuery(""); // Reset the search query for a fresh view
   };
 
   if (loading) {
@@ -261,12 +296,13 @@ function OrderAdmin() {
             <tr>
               <th>Date</th>
               <th>Order ID</th>
-              <th>Name</th>
+              {orderType === "online" && <th>Name</th>} {/* Hide for Walk-In */}
               <th>Total Amount</th>
               <th>Product</th>
               <th>Status</th>
               <th>Assign</th>
-              <th>Proof of Payment</th>
+              {orderType === "online" && <th>Proof of Payment</th>}{" "}
+              {/* Hide for Walk-In */}
             </tr>
           </thead>
           <tbody>
@@ -274,7 +310,8 @@ function OrderAdmin() {
               <tr key={order.id}>
                 <td>{order.date}</td>
                 <td>{order.orderId}</td>
-                <td>{order.name}</td>
+                {orderType === "online" && <td>{order.name}</td>}{" "}
+                {/* Hide for Walk-In */}
                 <td>₱{order.totalAmount}</td>
                 <td>
                   {order.items.map((product, index) => (
@@ -288,6 +325,11 @@ function OrderAdmin() {
                   <select
                     value={order.status}
                     onChange={(e) => handleStatusChange(order, e.target.value)}
+                    style={{
+                      backgroundColor: getStatusColor(order.status), // Colored background for selected status
+                      color: order.status === "Pending" ? "white" : "black", // Ensure text contrast
+                    }}
+                    className="status-dropdown"
                   >
                     <option value="Pending">Pending</option>
                     <option value="Preparing">Preparing</option>
@@ -311,7 +353,25 @@ function OrderAdmin() {
                     ))}
                   </select>
                 </td>
-                <td>{order.proofOfPayment}</td>
+                {orderType === "online" && (
+                  <td>
+                    {order.proofOfPayment !== "N/A" ? (
+                      <span
+                        style={{
+                          color: "red",
+                          textDecoration: "underline",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => handleImageClick(order.proofOfPayment)}
+                      >
+                        Click Here
+                      </span>
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                )}{" "}
+                {/* Hide for Walk-In */}
               </tr>
             ))}
           </tbody>
@@ -335,6 +395,22 @@ function OrderAdmin() {
               >
                 Yes
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Image Modal */}
+        {showImageModal && (
+          <div className="image-modal">
+            <div className="image-modal-content">
+              <button className="close-button" onClick={closeImageModal}>
+                X
+              </button>
+              <img
+                src={currentImageUrl}
+                alt="Proof of Payment"
+                className="modal-image"
+              />
             </div>
           </div>
         )}
