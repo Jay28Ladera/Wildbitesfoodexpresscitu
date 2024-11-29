@@ -15,7 +15,6 @@ import Admin from "./components/Admin";
 import WalkinClient from "./components/walkinclient";
 import Staffmanagement from "./components/staffmanagement";
 import OrderAdmin from "./components/orderAdmin"; // Fixed here
-import Reports from "./components/Reports";
 
 function App() {
   const location = useLocation(); // useLocation hook needs to be inside a Router
@@ -33,7 +32,6 @@ function App() {
         <Route path="/walkinclient" element={<WalkinClient />} />
         <Route path="/staffmanagement" element={<Staffmanagement />} />
         <Route path="/OrderAdmin" element={<OrderAdmin />} /> 
-        <Route path="/reports" element={<Reports />} />
       </Routes>
     </AnimatePresence>
   );

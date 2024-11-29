@@ -104,6 +104,7 @@ function OrderAdmin() {
               status: data.status || data.orderStatus || "Pending",
               assignTo: data.assignTo || data.assign || "Unassigned",
               proofOfPayment: data.paymentDetails?.receiptUrl || "N/A",
+              referenceNumber: data.paymentDetails?.referenceNumber || "N/A",
               date: formattedDate,
               timestamp: date, // For sorting
             };
@@ -174,8 +175,18 @@ function OrderAdmin() {
       newStatus === "Completed" ? "successfulOrders" : "cancelledOrders";
 
     try {
-      // Fetch the original document to preserve its structure
+      // Reference to the original document
       const orderDocRef = doc(db, collectionName, order.id);
+
+      // Determine the field to update based on the order type
+      const statusField = orderType === "online" ? "status" : "orderStatus";
+
+      // Update the status in the original document
+      await updateDoc(orderDocRef, {
+        [statusField]: newStatus, // Update the correct field based on the order type
+      });
+
+      // Fetch the updated document to preserve its structure
       const orderSnapshot = await getDoc(orderDocRef);
 
       if (!orderSnapshot.exists()) {
@@ -183,17 +194,19 @@ function OrderAdmin() {
         return;
       }
 
-      const orderData = orderSnapshot.data(); // Get the exact document structure
+      const orderData = orderSnapshot.data(); // Get the updated document structure
 
-      // Add the document to the target collection
+      // Add the updated document to the target collection
       await addDoc(collection(db, targetCollection), orderData);
 
-      // Delete the original document
+      // Delete the original document after moving
       await deleteDoc(orderDocRef);
 
-      console.log(`Moved order ${order.id} to ${targetCollection}`);
+      console.log(
+        `Order ${order.id} moved to ${targetCollection} with status ${newStatus}`
+      );
     } catch (error) {
-      console.error("Error moving order:", error);
+      console.error("Error updating and moving order:", error);
     } finally {
       setShowModal(false);
       setModalData(null); // Reset modal data
@@ -364,7 +377,7 @@ function OrderAdmin() {
                         }}
                         onClick={() => handleImageClick(order.proofOfPayment)}
                       >
-                        Click Here
+                        Ref#: {order.referenceNumber}
                       </span>
                     ) : (
                       "N/A"

@@ -5,37 +5,37 @@ import "./walkinclient.css";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import { FaShoppingCart } from "react-icons/fa";
-import { doc, updateDoc } from "firebase/firestore"; // import updateDoc to update documents in Firestore
+import { doc, updateDoc } from "firebase/firestore";
 
 function WalkinClient() {
   const navigate = useNavigate();
 
-  // State declarations
+  
   const [menuItems, setMenuItems] = useState([]);
   const [cart, setCart] = useState([]);
   const [cartModalOpen, setCartModalOpen] = useState(false);
   const [userRolesModalOpen, setUserRolesModalOpen] = useState(false);
-  const [receiptModalOpen, setReceiptModalOpen] = useState(false); // For the receipt modal
-  const [receiptContent, setReceiptContent] = useState(null); // Store order details for receipt
+  const [receiptModalOpen, setReceiptModalOpen] = useState(false);
+  const [receiptContent, setReceiptContent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Modal control functions
+  
   const openUserRolesModal = () => setUserRolesModalOpen(true);
   const closeUserRolesModal = () => setUserRolesModalOpen(false);
   const openCartModal = () => setCartModalOpen(true);
   const closeCartModal = () => setCartModalOpen(false);
 
   const closeReceiptModal = () => {
-    // Print the receipt content without the close button
+    
     const printReceipt = () => {
       const printWindow = window.open("", "", "height=600,width=600");
 
-      // Get the receipt content but exclude the button
+      
       const receiptContentHTML = document
         .querySelector(".modal-content-receipt")
         .cloneNode(true);
 
-      // Remove the button before printing
+   
       const button = receiptContentHTML.querySelector(".Submit");
       if (button) {
         button.remove();
@@ -50,9 +50,8 @@ function WalkinClient() {
       printWindow.print();
     };
 
-    // Call the print function before closing the modal
     printReceipt();
-    setReceiptModalOpen(false); // Close the modal
+    setReceiptModalOpen(false);
   };
 
   const handleChangeToAdmin = () => {
@@ -60,17 +59,21 @@ function WalkinClient() {
     navigate("/admin");
   };
 
+  const handleChangeToStatus = () => {
+    closeUserRolesModal();
+    navigate("/walkinStatus");
+  };
   const fetchMenuItems = async () => {
     const menuItemsRef = collection(db, "menuItems");
     const menuItemsSnap = await getDocs(menuItemsRef);
 
-    // Filter out menu items with 0 stock
+   
     const items = menuItemsSnap.docs
       .map((doc) => ({
         _id: doc.id,
         ...doc.data(),
       }))
-      .filter((item) => item.stock > 0); // Filter out items with 0 stock
+      .filter((item) => item.stock > 0);
 
     setMenuItems(items);
   };
@@ -127,19 +130,19 @@ function WalkinClient() {
     return cart.reduce((total, cartItem) => total + cartItem.quantity, 0);
   };
 
-  // Function to get the next priority number in "Cxxx" format
+  
   const getNextPriorityNumber = async () => {
     const walkinClientsRef = collection(db, "walkinClients");
     const walkinClientsSnap = await getDocs(walkinClientsRef);
 
-    // Extract valid priority numbers and find the highest one
+   
     const priorityNumbers = walkinClientsSnap.docs
       .map((doc) => doc.data().priorityNumber)
-      .filter((num) => typeof num === "string" && num.startsWith("C")) // Ensure num is a string and starts with "C"
-      .map((num) => parseInt(num.slice(1), 10)) // Extract the numeric part only
-      .sort((a, b) => b - a); // Sort in descending order
+      .filter((num) => typeof num === "string" && num.startsWith("C"))
+      .map((num) => parseInt(num.slice(1), 10))
+      .sort((a, b) => b - a); 
 
-    const lastPriorityNumber = priorityNumbers[0] || 0; // Default to 0 if no orders
+    const lastPriorityNumber = priorityNumbers[0] || 0; 
     const nextPriorityNumber = lastPriorityNumber + 1;
 
     return `C${String(nextPriorityNumber).padStart(3, "0")}`;
@@ -165,28 +168,28 @@ function WalkinClient() {
     };
 
     try {
-      // Add the order to Firestore
+      
       const walkinClientsRef = collection(db, "walkinClients");
       await addDoc(walkinClientsRef, walkinClientOrder);
 
-      // Update stock for each item in the order
+      
       for (const cartItem of cart) {
-        const menuItemRef = doc(db, "menuItems", cartItem._id); // Get reference to the menu item
+        const menuItemRef = doc(db, "menuItems", cartItem._id); 
         await updateDoc(menuItemRef, {
-          stock: cartItem.stock - cartItem.quantity, // Deduct the ordered quantity from stock
+          stock: cartItem.stock - cartItem.quantity,
         });
       }
 
-      // Fetch the updated menu items
-      await fetchMenuItems(); // Refetch the menu items to get updated stock
+      
+      await fetchMenuItems();
 
-      // Reset the cart and close the cart modal
+    
       setCart([]);
       closeCartModal();
 
-      // Set the receipt content and open the receipt modal
+      
       setReceiptContent(walkinClientOrder);
-      setReceiptModalOpen(true); // Open the receipt modal
+      setReceiptModalOpen(true);
     } catch (error) {
       console.error("Error submitting walk-in client order: ", error);
       alert("Failed to submit order. Please try again.");
@@ -220,8 +223,9 @@ function WalkinClient() {
               position: "relative",
             }}
           >
+            
             <button className="BacktoAdmin" onClick={openUserRolesModal}>Go to Admin</button>
-            <button className="walkinOrderStatus">Order Status</button>
+            <button className="walkinOrderStatus" onClick={handleChangeToStatus}>Order Status</button>
             <button
               className="cart-btn"
               aria-label="View Cart"
