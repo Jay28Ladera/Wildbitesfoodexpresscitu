@@ -20,18 +20,18 @@ function Report() {
         const reportsRef = collection(db, "successfulOrders");
         const snapshot = await getDocs(reportsRef);
 
-        const fetchedReports = snapshot.docs
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
-          .filter((report) => report.status === "Completed"); // Only include completed orders
+        const fetchedReports = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
         // Format dates and ensure data integrity
         const formattedReports = fetchedReports.map((report) => {
           const date = report.orderDate
             ? new Date(report.orderDate)
-            : new Date(report.createdAt?.toDate?.());
+            : report.createdAt?.toDate
+            ? new Date(report.createdAt.toDate())
+            : null;
           const formattedDate = date
             ? date.toISOString().split("T")[0].replace(/-/g, "/")
             : "N/A";
@@ -39,6 +39,11 @@ function Report() {
           return {
             ...report,
             date: formattedDate,
+            studentId:
+              report.paymentDetails?.studentId || // Fetch from paymentDetails
+              report.studentId || // Fallback to top-level field
+              report.priorityNumber || // Or priorityNumber
+              "Unknown", // Default if none exist
           };
         });
 
@@ -57,7 +62,9 @@ function Report() {
   // Filter reports based on search query
   useEffect(() => {
     const filtered = reports.filter((report) =>
-      (report.userName || "").toLowerCase().includes(searchQuery.toLowerCase())
+      (report.userName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (report.studentId || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (report.priorityNumber || "").toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredReports(filtered);
   }, [searchQuery, reports]);
@@ -85,13 +92,13 @@ function Report() {
           <thead>
             <tr>
               <th>Date</th>
-              <th>Order ID</th>
               <th>Name</th>
-              <th>Student ID</th>
+              <th>Student ID / Priority Number</th>
               <th>Total Amount</th>
-              <th>Product</th>
+              <th>Products</th>
               <th>Staff Assigned</th>
               <th>Receipt</th>
+              <th>Reference Number</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -99,13 +106,12 @@ function Report() {
             {filteredReports.map((report) => (
               <tr key={report.id}>
                 <td>{report.date}</td>
-                <td>{report.id || "N/A"}</td>
                 <td>{report.userName || "Unknown"}</td>
-                <td>{report.studentId || "N/A"}</td>
-                <td>₱{(report.orderTotal || 0).toFixed(2)}</td>
+                <td>{report.studentId}</td> {/* Fetch from nested paymentDetails */}
+                <td>₱{(report.orderTotal || report.totalPrice || 0).toFixed(2)}</td>
                 <td>
-                  {report.items?.length
-                    ? report.items
+                  {report.items?.length || report.orderItems?.length
+                    ? (report.items || report.orderItems)
                         .map(
                           (item) =>
                             `${item.foodName || item.name} (x${item.quantity})`
@@ -113,11 +119,11 @@ function Report() {
                         .join(", ")
                     : "N/A"}
                 </td>
-                <td>{report.assignTo || "Unassigned"}</td>
+                <td>{report.assignTo || report.assign || "Unassigned"}</td>
                 <td>
-                  {report.paymentDetails?.receiptUrl ? (
+                  {report.paymentDetails?.receiptUrl || report.receiptUrl ? (
                     <a
-                      href={report.paymentDetails.receiptUrl}
+                      href={report.paymentDetails?.receiptUrl || report.receiptUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -127,7 +133,8 @@ function Report() {
                     "N/A"
                   )}
                 </td>
-                <td>{report.status || "N/A"}</td>
+                <td>{report.referenceNumber || "N/A"}</td>
+                <td>{report.status || report.orderStatus || "N/A"}</td>
               </tr>
             ))}
           </tbody>
