@@ -104,11 +104,11 @@ function Navbar({
             Orders
           </button>
           <button
-            onClick={() => handleTabChange("reports")}
-            className="nav-link"
-          >
-            Reports
-          </button>
+        onClick={() => handleTabChange("reports")}
+        className="nav-link"
+      >
+        Reports
+      </button>
           <button onClick={openUserRolesModalHandler} className="nav-link">
             User Roles
           </button>
