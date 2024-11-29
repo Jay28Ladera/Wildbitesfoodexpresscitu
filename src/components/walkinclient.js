@@ -163,7 +163,7 @@ function WalkinClient() {
         price,
       })),
       totalPrice: calculateTotalPrice(),
-      orderStatus: "Pending",
+      orderStatus: null,
       assign: "Unassigned",
       createdAt: new Date(),
     };

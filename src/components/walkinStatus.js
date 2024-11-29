@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, onSnapshot } from "firebase/firestore"; // Import onSnapshot
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/maindash.svg";
 import "./walkinStatus.css";
@@ -17,53 +17,46 @@ function WalkinOrderStatus() {
   const [cartModalOpen, setCartModalOpen] = useState(false);
   const [userRolesModalOpen, setUserRolesModalOpen] = useState(false);
 
-  // Fetch data from Firestore
+  // Fetch data from Firestore in real-time
   useEffect(() => {
-    const fetchWalkinClients = async () => {
-      try {
-        const db = getFirestore();
-        const walkinClientsCollection = collection(db, "walkinClients");
-        const snapshot = await getDocs(walkinClientsCollection);
+    const db = getFirestore();
+    const walkinClientsCollection = collection(db, "walkinClients");
 
-        const clients = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    // Using onSnapshot to listen for real-time updates
+    const unsubscribe = onSnapshot(walkinClientsCollection, (snapshot) => {
+      const clients = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-        // Organize clients by status
-        const groupedClients = {
-          pending: clients.filter(
-            (client) => client.orderStatus === "Pending"
-          ),
-          preparing: clients.filter(
-            (client) => client.orderStatus === "Preparing"
-          ),
-          readyForPickup: clients.filter(
-            (client) => client.orderStatus === "Ready for Pickup"
-          ),
-        };
+      // Organize clients by status
+      const groupedClients = {
+        pending: clients.filter((client) => client.orderStatus === "Pending"),
+        preparing: clients.filter((client) => client.orderStatus === "Preparing"),
+        readyForPickup: clients.filter(
+          (client) => client.orderStatus === "Ready for Pickup"
+        ),
+      };
 
-        // Sort clients by priority number (chronologically)
-        const sortPriorityNumbers = (clients) => {
-          return clients.sort((a, b) => {
-            const priorityA = parseInt(a.priorityNumber.slice(1)); // Remove 'C' and parse as number
-            const priorityB = parseInt(b.priorityNumber.slice(1));
-            return priorityA - priorityB; // Ascending order
-          });
-        };
-
-        // Apply sorting
-        setWalkinClients({
-          pending: sortPriorityNumbers(groupedClients.pending),
-          preparing: sortPriorityNumbers(groupedClients.preparing),
-          readyForPickup: sortPriorityNumbers(groupedClients.readyForPickup),
+      // Sort clients by priority number (chronologically)
+      const sortPriorityNumbers = (clients) => {
+        return clients.sort((a, b) => {
+          const priorityA = parseInt(a.priorityNumber.slice(1)); // Remove 'C' and parse as number
+          const priorityB = parseInt(b.priorityNumber.slice(1));
+          return priorityA - priorityB; // Ascending order
         });
-      } catch (error) {
-        console.error("Error fetching walk-in clients:", error);
-      }
-    };
+      };
 
-    fetchWalkinClients();
+      // Apply sorting and update state
+      setWalkinClients({
+        pending: sortPriorityNumbers(groupedClients.pending),
+        preparing: sortPriorityNumbers(groupedClients.preparing),
+        readyForPickup: sortPriorityNumbers(groupedClients.readyForPickup),
+      });
+    });
+
+    // Cleanup the subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   // Modal control functions
@@ -108,9 +101,15 @@ function WalkinOrderStatus() {
               position: "relative",
             }}
           >
-            
-            <button className="BacktoAdmin" onClick={openUserRolesModal}>Go to Admin</button>
-            <button className="walkinClient" onClick={handleChangeToWalkinClient}>Walk-in Client</button>
+            <button className="BacktoAdmin" onClick={openUserRolesModal}>
+              Go to Admin
+            </button>
+            <button
+              className="walkinClient"
+              onClick={handleChangeToWalkinClient}
+            >
+              Walk-in Client
+            </button>
           </div>
         </div>
 
