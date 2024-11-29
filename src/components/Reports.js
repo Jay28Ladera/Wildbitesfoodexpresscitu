@@ -1,46 +1,49 @@
 import React, { useEffect, useState } from "react";
-import {
-  collection,
-  getDocs,
-} from "firebase/firestore";
-import { db } from "../firebase/firebase"; // Ensure Firebase is configured correctly
-import Navbar from "./Navbar"; // Include Navbar component
-import SPLoader from "./spinnerloader"; // Include loading spinner
-import "./Reports.css"; // Include custom CSS for reports
-import "./orderAdmin.css"; // Include additional styling for admin orders
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase/firebase";
+import Navbar from "./Navbar";
+import SPLoader from "./spinnerloader";
+import "./Reports.css";
+import "./orderAdmin.css";
 
 function Report() {
-  const [reports, setReports] = useState([]); // Store fetched reports
-  const [loading, setLoading] = useState(true); // Loading state
-  const [reportType, setReportType] = useState("sales"); // Default report type
-  const [filteredReports, setFilteredReports] = useState([]); // Filtered reports for display
-  const [searchQuery, setSearchQuery] = useState(""); // Search query for filtering
+  const [reports, setReports] = useState([]);
+  const [filteredReports, setFilteredReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch reports based on the selected type (sales/cancellations)
+  // Fetch completed orders from Firestore
   useEffect(() => {
     const fetchReports = async () => {
       setLoading(true);
       try {
-        // Define the collection name
-        const collectionName =
-          reportType === "sales"
-            ? "successfulOrders"
-            : reportType === "cancellations"
-            ? "cancelledOrders"
-            : "orders";
-
-        // Fetch data from Firestore
-        const reportsRef = collection(db, collectionName);
+        const reportsRef = collection(db, "successfulOrders");
         const snapshot = await getDocs(reportsRef);
 
-        // Map and structure the data
-        const fetchedReports = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const fetchedReports = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter((report) => report.status === "Completed"); // Only include completed orders
 
-        setReports(fetchedReports);
-        setFilteredReports(fetchedReports); // Initially, all reports are shown
+        // Format dates and ensure data integrity
+        const formattedReports = fetchedReports.map((report) => {
+          const date = report.orderDate
+            ? new Date(report.orderDate)
+            : new Date(report.createdAt?.toDate?.());
+          const formattedDate = date
+            ? date.toISOString().split("T")[0].replace(/-/g, "/")
+            : "N/A";
+
+          return {
+            ...report,
+            date: formattedDate,
+          };
+        });
+
+        setReports(formattedReports);
+        setFilteredReports(formattedReports);
       } catch (error) {
         console.error("Error fetching reports:", error);
       } finally {
@@ -49,87 +52,25 @@ function Report() {
     };
 
     fetchReports();
-  }, [reportType]); // Refetch data when report type changes
+  }, []);
 
-  // Filter reports by search query
+  // Filter reports based on search query
   useEffect(() => {
     const filtered = reports.filter((report) =>
-      report.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      (report.userName || "").toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredReports(filtered);
   }, [searchQuery, reports]);
 
-  // Handle tab change for report type
-  const handleTabChange = (type) => {
-    if (reportType === type) return; // Avoid reloading if already selected
-    setReportType(type);
-    setSearchQuery(""); // Clear search when switching tabs
-  };
-
-  // Export filtered reports to CSV
-  const exportToCSV = () => {
-    if (filteredReports.length === 0) {
-      alert("No data available to export.");
-      return;
-    }
-
-    const rows = filteredReports.map((report) => ({
-      Date: report.date || "N/A",
-      OrderID: report.orderId || "N/A",
-      Name: report.name || "Unknown",
-      TotalAmount: report.totalAmount || 0,
-      StaffAssigned: report.assignTo || "Unassigned",
-      ModeOfPurchase: "N/A", // Add a value if applicable
-      Status: report.status || "N/A",
-    }));
-
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [
-        Object.keys(rows[0]).join(","), // CSV headers
-        ...rows.map((row) =>
-          Object.values(row)
-            .map((value) => `"${value}"`)
-            .join(",")
-        ),
-      ].join("\n");
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `${reportType}_report.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   if (loading) {
-    return <SPLoader />; // Show spinner while loading
+    return <SPLoader />;
   }
 
   return (
     <div className="App">
       <Navbar />
       <div className="reports-content" style={{ padding: "20px" }}>
-        <h2>Wildcats Sales Reports</h2>
-        <div className="report-tabs">
-          <button
-            className={`report-tab ${
-              reportType === "sales" ? "active-tab" : ""
-            }`}
-            onClick={() => handleTabChange("sales")}
-          >
-            Sales Report
-          </button>
-          <button
-            className={`report-tab ${
-              reportType === "cancellations" ? "active-tab" : ""
-            }`}
-            onClick={() => handleTabChange("cancellations")}
-          >
-            Cancellations Report
-          </button>
-        </div>
+        <h2>Completed Orders Report</h2>
 
         {/* Search Box */}
         <input
@@ -146,30 +87,51 @@ function Report() {
               <th>Date</th>
               <th>Order ID</th>
               <th>Name</th>
+              <th>Student ID</th>
               <th>Total Amount</th>
+              <th>Product</th>
               <th>Staff Assigned</th>
-              <th>Mode of Purchase</th>
+              <th>Receipt</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
             {filteredReports.map((report) => (
               <tr key={report.id}>
-                <td>{report.date || "N/A"}</td>
-                <td>{report.orderId || "N/A"}</td>
-                <td>{report.name || "Unknown"}</td>
-                <td>₱{report.totalAmount?.toFixed(2)}</td>
+                <td>{report.date}</td>
+                <td>{report.id || "N/A"}</td>
+                <td>{report.userName || "Unknown"}</td>
+                <td>{report.studentId || "N/A"}</td>
+                <td>₱{(report.orderTotal || 0).toFixed(2)}</td>
+                <td>
+                  {report.items?.length
+                    ? report.items
+                        .map(
+                          (item) =>
+                            `${item.foodName || item.name} (x${item.quantity})`
+                        )
+                        .join(", ")
+                    : "N/A"}
+                </td>
                 <td>{report.assignTo || "Unassigned"}</td>
-                <td>N/A</td>
+                <td>
+                  {report.paymentDetails?.receiptUrl ? (
+                    <a
+                      href={report.paymentDetails.receiptUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View Receipt
+                    </a>
+                  ) : (
+                    "N/A"
+                  )}
+                </td>
                 <td>{report.status || "N/A"}</td>
               </tr>
             ))}
           </tbody>
         </table>
-
-        <button onClick={exportToCSV} className="export-button">
-          Export to CSV
-        </button>
       </div>
     </div>
   );
