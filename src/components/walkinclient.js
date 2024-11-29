@@ -60,6 +60,10 @@ function WalkinClient() {
     navigate("/admin");
   };
 
+  const handleChangeToStatus = () => {
+    closeUserRolesModal();
+    navigate("/walkinStatus");
+  };
   const fetchMenuItems = async () => {
     const menuItemsRef = collection(db, "menuItems");
     const menuItemsSnap = await getDocs(menuItemsRef);
@@ -159,7 +163,7 @@ function WalkinClient() {
         price,
       })),
       totalPrice: calculateTotalPrice(),
-      orderStatus: null,
+      orderStatus: "Pending",
       assign: "Unassigned",
       createdAt: new Date(),
     };
@@ -220,8 +224,9 @@ function WalkinClient() {
               position: "relative",
             }}
           >
+            
             <button className="BacktoAdmin" onClick={openUserRolesModal}>Go to Admin</button>
-            <button className="walkinOrderStatus">Order Status</button>
+            <button className="walkinOrderStatus" onClick={handleChangeToStatus}>Order Status</button>
             <button
               className="cart-btn"
               aria-label="View Cart"
