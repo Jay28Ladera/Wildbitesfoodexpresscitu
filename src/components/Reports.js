@@ -3,6 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import Navbar from "./Navbar";
 import SPLoader from "./spinnerloader";
+import { saveAs } from "file-saver"; // For saving the file
 import "./Reports.css";
 import "./orderAdmin.css";
 
@@ -11,6 +12,7 @@ function Report() {
   const [filteredReports, setFilteredReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDate, setSelectedDate] = useState(""); // Date filter state
 
   // Fetch completed orders from Firestore
   useEffect(() => {
@@ -59,15 +61,63 @@ function Report() {
     fetchReports();
   }, []);
 
-  // Filter reports based on search query
+  // Filter reports based on search query and selected date
   useEffect(() => {
-    const filtered = reports.filter((report) =>
-      (report.userName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (report.studentId || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (report.priorityNumber || "").toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filtered = reports.filter((report) => {
+      const matchesSearchQuery =
+        (report.userName || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (report.studentId || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (report.priorityNumber || "").toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesDateFilter = selectedDate
+        ? report.date.includes(selectedDate) // Check if the report's date matches the selected date
+        : true;
+
+      return matchesSearchQuery && matchesDateFilter;
+    });
     setFilteredReports(filtered);
-  }, [searchQuery, reports]);
+  }, [searchQuery, selectedDate, reports]);
+
+  // Generate CSV content and download the file
+  const downloadCSV = () => {
+    const headers = [
+      "Date",
+      "Name",
+      "Student ID / Priority Number",
+      "Total Amount",
+      "Products",
+      "Staff Assigned",
+      "Receipt",
+      "Reference Number",
+      "Status",
+    ];
+
+    const rows = filteredReports.map((report) => [
+      report.date,
+      report.userName || "Unknown",
+      report.studentId,
+      `${report.orderTotal || report.totalPrice ? `₱${(report.orderTotal || report.totalPrice).toFixed(2)}` : "₱0.00"}`, // Total with Peso symbol
+      report.items?.length || report.orderItems?.length
+        ? (report.items || report.orderItems)
+            .map((item) => `${item.foodName || item.name} (x${item.quantity})`)
+            .join(", ")
+        : "N/A",
+      report.assignTo || report.assign || "Unassigned",
+      report.paymentDetails?.receiptUrl || report.receiptUrl || "N/A",
+      report.paymentDetails?.referenceNumber || "N/A",
+      report.status || report.orderStatus || "N/A",
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((field) => `"${field}"`).join(",")),
+    ].join("\n");
+
+    const csvWithBom = "\uFEFF" + csvContent;
+
+    const blob = new Blob([csvWithBom], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "report.csv");
+  };
 
   if (loading) {
     return <SPLoader />;
@@ -82,11 +132,34 @@ function Report() {
         {/* Search Box */}
         <input
           type="text"
-          placeholder="Search reports by name..."
+          placeholder="Search reports by name, student ID, or priority number..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{ margin: "10px 0", padding: "6px", width: "300px" }}
         />
+
+        {/* Date Picker */}
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          style={{ margin: "10px 0", padding: "6px", width: "200px" }}
+        />
+
+        {/* Download CSV Button */}
+        <button
+          onClick={downloadCSV}
+          style={{
+            margin: "10px 0",
+            padding: "10px 15px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          Download CSV
+        </button>
 
         <table className="reports-table">
           <thead>
@@ -107,15 +180,12 @@ function Report() {
               <tr key={report.id}>
                 <td>{report.date}</td>
                 <td>{report.userName || "Unknown"}</td>
-                <td>{report.studentId}</td> {/* Fetch from nested paymentDetails */}
+                <td>{report.studentId}</td>
                 <td>₱{(report.orderTotal || report.totalPrice || 0).toFixed(2)}</td>
                 <td>
                   {report.items?.length || report.orderItems?.length
                     ? (report.items || report.orderItems)
-                        .map(
-                          (item) =>
-                            `${item.foodName || item.name} (x${item.quantity})`
-                        )
+                        .map((item) => `${item.foodName || item.name} (x${item.quantity})`)
                         .join(", ")
                     : "N/A"}
                 </td>
@@ -133,7 +203,7 @@ function Report() {
                     "N/A"
                   )}
                 </td>
-                <td>{report.referenceNumber || "N/A"}</td>
+                <td>{report.paymentDetails?.referenceNumber || "N/A"}</td>
                 <td>{report.status || report.orderStatus || "N/A"}</td>
               </tr>
             ))}
