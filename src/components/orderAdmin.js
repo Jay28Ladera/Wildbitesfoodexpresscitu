@@ -104,6 +104,7 @@ function OrderAdmin() {
               status: data.status || data.orderStatus || "Pending",
               assignTo: data.assignTo || data.assign || "Unassigned",
               proofOfPayment: data.paymentDetails?.receiptUrl || "N/A",
+              referenceNumber: data.paymentDetails?.referenceNumber || "N/A",
               date: formattedDate,
               timestamp: date, // For sorting
             };
@@ -364,7 +365,7 @@ function OrderAdmin() {
                         }}
                         onClick={() => handleImageClick(order.proofOfPayment)}
                       >
-                        Click Here
+                        Ref#: {order.referenceNumber}
                       </span>
                     ) : (
                       "N/A"
