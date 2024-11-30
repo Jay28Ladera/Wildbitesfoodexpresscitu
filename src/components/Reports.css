@@ -87,4 +87,35 @@
     text-align: center;
   }
   
-  
+ /* Container for the button and total sales */
+.reports-actions {
+  display: flex;
+  flex-direction: row; /* Place items in one row */
+  align-items: center; /* Align items vertically in the center */
+  justify-content: space-between; /* Space out items to maximize horizontal space */
+  width: 100%; /* Ensure the row spans the container */
+  margin-bottom: 15px; /* Add spacing below the row */
+}
+
+/* Button styling */
+.reports-actions button {
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background-color: #b30000;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.reports-actions button:hover {
+  background-color: #8f0000;
+}
+
+/* Total Sales styling */
+.reports-actions span {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}

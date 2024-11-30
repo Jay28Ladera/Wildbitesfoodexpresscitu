@@ -14,6 +14,11 @@ function Report() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState(""); // Date filter state
 
+  const totalSales = filteredReports.reduce((sum, report) => {
+    const total = report.orderTotal || report.totalPrice || 0; // Use orderTotal or totalPrice for each report
+    return sum + total;
+  }, 0);
+
   // Fetch completed orders from Firestore
   useEffect(() => {
     const fetchReports = async () => {
@@ -42,10 +47,10 @@ function Report() {
             ...report,
             date: formattedDate,
             studentId:
-              report.paymentDetails?.studentId || // Fetch from paymentDetails
-              report.studentId || // Fallback to top-level field
-              report.priorityNumber || // Or priorityNumber
-              "Unknown", // Default if none exist
+              report.paymentDetails?.studentId ||
+              report.studentId ||
+              report.priorityNumber ||
+              "Unknown",
           };
         });
 
@@ -69,8 +74,12 @@ function Report() {
         (report.studentId || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         (report.priorityNumber || "").toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesDateFilter = selectedDate
-        ? report.date.includes(selectedDate) // Check if the report's date matches the selected date
+      const formattedSelectedDate = selectedDate
+        ? selectedDate.replace(/-/g, "/")
+        : null;
+
+      const matchesDateFilter = formattedSelectedDate
+        ? report.date === formattedSelectedDate
         : true;
 
       return matchesSearchQuery && matchesDateFilter;
@@ -96,7 +105,7 @@ function Report() {
       report.date,
       report.userName || "Unknown",
       report.studentId,
-      `${report.orderTotal || report.totalPrice ? `₱${(report.orderTotal || report.totalPrice).toFixed(2)}` : "₱0.00"}`, // Total with Peso symbol
+      `${report.orderTotal || report.totalPrice ? `₱${(report.orderTotal || report.totalPrice).toFixed(2)}` : "₱0.00"}`,
       report.items?.length || report.orderItems?.length
         ? (report.items || report.orderItems)
             .map((item) => `${item.foodName || item.name} (x${item.quantity})`)
@@ -143,23 +152,30 @@ function Report() {
           type="date"
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
-          style={{ margin: "10px 0", padding: "6px", width: "200px" }}
+          style={{ margin: "10px 10px 10px 0", padding: "6px", width: "200px" }}
         />
 
-        {/* Download CSV Button */}
-        <button
-          onClick={downloadCSV}
-          style={{
-            margin: "10px 0",
-            padding: "10px 15px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Download CSV
-        </button>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+          {/* Download CSV Button */}
+          <button
+            onClick={downloadCSV}
+            style={{
+              padding: "10px 15px",
+              backgroundColor: "#b30000",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+              borderRadius: "10px",
+            }}
+          >
+            Download CSV
+          </button>
+
+          {/* Total Sales */}
+          <span style={{ marginLeft: "20px", fontSize: "16px", fontWeight: "bold" }}>
+            Total Sales: ₱{totalSales.toFixed(2)}
+          </span>
+        </div>
 
         <table className="reports-table">
           <thead>
