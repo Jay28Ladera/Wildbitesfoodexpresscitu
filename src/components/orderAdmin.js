@@ -151,6 +151,17 @@ function OrderAdmin() {
 
   // Handle status change with modal confirmation for Complete and Cancel
   const handleStatusChange = async (order, newStatus) => {
+    // Check if staff is assigned before allowing completion or cancellation
+    if (
+      (newStatus === "Completed" || newStatus === "Cancelled") &&
+      order.assignTo === "Unassigned"
+    ) {
+      setNotification(
+        "You must assign staff before completing or canceling an order."
+      );
+      return;
+    }
+
     if (newStatus === "Completed" || newStatus === "Cancelled") {
       setModalData({ order, newStatus }); // Set modal data and open modal
       setShowModal(true);
