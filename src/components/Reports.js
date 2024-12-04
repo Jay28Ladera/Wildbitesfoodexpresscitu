@@ -3,7 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import Navbar from "./Navbar";
 import SPLoader from "./spinnerloader";
-import { saveAs } from "file-saver"; // For saving the file
+import { saveAs } from "file-saver";
 import "./Reports.css";
 import "./orderAdmin.css";
 
@@ -12,11 +12,12 @@ function Report() {
   const [filteredReports, setFilteredReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDate, setSelectedDate] = useState(""); // Date filter state
-  const [bestSeller, setBestSeller] = useState(null); // Best-selling product state
+  const [selectedDate, setSelectedDate] = useState("");
+  const [bestSeller, setBestSeller] = useState(null);
 
+  // Calculate total sales
   const totalSales = filteredReports.reduce((sum, report) => {
-    const total = report.orderTotal || report.totalPrice || 0; // Use orderTotal or totalPrice for each report
+    const total = report.orderTotal || report.totalPrice || 0;
     return sum + total;
   }, 0);
 
@@ -47,6 +48,7 @@ function Report() {
           return {
             ...report,
             date: formattedDate,
+            dateObject: date, // Store original date object for sorting
             studentId:
               report.paymentDetails?.studentId ||
               report.studentId ||
@@ -55,8 +57,13 @@ function Report() {
           };
         });
 
-        setReports(formattedReports);
-        setFilteredReports(formattedReports);
+        // Sort reports by date (newest to oldest)
+        const sortedReports = formattedReports.sort(
+          (a, b) => b.dateObject - a.dateObject
+        );
+
+        setReports(sortedReports);
+        setFilteredReports(sortedReports);
       } catch (error) {
         console.error("Error fetching reports:", error);
       } finally {
@@ -75,11 +82,9 @@ function Report() {
         (report.studentId || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         (report.priorityNumber || "").toLowerCase().includes(searchQuery.toLowerCase());
 
-        const formattedSelectedDate = selectedDate
+      const formattedSelectedDate = selectedDate
         ? new Date(selectedDate).toISOString().split("T")[0].replace(/-/g, "/")
         : null;
-      
-      
 
       const matchesDateFilter = formattedSelectedDate
         ? report.date === formattedSelectedDate
@@ -87,6 +92,7 @@ function Report() {
 
       return matchesSearchQuery && matchesDateFilter;
     });
+
     setFilteredReports(filtered);
   }, [searchQuery, selectedDate, reports]);
 

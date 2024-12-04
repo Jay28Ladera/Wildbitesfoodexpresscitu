@@ -90,9 +90,13 @@ function Admin() {
       const filtered = menuItems.filter((item) =>
         item.name.toLowerCase().includes(query.toLowerCase())
       );
-      setFilteredItems(filtered); // Update filtered items
+  
+      // Update filtered items or show empty array if no matches
+      setFilteredItems(filtered.length > 0 ? filtered : []);
     }
   };
+  
+  
 
   // Handle deletion of menu items
   const handleDelete = async (id) => {
@@ -466,16 +470,15 @@ function Admin() {
                 required
               />
 
-              <button type="submit" className="btn submit-btn">
-                Update Item
-              </button>
-              <button
-                type="button"
-                className="btn cancel-btn"
-                onClick={closeEditModal}
-              >
-                Cancel
-              </button>
+<div className="unique-button-container">
+  <button type="submit" className="updateItemBtn">
+    Update Item
+  </button>
+  <button type="button" className="cancelActionBtn" onClick={closeEditModal}>
+    Cancel
+  </button>
+</div>
+
             </form>
           </div>
         </div>
@@ -489,33 +492,38 @@ function Admin() {
       />
 
 <div className="menu-items">
-  {(filteredItems.length > 0 ? filteredItems : menuItems).map((item) => (
-    <div key={item._id} className="menu-item">
-      <img
-        src={item.image || "placeholder.png"}
-        alt={item.name}
-        className="menu-item-image"
-      />
-      <h3>{item.name}</h3>
-      <p className="stock">Stock: {item.stock}</p>
-      <p className="price">Price: Php {item.price.toFixed(2)}</p>
-      <div className="button-container">
-        <button
-          className="btn edit-button"
-          onClick={() => handleEditMenuItem(item)}
-        >
-          Edit
-        </button>
-        <button
-          className="btn delete-button"
-          onClick={() => handleDelete(item._id)}
-        >
-          Delete
-        </button>
+  {filteredItems.length === 0 && searchQuery !== "" ? (
+    <p>No menu items found.</p> // Show this message when no results match the query
+  ) : (
+    (filteredItems.length > 0 ? filteredItems : menuItems).map((item) => (
+      <div key={item._id} className="menu-item">
+        <img
+          src={item.image || "placeholder.png"}
+          alt={item.name}
+          className="menu-item-image"
+        />
+        <h3>{item.name}</h3>
+        <p className="stock">Stock: {item.stock}</p>
+        <p className="price">Price: Php {item.price.toFixed(2)}</p>
+        <div className="button-container">
+          <button
+            className="btn edit-button"
+            onClick={() => handleEditMenuItem(item)}
+          >
+            Edit
+          </button>
+          <button
+            className="btn delete-button"
+            onClick={() => handleDelete(item._id)}
+          >
+            Delete
+          </button>
+        </div>
       </div>
-    </div>
-  ))}
+    ))
+  )}
 </div>
+
     </div>
   );
 }

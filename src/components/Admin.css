@@ -664,4 +664,67 @@ input[type="number"]:focus {
   width: 160px; /* Set a fixed width */
   height: 38px;
   text-align: center;
+}/* Generic button style */
+
+
+
+/* Unique Container for Buttons */
+.unique-button-container {
+  display: flex;
+  justify-content: center;  /* Centers buttons horizontally */
+  align-items: center;      /* Centers buttons vertically */
+  gap: 10px;                /* Space between buttons */
+  border-radius: 10px;      /* Rounded corners for the container */
+  flex-wrap: wrap;          /* Allow buttons to wrap on smaller screens */
+  transition: all 0.3s ease; /* Smooth transition effect */
+}
+
+
+
+/* Styling for Individual Buttons */
+.updateItemBtn, .cancelActionBtn {
+  padding: 15px 30px;
+  font-size: 16px;
+  font-weight: normal;
+  border: none;
+  border-radius: 12px; /* Rounded button corners */
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+ 
+}
+
+/* Update Item Button */
+.updateItemBtn {
+  background-color: rgba(242, 181, 76, 1);
+  color: white;
+ 
+}
+
+.updateItemBtn:hover {
+  background-color: rgb(252, 202, 116);
+  transform: translateY(-3px); /* Lift the button on hover */
+}
+
+.updateItemBtn:active {
+  background-color:rgba(242, 181, 76, 1);
+  transform: translateY(1px); /* Button depress effect on click */
+}
+
+/* Cancel Action Button */
+.cancelActionBtn {
+  background-color: rgba(163, 19, 19, 1);  /* Red background */
+  color: white;
+  
+}
+
+.cancelActionBtn:hover {
+  background-color: rgba(163, 19, 19, 1); 
+
+  transform: translateY(-3px); /* Lift the button on hover */
+}
+
+.cancelActionBtn:active {
+  background-color: rgba(163, 19, 19, 1); 
+  transform: translateY(1px); /* Button depress effect on click */
 }
