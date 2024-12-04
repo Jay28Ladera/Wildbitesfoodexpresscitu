@@ -207,6 +207,13 @@ function OrderAdmin() {
 
       const orderData = orderSnapshot.data(); // Get the updated document structure
 
+      // Add a timestamp field depending on the status
+      if (newStatus === "Completed") {
+        orderData.orderDateFinished = new Date().toISOString(); // Add completion timestamp
+      } else if (newStatus === "Cancelled") {
+        orderData.orderDateCancelled = new Date().toISOString(); // Add cancellation timestamp
+      }
+
       // Add the updated document to the target collection
       await addDoc(collection(db, targetCollection), orderData);
 
