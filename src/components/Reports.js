@@ -13,6 +13,7 @@ function Report() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState(""); // Date filter state
+  const [bestSeller, setBestSeller] = useState(null); // Best-selling product state
 
   const totalSales = filteredReports.reduce((sum, report) => {
     const total = report.orderTotal || report.totalPrice || 0; // Use orderTotal or totalPrice for each report
@@ -74,9 +75,11 @@ function Report() {
         (report.studentId || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         (report.priorityNumber || "").toLowerCase().includes(searchQuery.toLowerCase());
 
-      const formattedSelectedDate = selectedDate
-        ? selectedDate.replace(/-/g, "/")
+        const formattedSelectedDate = selectedDate
+        ? new Date(selectedDate).toISOString().split("T")[0].replace(/-/g, "/")
         : null;
+      
+      
 
       const matchesDateFilter = formattedSelectedDate
         ? report.date === formattedSelectedDate
@@ -86,6 +89,32 @@ function Report() {
     });
     setFilteredReports(filtered);
   }, [searchQuery, selectedDate, reports]);
+
+  // Calculate best-selling product
+  useEffect(() => {
+    const productSales = {};
+
+    // Aggregate product sales
+    filteredReports.forEach((report) => {
+      const products = report.items || report.orderItems || [];
+      products.forEach((product) => {
+        const name = product.foodName || product.name;
+        if (!productSales[name]) {
+          productSales[name] = 0;
+        }
+        productSales[name] += product.quantity;
+      });
+    });
+
+    // Find the best seller
+    const bestSellingProduct = Object.entries(productSales).reduce(
+      (best, [name, quantity]) =>
+        quantity > best.quantity ? { name, quantity } : best,
+      { name: null, quantity: 0 }
+    );
+
+    setBestSeller(bestSellingProduct);
+  }, [filteredReports]);
 
   // Generate CSV content and download the file
   const downloadCSV = () => {
@@ -176,6 +205,13 @@ function Report() {
             Total Sales: ₱{totalSales.toFixed(2)}
           </span>
         </div>
+
+        {/* Best Seller */}
+        {bestSeller && (
+          <div style={{ marginBottom: "20px", fontWeight: "bold" }}>
+            Best Seller: {bestSeller.name} (x{bestSeller.quantity})
+          </div>
+        )}
 
         <table className="reports-table">
           <thead>
