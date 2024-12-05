@@ -1,6 +1,8 @@
+
+
 .my-orders-container {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   background-color: white;
 }
@@ -60,7 +62,7 @@
 .my-orders-table th {
   background-color: #990000;
   padding: 1rem;
-  text-align: center;
+  text-align: left;
   font-weight: 600;
   color: white;
   border-bottom: 2px solid #990000;
@@ -266,118 +268,218 @@
   background-color: darkgrey;
 }
 
-
-
-
-
-
-/*Order History CSS*/
-/* Container for the order history */
-/* Order History CSS for User Profile */
-.user-profile-container .order-history-section {
-  margin-top: 2rem;
+/* Cancel Order Column - Header and Body Alignment */
+.my-orders-table th.my-orders-cancel-header {
+  text-align: center;
+  width: 100px; /* Adjust the width to make it smaller */
 }
 
-.user-profile-container .order-history-section h3 {
-  color: #990000;
+.my-orders-table td.my-orders-cancel {
+  text-align: center;
+  width: 100px; /* Match the width with the header */
+}
+
+/* Eye icon styles */
+.my-orders-eye-icon {
   font-size: 1.5rem;
-  margin-bottom: 1rem;
-  border-bottom: 2px solid #FFE5E5;
-  padding-bottom: 0.5rem;
+  cursor: pointer;
+  margin-left: 10px; /* Add some space between the text and the icon */
 }
 
-.user-profile-container .user-profile-order-history-container {
-  margin: 20px 0;
-  padding: 15px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* For the FontAwesome eye icons */
+.my-orders-eye-open::before {
+  content: "\f06e"; /* FontAwesome eye icon */
+  font-family: 'Font Awesome 5 Free'; /* Ensure FontAwesome is applied */
+  font-weight: 900;
 }
 
-.user-profile-container .user-profile-order-history-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
+.my-orders-eye-closed::before {
+  content: "\f070"; /* FontAwesome eye-slash icon */
+  font-family: 'Font Awesome 5 Free'; /* Ensure FontAwesome is applied */
+  font-weight: 900;
+}
+
+/* Toggle Button for Completed and Canceled Orders */
+.my-orders-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.my-orders-toggle-btn:hover {
+  text-decoration: underline;
+}
+
+/* Completed Orders */
+.my-orders-completed .my-orders-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.my-orders-completed .my-orders-title-completed {
+  color: #28A745; /* Green color for completed orders */
+  font-size: 1.8rem;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 0.1rem;
+}
+
+/* Cancelled Orders */
+.my-orders-canceled .my-orders-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.my-orders-canceled .my-orders-title-canceled {
+  color: #990000; /* Red color for canceled orders */
+  font-size: 1.8rem;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 0.1rem;
+}
+
+/* Completed Orders Container */
+.my-orders-completed .my-orders-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: white;
+}
+
+.my-orders-completed .my-orders-table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 255, 0, 0.1); /* Light green shadow */
+}
+
+.my-orders-completed .my-orders-table th {
+  background-color: #28A745;
+  padding: 1rem;
+  text-align: left; /* Align headers to the left */
+  font-weight: 600;
+  color: white;
+  border-bottom: 2px solid #28A745;
+}
+
+.my-orders-completed .my-orders-table tr:hover {
+  background-color: #E6F9E6; /* Light green hover effect */
+}
+
+/* Cancelled Orders Container */
+.my-orders-canceled .my-orders-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: white;
+}
+
+.my-orders-canceled .my-orders-table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(231, 16, 16, 0.1); /* Light red shadow */
+}
+
+.my-orders-canceled .my-orders-table th {
+  background-color: #990000;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: white;
+  border-bottom: 2px solid #990000;
+}
+
+.my-orders-canceled .my-orders-table tr:hover {
+  background-color: #FFEBEB; /* Light red hover effect */
+}
+
+/* Table styling */
+.my-orders-table td {
+  padding: 10px;
   text-align: left;
 }
 
-.user-profile-container .user-profile-order-history-table thead {
-  background-color: #990000;
-  color: #fff;
+.my-orders-table .my-orders-status-badge {
+  padding: 5px;
+  font-weight: bold;
 }
 
-.user-profile-container .user-profile-order-history-table th,
-.user-profile-container .user-profile-order-history-table td {
-  padding: 10px;
-  border: 1px solid #ddd;
-}
-
-.user-profile-container .user-profile-order-history-table th {
-  font-weight: 600;
-  text-align: center;
-}
-
-.user-profile-container .user-profile-order-history-table tbody tr:nth-child(odd) {
-  background-color: #f2f2f2;
-}
-
-.user-profile-container .user-profile-order-history-table tbody tr:hover {
-  background-color: #e9ecef;
-}
-
-.user-profile-container .user-profile-order-history-table td {
-  vertical-align: middle;
-  text-align: center;
-}
-
-.user-profile-container .user-profile-order-history-table td div {
-  margin: 5px 0;
-}
-
-.user-profile-container .user-profile-status-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
+.my-orders-table .my-orders-status-completed {
+  background-color: #28A745;
   color: white;
-  font-weight: 500;
 }
 
-.user-profile-container .user-profile-status-completed {
-  background-color: #097e05;
-}
-
-.user-profile-container .user-profile-status-cancelled {
+.my-orders-table .my-orders-status-canceled {
   background-color: #990000;
+  color: white;
 }
 
-.user-profile-container .user-profile-no-orders {
+.my-orders-table tr:last-child {
+  border-bottom: 2px solid #000;
+}
+
+/* Status Column - Header and Body Alignment */
+.my-orders-table th.my-orders-status-header,
+.my-orders-table td.my-orders-status {
   text-align: center;
-  padding: 1rem;
-  color: #990000;
-  font-style: italic;
+  width: 120px; /* Adjust to make it smaller */
 }
 
-/* Responsive Design */
+/* Status Badge Styling for Consistency */
+.my-orders-status .my-orders-status-badge {
+  margin: 0 auto;
+  display: inline-block;
+  width: auto;
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Media Query for smaller screens (mobile/tablet) */
 @media (max-width: 768px) {
-  .user-profile-container .user-profile-order-history-container {
-    padding: 10px;
+  /* Adjust container padding */
+  .my-orders-completed .my-orders-container,
+  .my-orders-canceled .my-orders-container {
+    padding: 1rem;
   }
 
-  .user-profile-container .user-profile-order-history-table {
-    font-size: 12px;
+  /* Adjust the font size of the headers for smaller screens */
+  .my-orders-completed .my-orders-title-completed,
+  .my-orders-canceled .my-orders-title-canceled {
+    font-size: 1.4rem; /* Slightly smaller font for titles */
   }
 
-  .user-profile-container .user-profile-order-history-table th,
-  .user-profile-container .user-profile-order-history-table td {
+  /* Stack the header elements vertically */
+  .my-orders-completed .my-orders-header,
+  .my-orders-canceled .my-orders-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Adjust table container */
+  .my-orders-completed .my-orders-table-container,
+  .my-orders-canceled .my-orders-table-container {
+    width: 100%; /* Ensure tables use full width */
+    overflow-x: scroll; /* Add horizontal scrolling for smaller screens */
+  }
+
+  /* Adjust table cell padding */
+  .my-orders-table td {
     padding: 8px;
   }
-}
 
-.user-profile-status-completed {
-  background-color: #4CAF50;
-  color: white;
-}
+  /* Adjust icon size for smaller screens */
+  .my-orders-eye-icon {
+    font-size: 1.2rem; /* Smaller icon */
+  }
 
-.user-profile-status-cancelled {
-  background-color: #f44336;
-  color: white;
+  /* Adjust the width of status columns */
+  .my-orders-table th.my-orders-status-header,
+  .my-orders-table td.my-orders-status {
+    width: 100px;
+  }
 }

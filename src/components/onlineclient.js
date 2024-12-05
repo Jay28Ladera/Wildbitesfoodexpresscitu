@@ -6,7 +6,6 @@ import {
   getDoc,
   deleteDoc,
   collection,
-  getDocs,
   addDoc,
   updateDoc,
   query,
@@ -25,6 +24,10 @@ import "./userprofile.css";
 import logo from "../assets/maindash.svg";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "./myorders.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 
 
@@ -63,6 +66,9 @@ function OnlineClient() {
   const [qrCodeImage, setQRCodeImage] = useState("");
   const [showQRCode, setShowQRCode] = useState(false);
 
+  
+
+
   useEffect(() => {
     const fetchGcashDetails = async () => {
       try {
@@ -92,13 +98,7 @@ function OnlineClient() {
     setShowPaymentModal(false); // Hide the payment modal
   };
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      console.log("Uploaded file:", file);
-      // Handle file upload logic, e.g., set to state or upload to server
-    }
-  };
+
 
 
 
@@ -128,74 +128,172 @@ function OnlineClient() {
     });
     return () => unsubscribe();
   }, [navigate]);
-  
-  useEffect(() => {
-    if (userData) {
-      // References to cleanup listeners
-      let unsubscribeCompletedOrders = null;
-      let unsubscribeCancelledOrders = null;
-  
-      try {
-        // Query for completed orders
-        const completedOrdersRef = collection(db, 'successfulOrders');
-        const completedOrdersQuery = query(completedOrdersRef, where("userId", "==", userData.uid));
-        
-        // Query for cancelled orders
-        const cancelledOrdersRef = collection(db, 'cancelledOrders');
-        const cancelledOrdersQuery = query(cancelledOrdersRef, where("userId", "==", userData.uid));
-  
-        // Set up real-time listener for completed orders
-        unsubscribeCompletedOrders = onSnapshot(completedOrdersQuery, (snapshot) => {
-          const completedOrders = snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              status: 'Completed',
-              items: data.items || [],
-              orderTotal: data.orderTotal || data.totalAmount || 0,
-              orderDate: data.orderDate || new Date().toISOString(),
-              orderFinishedDate: data.orderFinishedDate || new Date().toISOString()
-            };
-          });
-  
-          setCompletedOrderHistory(completedOrders);
-        }, (error) => {
-          console.error("Error fetching completed orders:", error);
-        });
-  
-        // Set up real-time listener for cancelled orders
-        unsubscribeCancelledOrders = onSnapshot(cancelledOrdersQuery, (snapshot) => {
-          const cancelledOrders = snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              status: 'Cancelled',
-              items: data.items || [],
-              orderTotal: data.orderTotal || data.totalAmount || 0,
-              orderDate: data.orderDate || new Date().toISOString(),
-              orderFinishedDate: data.orderFinishedDate || new Date().toISOString()
-            };
-          });
-  
-          setCancelledOrderHistory(cancelledOrders);
-        }, (error) => {
-          console.error("Error fetching cancelled orders:", error);
-        });
-  
-      } catch (error) {
-        console.error("Error setting up real-time listeners:", error);
-      }
-  
-      // Cleanup listeners on unmount or user change
-      return () => {
-        if (unsubscribeCompletedOrders) unsubscribeCompletedOrders();
-        if (unsubscribeCancelledOrders) unsubscribeCancelledOrders();
-      };
+
+  const [mutedNotifications, setMutedNotifications] = useState(() => {
+    const storedMuted = localStorage.getItem('mutedNotifications');
+    try {
+      return storedMuted ? JSON.parse(storedMuted) : {}; // Default to an empty object
+    } catch (error) {
+      console.error("Error parsing mutedNotifications:", error);
+      return {}; // Fallback in case of a parse error
     }
-  }, [userData]);
+  });
+
+  // Updated function to track muted notifications
+const updateMutedNotifications = (orderId, status) => {
+  setMutedNotifications((prev) => {
+    const updated = { ...prev, [orderId]: status };
+    localStorage.setItem('mutedNotifications', JSON.stringify(updated)); // Save to localStorage
+    return updated;
+  });
+};
+
+
+// Update the useEffect to maintain existing functionality
+useEffect(() => {
+  if (userData) {
+    let unsubscribeCompletedOrders = null;
+    let unsubscribeCancelledOrders = null;
+
+    try {
+      const completedOrdersRef = collection(db, 'successfulOrders');
+      const completedOrdersQuery = query(completedOrdersRef, where("userId", "==", userData.uid));
+
+      const cancelledOrdersRef = collection(db, 'cancelledOrders');
+      const cancelledOrdersQuery = query(cancelledOrdersRef, where("userId", "==", userData.uid));
+
+      // Real-time listener for completed orders
+      unsubscribeCompletedOrders = onSnapshot(completedOrdersQuery, (snapshot) => {
+        const completedOrders = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const processedOrder = {
+            id: doc.id,
+            ...data,
+            status: 'Completed',
+            items: data.items || [],
+            orderTotal: data.orderTotal || data.totalAmount || 0,
+            orderDate: data.orderDate || new Date().toISOString(),
+            orderFinishedDate: data.orderDateFinished || data.orderFinishedDate || data.orderDate || new Date().toISOString(),
+          };
+
+          // Notify user if status has changed
+          const previousStatus = localStorage.getItem(`orderStatus-${processedOrder.id}`);
+          if (previousStatus !== 'Completed') {
+            notifyOrderStatus(processedOrder); // Notify user
+            localStorage.setItem(`orderStatus-${processedOrder.id}`, 'Completed'); // Update status
+          }
+
+          return processedOrder;
+        });
+
+        // Sort completed orders by the finished date, newest first
+        completedOrders.sort((a, b) => new Date(b.orderFinishedDate) - new Date(a.orderFinishedDate));
+        setCompletedOrderHistory(completedOrders);
+      });
+
+      // Real-time listener for cancelled orders
+      unsubscribeCancelledOrders = onSnapshot(cancelledOrdersQuery, (snapshot) => {
+        const cancelledOrders = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const processedOrder = {
+            id: doc.id,
+            ...data,
+            status: 'Cancelled',
+            items: data.items || [],
+            orderTotal: data.orderTotal || data.totalAmount || 0,
+            orderDate: data.orderDate || new Date().toISOString(),
+            orderCancelledDate: data.orderDateCancelled || data.orderCancelledDate || data.orderDate || new Date().toISOString(),
+          };
+
+          // Check if the notification for this order has already been triggered
+          const previousStatus = localStorage.getItem(`orderStatus-${processedOrder.id}`);
+          if (previousStatus !== 'Cancelled' && !mutedNotifications[processedOrder.id]) {
+            notifyOrderStatus(processedOrder, true); // Notify user
+            localStorage.setItem(`orderStatus-${processedOrder.id}`, 'Cancelled'); // Update status
+            updateMutedNotifications(processedOrder.id, 'Cancelled'); // Update muted notifications state
+          }
+
+          return processedOrder;
+        });
+
+        // Sort cancelled orders by the cancellation date, newest first
+        cancelledOrders.sort((a, b) => new Date(b.orderCancelledDate) - new Date(a.orderCancelledDate));
+
+        // Prevent duplicates and update the cancelled order history
+        setCancelledOrderHistory((prevCancelledOrders) => {
+          const newCancelledOrders = cancelledOrders.filter(
+            (newOrder) => !prevCancelledOrders.some((order) => order.id === newOrder.id)
+          );
+          return [...prevCancelledOrders, ...newCancelledOrders]; // Append only new orders
+        });
+      });
+    } catch (error) {
+      console.error("Error setting up listeners:", error);
+    }
+
+    // Cleanup listeners on unmount or user change
+    return () => {
+      if (unsubscribeCompletedOrders) unsubscribeCompletedOrders();
+      if (unsubscribeCancelledOrders) unsubscribeCancelledOrders();
+    };
+  }
+}, [userData, mutedNotifications]);
+
+
+
+
+
+
+
+
+// Helper function for showing order notifications
+const notifyOrderStatus = (order, isCancellation = false) => {
+  const itemNames = order.items && Array.isArray(order.items)
+    ? order.items.map((item) => `${item.quantity}x ${item.foodName}`).join(', ')
+    : 'No items';
+
+  const notificationConfig = {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "light",
+  };
+
+  // If it's a cancellation, only show the cancellation toast
+  if (isCancellation) {
+    toast.error(`Order Cancelled: ${itemNames}`, notificationConfig);
+    return;
+  }
+
+  switch (order.status) {
+    case null: // Treat null status as Pending
+    case 'Pending':
+      toast.info(`Order Pending: ${itemNames}`, notificationConfig);
+      break;
+    case 'Preparing':
+      toast.warning(`Order Preparing: ${itemNames}`, notificationConfig);
+      break;
+    case 'Ready for Pickup':
+      toast.success(`Order Ready for Pickup: ${itemNames}`, notificationConfig);
+      break;
+    case 'Completed':
+      toast.success(`Order Completed: ${itemNames}`, notificationConfig);
+      break;
+    default:
+      console.warn(`Unhandled order status: ${order.status}`);
+      break;
+  }
+};
+
+
+
+
+
   
+
 
 
 
@@ -628,6 +726,19 @@ function OnlineClient() {
       auth.signOut();
     }
   };
+
+  const [showCompletedOrders, setShowCompletedOrders] = useState(false);
+  const [showCancelledOrders, setShowCancelledOrders] = useState(false);
+
+  // Function to toggle the visibility of Completed Orders
+  const toggleCompletedOrders = () => {
+    setShowCompletedOrders(prevState => !prevState);
+  };
+
+  // Function to toggle the visibility of Cancelled Orders
+  const toggleCancelledOrders = () => {
+    setShowCancelledOrders(prevState => !prevState);
+  };
   
 
   // Component for Food Menu 
@@ -714,71 +825,78 @@ function OnlineClient() {
   );
 
 
-
-  /*My Orders Component*/
+  
   const MyOrders = () => {
     const [orders, setOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [orderToCancel, setOrderToCancel] = useState(null);
   
-    // Fetch orders from Firebase
+    const updateMutedNotifications = (orderId, status) => {
+      setMutedNotifications((prev) => {
+        const updated = { ...prev, [orderId]: status };
+        localStorage.setItem('mutedNotifications', JSON.stringify(updated));
+        return updated;
+      });
+    };
+  
     useEffect(() => {
-      const fetchAndManageOrders = async () => {
-        if (userData) {
-          const ordersRef = collection(db, 'orders');
-          const q = query(ordersRef, where("userId", "==", userData.uid));
-          const querySnapshot = await getDocs(q);
-          
-          const fetchedOrders = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
+      if (!userData) return;
   
-          // Separate active and transferable orders
-          const activeOrders = [];
-          const transferOrders = [];
+      const ordersRef = collection(db, 'orders');
+      const q = query(ordersRef, where('userId', '==', userData.uid));
   
-          fetchedOrders.forEach(order => {
-            if (order.status === 'Cancelled' || order.status === 'Completed') {
-              transferOrders.push(order);
-            } else {
-              activeOrders.push(order);
-            }
-          });
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const fetchedOrders = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          orderDate: doc.data().orderDate || new Date().toISOString(),
+        }));
   
-          // Sort active orders
-          const sortedActiveOrders = activeOrders.sort((a, b) =>
-            new Date(b.orderDate) - new Date(a.orderDate)
-          );
+        const updatedOrders = [];
+        fetchedOrders.forEach((order) => {
+          const mutedStatus = mutedNotifications[order.id];
+          if (mutedStatus !== order.status) {
+            notifyOrderStatus(order); // Trigger notification for the new status
+            updateMutedNotifications(order.id, order.status); // Update muted status
+          }
+          updatedOrders.push(order);
+        });
   
-          // Transfer orders to respective collections
-          await transferOrdersToArchive(transferOrders);
+        // Sort orders by orderDate in descending order (latest orders first)
+        updatedOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
   
-          setOrders(sortedActiveOrders);
+        // Update the orders state to reflect the latest data
+        setOrders(updatedOrders);
+      });
+  
+      return () => unsubscribe();
+    }, [userData, mutedNotifications]);
+  
+    const cancelOrder = async () => {
+      try {
+        const orderToTransfer = orders.find((order) => order.id === orderToCancel);
+        if (!orderToTransfer) {
+          console.error('Order not found for cancellation.');
+          return;
         }
-      };
-      // Transfer orders to appropriate archive collections
-    const transferOrdersToArchive = async (ordersToTransfer) => {
-      for (const order of ordersToTransfer) {
-        try {
-          const targetCollection = order.status === 'Completed' 
-            ? 'successfulOrders' 
-            : 'cancelledOrders';
-
-          // Add to target collection
-          await addDoc(collection(db, targetCollection), { ...order });
-
-          // Delete from original collection
-          await deleteDoc(doc(db, 'orders', order.id));
-        } catch (error) {
-          console.error(`Error transferring order ${order.id}:`, error);
-        }
+  
+        notifyOrderStatus(orderToTransfer, true); // Notify cancellation
+        updateMutedNotifications(orderToTransfer.id, 'Cancelled'); // Mute the canceled status
+  
+        const orderDoc = doc(db, 'orders', orderToCancel);
+        await updateDoc(orderDoc, { status: 'Cancelled' });
+        await addDoc(collection(db, 'cancelledOrders'), orderToTransfer);
+        await deleteDoc(orderDoc);
+  
+        // Remove the canceled order from the orders state
+        setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderToCancel));
+        setShowCancelModal(false);
+        setOrderToCancel(null);
+      } catch (error) {
+        console.error('Error canceling order:', error);
       }
     };
-
-    fetchAndManageOrders();
-  }, [userData]);
   
     const formatDate = (dateString) => {
       const options = {
@@ -786,7 +904,7 @@ function OnlineClient() {
         month: 'long',
         day: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       };
       return new Date(dateString).toLocaleDateString('en-US', options);
     };
@@ -798,7 +916,7 @@ function OnlineClient() {
         'Preparing': 'my-orders-status-preparing',
         'Ready for Pickup': 'my-orders-status-ready',
         'Completed': 'my-orders-status-completed',
-        'Cancelled': 'my-orders-status-canceled'
+        'Cancelled': 'my-orders-status-canceled',
       };
       return (
         <div className={`my-orders-status-badge ${statusClasses[status] || ''}`}>
@@ -806,7 +924,6 @@ function OnlineClient() {
         </div>
       );
     };
-    
   
     // Handle cancel modal display
     const openCancelModal = (studentId) => {
@@ -818,35 +935,9 @@ function OnlineClient() {
       setShowCancelModal(false);
       setOrderToCancel(null);
     };
-
-
   
-    const cancelOrder = async () => {
-      try {
-        // Update order status to 'Cancelled' in Firestore
-        const orderDoc = doc(db, 'orders', orderToCancel);
-        await updateDoc(orderDoc, { status: 'Cancelled' });
-        
-        // Immediately remove from local state and transfer to cancelled collection
-        const updatedOrders = orders.filter(order => order.id !== orderToCancel);
-        setOrders(updatedOrders);
-        
-        // Get full order details to transfer
-        const orderToTransfer = orders.find(order => order.id === orderToCancel);
-        
-        // Transfer to cancelled collection
-        await addDoc(collection(db, 'cancelledOrders'), { ...orderToTransfer });
-        await deleteDoc(orderDoc);
-        
-        // Close modal
-        closeCancelModal();
-      } catch (error) {
-        console.error('Error cancelling order:', error);
-      }
-    };
-  
-    const filteredOrders = orders.filter(order =>
-      order.items.some(item => item.foodName.toLowerCase().includes(searchTerm.toLowerCase()))
+    const filteredOrders = orders.filter((order) =>
+      order.items.some((item) => item.foodName.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   
     return (
@@ -879,72 +970,64 @@ function OnlineClient() {
                   <th>Price per Item</th>
                   <th>Total Amount</th>
                   <th>Status</th>
-                  <th>Cancel Order</th>
+                  <th className="my-orders-cancel-header">Cancel Order</th>
                 </tr>
               </thead>
               <tbody>
-  {filteredOrders.map((order) => (
-    <React.Fragment key={order.id}>
-      {order.items.map((item, itemIndex) => (
-        <tr
-          key={`${order.id}-${itemIndex}`}
-          className={`order-row ${
-            itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''
-          }`}
-        >
-          {itemIndex === 0 && (
-            <td
-              rowSpan={order.items.length}
-              className={`my-orders-date ${
-                itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''
-              }`}
-            >
-              {formatDate(order.orderDate)}
-            </td>
-          )}
-          <td className="my-orders-food-name">{item.foodName}</td>
-          <td className="my-orders-quantity">{item.quantity}</td>
-          <td className="my-orders-price">₱{item.price.toFixed(2)}</td>
-          {itemIndex === 0 && (
-            <td
-              rowSpan={order.items.length}
-              className={`my-orders-total-amount ${
-                itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''
-              }`}
-            >
-              ₱{order.orderTotal.toFixed(2)}
-            </td>
-          )}
-          {itemIndex === 0 && (
-            <td
-              rowSpan={order.items.length}
-              className="my-orders-status"
-            >
-              {renderStatusBadge(order.status || 'Pending')}
-            </td>
-          )}
-          {itemIndex === 0 && (
-            <td
-              rowSpan={order.items.length}
-              className="my-orders-cancel"
-            >
-              {order.status === 'Pending' && (
-                <button
-                  className="my-orders-cancel-button"
-                  onClick={() => openCancelModal(order.id)}
-                >
-                  X
-                </button>
-              )}
-            </td>
-          )}
-
-        </tr>
-      ))}
-    </React.Fragment>
-  ))}
-</tbody>
-
+                {filteredOrders.map((order) => (
+                  <React.Fragment key={order.id}>
+                    {order.items.map((item, itemIndex) => (
+                      <tr
+                        key={`${order.id}-${itemIndex}`}
+                        className={`order-row ${
+                          itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''
+                        }`}
+                      >
+                        {itemIndex === 0 && (
+                          <td
+                            rowSpan={order.items.length}
+                            className={`my-orders-date ${
+                              itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''
+                            }`}
+                          >
+                            {formatDate(order.orderDate)}
+                          </td>
+                        )}
+                        <td className="my-orders-food-name">{item.foodName}</td>
+                        <td className="my-orders-quantity">{item.quantity}</td>
+                        <td className="my-orders-price">₱{item.price.toFixed(2)}</td>
+                        {itemIndex === 0 && (
+                          <td
+                            rowSpan={order.items.length}
+                            className={`my-orders-total-amount ${
+                              itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''
+                            }`}
+                          >
+                            ₱{order.orderTotal.toFixed(2)}
+                          </td>
+                        )}
+                        {itemIndex === 0 && (
+                          <td rowSpan={order.items.length} className="my-orders-status">
+                            {renderStatusBadge(order.status || 'Pending')}
+                          </td>
+                        )}
+                        {itemIndex === 0 && (
+                          <td rowSpan={order.items.length} className="my-orders-cancel">
+                            {(order.status === 'Pending' || order.status === null) && (
+                              <button
+                                className="my-orders-cancel-button"
+                                onClick={() => openCancelModal(order.id)}
+                              >
+                                X
+                              </button>
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
             </table>
           </div>
         )}
@@ -954,14 +1037,14 @@ function OnlineClient() {
           <div className="my-orders-cancel-modal">
             <div className="my-orders-cancel-modal-content">
               <h3>Are you sure you want to cancel this order?</h3>
-              <button 
-                className="my-orders-cancel-confirm" 
+              <button
+                className="my-orders-cancel-confirm"
                 onClick={cancelOrder}
               >
                 Yes, Cancel
               </button>
-              <button 
-                className="my-orders-cancel-cancel" 
+              <button
+                className="my-orders-cancel-cancel"
                 onClick={closeCancelModal}
               >
                 No, Keep Order
@@ -988,6 +1071,8 @@ function OnlineClient() {
       minute: "2-digit",
     });
   };
+
+
   
 
 
@@ -997,6 +1082,18 @@ function OnlineClient() {
 
   return (
     <div className="App">
+    <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <nav className="navbar">
         <div className="navbar-logo">
           <a href="/onlineclient">
@@ -1143,118 +1240,156 @@ function OnlineClient() {
         </div>
 
 {/* Completed Orders */}
-<div className="my-orders-container">
+<div className="my-orders-completed">
   <div className="my-orders-header">
-    <h3 className="my-orders-title">Completed Orders</h3>
+    <h3 className="my-orders-title-completed">
+      Completed Orders
+      <button
+        className="my-orders-toggle-btn"
+        onClick={toggleCompletedOrders}
+      >
+        <i className={`my-orders-eye-icon ${showCompletedOrders ? 'my-orders-eye-open' : 'my-orders-eye-closed'}`} />
+      </button>
+    </h3>
   </div>
   <div className="my-orders-table-container">
-    {completedOrderHistory.length > 0 ? (
-      <table className="my-orders-table">
-        <thead>
-          <tr>
-            <th>Order Date</th>
-            <th>Order Finished</th>
-            <th>Item/s</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total Amount</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {completedOrderHistory.map((order) => (
-            <tr key={order.id}>
-              <td className="my-orders-date">{formatDate(order.orderDate)}</td>
-              <td className="my-orders-date">{formatDate(order.orderFinishedDate || order.orderDate)}</td>
-              <td className="my-orders-food-name">
-                {order.items 
-                  ? order.items.map(item => item.name || item.foodName || 'Unknown').join(', ')
-                  : 'No items'}
-              </td>
-              <td>
-                {order.items 
-                  ? order.items.map(item => item.quantity || 0).join(', ')
-                  : 'N/A'}
-              </td>
-              <td className="my-orders-price">
-                {order.items 
-                  ? order.items.map(item => `Php ${(item.price || 0).toFixed(2)}`).join(', ')
-                  : 'N/A'}
-              </td>
-              <td className="my-orders-total-amount">
-                Php {(order.orderTotal || order.totalAmount || 0).toFixed(2)}
-              </td>
-              <td className="my-orders-status">
-                <span className="my-orders-status-badge my-orders-status-completed">
-                  Completed
-                </span>
-              </td>
+    {showCompletedOrders ? (
+      completedOrderHistory.length > 0 ? (
+        <table className="my-orders-table">
+          <thead>
+            <tr>
+              <th>Order Date</th>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Total Price</th>
+              <th className="my-orders-status-header">Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    ) : (
-      <div className="my-orders-no-orders">No completed orders found</div>
-    )}
+          </thead>
+          <tbody>
+            {completedOrderHistory.map((order) => (
+              <React.Fragment key={order.id}>
+                {order.items.map((item, itemIndex) => (
+                  <tr
+                    key={`${order.id}-${itemIndex}`}
+                    className={`order-row ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                  >
+                    {itemIndex === 0 && (
+                      <td
+                        rowSpan={order.items.length}
+                        className={`my-orders-date ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                      >
+                        {formatDate(order.orderDate)}
+                      </td>
+                    )}
+                    <td className="my-orders-food-name">{item.name || item.foodName || 'Unknown'}</td>
+                    <td className="my-orders-quantity">{item.quantity || 0}</td>
+                    <td className="my-orders-price">Php {(item.price || 0).toFixed(2)}</td>
+                    {itemIndex === 0 && (
+                      <td
+                        rowSpan={order.items.length}
+                        className={`my-orders-total-amount ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                      >
+                        Php {(item.price * item.quantity || 0).toFixed(2)}
+                      </td>
+                    )}
+                    {itemIndex === 0 && (
+                      <td rowSpan={order.items.length} className="my-orders-status">
+                        <span className="my-orders-status-badge my-orders-status-completed">
+                          Completed
+                        </span>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className="my-orders-no-orders">No completed orders found</div>
+      )
+    ) : null}
   </div>
 </div>
 
 {/* Cancelled Orders */}
-<div className="my-orders-container">
+<div className="my-orders-canceled">
   <div className="my-orders-header">
-    <h3 className="my-orders-title">Cancelled Orders</h3>
+    <h3 className="my-orders-title-canceled">
+      Cancelled Orders
+      <button
+        className="my-orders-toggle-btn"
+        onClick={toggleCancelledOrders}
+      >
+        <i className={`my-orders-eye-icon ${showCancelledOrders ? 'my-orders-eye-open' : 'my-orders-eye-closed'}`} />
+      </button>
+    </h3>
   </div>
   <div className="my-orders-table-container">
-    {cancelledOrderHistory.length > 0 ? (
-      <table className="my-orders-table">
-        <thead>
-          <tr>
-            <th>Order Date</th>
-            <th>Order Cancelled</th>
-            <th>Item/s</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total Amount</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cancelledOrderHistory.map((order) => (
-            <tr key={order.id}>
-              <td className="my-orders-date">{formatDate(order.orderDate)}</td>
-              <td className="my-orders-date">{formatDate(order.orderFinishedDate || order.orderDate)}</td>
-              <td className="my-orders-food-name">
-                {order.items 
-                  ? order.items.map(item => item.name || item.foodName || 'Unknown').join(', ')
-                  : 'No items'}
-              </td>
-              <td>
-                {order.items 
-                  ? order.items.map(item => item.quantity || 0).join(', ')
-                  : 'N/A'}
-              </td>
-              <td className="my-orders-price">
-                {order.items 
-                  ? order.items.map(item => `Php ${(item.price || 0).toFixed(2)}`).join(', ')
-                  : 'N/A'}
-              </td>
-              <td className="my-orders-total-amount">
-                Php {(order.orderTotal || order.totalAmount || 0).toFixed(2)}
-              </td>
-              <td className="my-orders-status">
-                <span className="my-orders-status-badge my-orders-status-canceled">
-                  Cancelled
-                </span>
-              </td>
+    {showCancelledOrders ? (
+      cancelledOrderHistory.length > 0 ? (
+        <table className="my-orders-table">
+          <thead>
+            <tr>
+              <th>Order Date</th>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Total Price</th>
+              <th className="my-orders-status-header">Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    ) : (
-      <div className="my-orders-no-orders">No cancelled orders found</div>
-    )}
+          </thead>
+          <tbody>
+            {cancelledOrderHistory.map((order) => (
+              <React.Fragment key={order.id}>
+                {order.items.map((item, itemIndex) => (
+                  <tr
+                    key={`${order.id}-${itemIndex}`}
+                    className={`order-row ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                  >
+                    {itemIndex === 0 && (
+                      <td
+                        rowSpan={order.items.length}
+                        className={`my-orders-date ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                      >
+                        {formatDate(order.orderDate)}
+                      </td>
+                    )}
+                    <td className="my-orders-food-name">{item.name || item.foodName || 'Unknown'}</td>
+                    <td className="my-orders-quantity">{item.quantity || 0}</td>
+                    <td className="my-orders-price">Php {(item.price || 0).toFixed(2)}</td>
+                    {itemIndex === 0 && (
+                      <td
+                        rowSpan={order.items.length}
+                        className={`my-orders-total-amount ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                      >
+                        Php {(item.price * item.quantity || 0).toFixed(2)}
+                      </td>
+                    )}
+                    {itemIndex === 0 && (
+                      <td rowSpan={order.items.length} className="my-orders-status">
+                        <span className="my-orders-status-badge my-orders-status-canceled">
+                          Cancelled
+                        </span>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className="my-orders-no-orders">No cancelled orders found</div>
+      )
+    ) : null}
   </div>
 </div>
+
+
+
+
 
       </div>
     </div>
