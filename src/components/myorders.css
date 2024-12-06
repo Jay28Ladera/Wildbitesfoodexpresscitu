@@ -9,7 +9,6 @@
 
 .my-orders-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
 }
@@ -22,18 +21,45 @@
   margin-bottom: 0.1rem; /* Reduce margin to decrease the gap */
 }
 
-.my-orders-search-container {
+.my-orders-title-completed,
+.my-orders-title-canceled {
   display: flex;
   align-items: center;
+  margin-right: auto; /* Push title to the left */
+}
+
+.my-orders-search-container {
+  margin-left: auto; /* Push to the far right of the header */
+  margin-top: 2.4rem;
+
 }
 
 .my-orders-search-input {
-  padding: 0.5rem 1rem;
-  border: 1px solid #FFE5E5;
-  border-radius: 4px;
-  font-size: 1rem;
-  width: 200px;
-  margin-bottom: 0.1rem;
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  width: 250px;
+  transition: all 0.3s ease;
+}
+
+.my-orders-search-input:focus {
+  outline: none;
+  border-color: #28A745; /* Green for completed orders */
+  box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+}
+
+/* Adjust for Cancelled Orders */
+.my-orders-canceled .my-orders-search-input:focus {
+  box-shadow: 0 0 5px rgba(153, 0, 0, 0.3);
+
+}
+
+
+/* Adjust for Cancelled Orders */
+.my-orders-canceled .my-orders-search-input:focus {
+
+  box-shadow: 0 0 5px rgba(153, 0, 0, 0.3);
 }
 
 .my-orders-no-orders {
@@ -311,34 +337,24 @@
   text-decoration: underline;
 }
 
-/* Completed Orders */
-.my-orders-completed .my-orders-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 2rem;
-}
+
 
 .my-orders-completed .my-orders-title-completed {
   color: #28A745; /* Green color for completed orders */
   font-size: 1.8rem;
   font-weight: bold;
   font-family: 'Inter', sans-serif;
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.2rem;
 }
 
 /* Cancelled Orders */
-.my-orders-canceled .my-orders-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 2rem;
-}
 
 .my-orders-canceled .my-orders-title-canceled {
   color: #990000; /* Red color for canceled orders */
   font-size: 1.8rem;
   font-weight: bold;
   font-family: 'Inter', sans-serif;
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.2rem;
 }
 
 /* Completed Orders Container */
@@ -438,6 +454,8 @@
   font-size: 0.9rem;
   text-align: center;
 }
+
+
 
 /* Media Query for smaller screens (mobile/tablet) */
 @media (max-width: 768px) {

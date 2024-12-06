@@ -68,6 +68,8 @@ function OnlineClient() {
 
   
 
+  
+
 
   useEffect(() => {
     const fetchGcashDetails = async () => {
@@ -739,6 +741,55 @@ const notifyOrderStatus = (order, isCancellation = false) => {
   const toggleCancelledOrders = () => {
     setShowCancelledOrders(prevState => !prevState);
   };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // State for search inputs
+  const [completedOrdersSearch, setCompletedOrdersSearch] = useState('');
+  const [cancelledOrdersSearch, setCancelledOrdersSearch] = useState('');
+
+  // Search filtering function for completed orders
+  const filteredCompletedOrders = useMemo(() => {
+    if (!completedOrderHistory) return [];
+    
+    return completedOrderHistory.filter(order => {
+      const searchTerm = completedOrdersSearch.toLowerCase();
+      
+      // Search across order details
+      return order.items.some(item => 
+        (item.name || item.foodName || 'Unknown').toLowerCase().includes(searchTerm) ||
+        formatDate(order.orderDate).toLowerCase().includes(searchTerm) ||
+        (item.price && item.price.toString().includes(searchTerm)) ||
+        (item.quantity && item.quantity.toString().includes(searchTerm))
+      );
+    });
+  }, [completedOrderHistory, completedOrdersSearch]);
+
+  // Search filtering function for cancelled orders
+  const filteredCancelledOrders = useMemo(() => {
+    if (!cancelledOrderHistory) return [];
+    
+    return cancelledOrderHistory.filter(order => {
+      const searchTerm = cancelledOrdersSearch.toLowerCase();
+      
+      // Search across order details
+      return order.items.some(item => 
+        (item.name || item.foodName || 'Unknown').toLowerCase().includes(searchTerm) ||
+        formatDate(order.orderDate).toLowerCase().includes(searchTerm) ||
+        (item.price && item.price.toString().includes(searchTerm)) ||
+        (item.quantity && item.quantity.toString().includes(searchTerm))
+      );
+    });
+  }, [cancelledOrderHistory, cancelledOrdersSearch]);
   
 
   // Component for Food Menu 
@@ -1061,16 +1112,7 @@ const notifyOrderStatus = (order, isCancellation = false) => {
   
   
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+
 
 
   
@@ -1239,156 +1281,183 @@ const notifyOrderStatus = (order, isCancellation = false) => {
           </div>
         </div>
 
-{/* Completed Orders */}
-<div className="my-orders-completed">
-  <div className="my-orders-header">
-    <h3 className="my-orders-title-completed">
-      Completed Orders
-      <button
-        className="my-orders-toggle-btn"
-        onClick={toggleCompletedOrders}
-      >
-        <i className={`my-orders-eye-icon ${showCompletedOrders ? 'my-orders-eye-open' : 'my-orders-eye-closed'}`} />
-      </button>
-    </h3>
-  </div>
-  <div className="my-orders-table-container">
-    {showCompletedOrders ? (
-      completedOrderHistory.length > 0 ? (
-        <table className="my-orders-table">
-          <thead>
-            <tr>
-              <th>Order Date</th>
-              <th>Item</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th>Total Price</th>
-              <th className="my-orders-status-header">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {completedOrderHistory.map((order) => (
-              <React.Fragment key={order.id}>
-                {order.items.map((item, itemIndex) => (
-                  <tr
-                    key={`${order.id}-${itemIndex}`}
-                    className={`order-row ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
-                  >
-                    {itemIndex === 0 && (
-                      <td
-                        rowSpan={order.items.length}
-                        className={`my-orders-date ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
-                      >
-                        {formatDate(order.orderDate)}
-                      </td>
-                    )}
-                    <td className="my-orders-food-name">{item.name || item.foodName || 'Unknown'}</td>
-                    <td className="my-orders-quantity">{item.quantity || 0}</td>
-                    <td className="my-orders-price">Php {(item.price || 0).toFixed(2)}</td>
-                    {itemIndex === 0 && (
-                      <td
-                        rowSpan={order.items.length}
-                        className={`my-orders-total-amount ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
-                      >
-                        Php {(item.price * item.quantity || 0).toFixed(2)}
-                      </td>
-                    )}
-                    {itemIndex === 0 && (
-                      <td rowSpan={order.items.length} className="my-orders-status">
-                        <span className="my-orders-status-badge my-orders-status-completed">
-                          Completed
-                        </span>
-                      </td>
-                    )}
+      {/* Completed Orders Section */}
+      <div className="my-orders-completed">
+        <div className="my-orders-header">
+          <h3 className="my-orders-title-completed">
+            Completed Orders
+            <button
+              className="my-orders-toggle-btn"
+              onClick={toggleCompletedOrders}
+            >
+              <i className={`my-orders-eye-icon ${showCompletedOrders ? 'my-orders-eye-open' : 'my-orders-eye-closed'}`} />
+            </button>
+          </h3>
+          
+          {/* Search Input */}
+          <div className="my-orders-search-container">
+            <input
+              type="text"
+              placeholder="Search completed orders..."
+              className="my-orders-search-input"
+              value={completedOrdersSearch}
+              onChange={(e) => setCompletedOrdersSearch(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="my-orders-table-container">
+          {showCompletedOrders ? (
+            filteredCompletedOrders.length > 0 ? (
+              <table className="my-orders-table">
+                <thead>
+                  <tr>
+                    <th>Order Date</th>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total Price</th>
+                    <th className="my-orders-status-header">Status</th>
                   </tr>
-                ))}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <div className="my-orders-no-orders">No completed orders found</div>
-      )
-    ) : null}
-  </div>
-</div>
+                </thead>
+                <tbody>
+                  {filteredCompletedOrders.map((order) => (
+                    <React.Fragment key={order.id}>
+                      {order.items.map((item, itemIndex) => (
+                        <tr
+                          key={`${order.id}-${itemIndex}`}
+                          className={`order-row ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                        >
+                          {itemIndex === 0 && (
+                            <td
+                              rowSpan={order.items.length}
+                              className={`my-orders-date ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                            >
+                              {formatDate(order.orderDate)}
+                            </td>
+                          )}
+                          <td className="my-orders-food-name">{item.name || item.foodName || 'Unknown'}</td>
+                          <td className="my-orders-quantity">{item.quantity || 0}</td>
+                          <td className="my-orders-price">Php {(item.price || 0).toFixed(2)}</td>
+                          {itemIndex === 0 && (
+                            <td
+                              rowSpan={order.items.length}
+                              className={`my-orders-total-amount ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                            >
+                              Php {(item.price * item.quantity || 0).toFixed(2)}
+                            </td>
+                          )}
+                          {itemIndex === 0 && (
+                            <td rowSpan={order.items.length} className="my-orders-status">
+                              <span className="my-orders-status-badge my-orders-status-completed">
+                                Completed
+                              </span>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="my-orders-no-orders">
+                {completedOrdersSearch 
+                  ? `No orders found matching "${completedOrdersSearch}"` 
+                  : "No completed orders found"}
+              </div>
+            )
+          ) : null}
+        </div>
+      </div>
 
-{/* Cancelled Orders */}
-<div className="my-orders-canceled">
-  <div className="my-orders-header">
-    <h3 className="my-orders-title-canceled">
-      Cancelled Orders
-      <button
-        className="my-orders-toggle-btn"
-        onClick={toggleCancelledOrders}
-      >
-        <i className={`my-orders-eye-icon ${showCancelledOrders ? 'my-orders-eye-open' : 'my-orders-eye-closed'}`} />
-      </button>
-    </h3>
-  </div>
-  <div className="my-orders-table-container">
-    {showCancelledOrders ? (
-      cancelledOrderHistory.length > 0 ? (
-        <table className="my-orders-table">
-          <thead>
-            <tr>
-              <th>Order Date</th>
-              <th>Item</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th>Total Price</th>
-              <th className="my-orders-status-header">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cancelledOrderHistory.map((order) => (
-              <React.Fragment key={order.id}>
-                {order.items.map((item, itemIndex) => (
-                  <tr
-                    key={`${order.id}-${itemIndex}`}
-                    className={`order-row ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
-                  >
-                    {itemIndex === 0 && (
-                      <td
-                        rowSpan={order.items.length}
-                        className={`my-orders-date ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
-                      >
-                        {formatDate(order.orderDate)}
-                      </td>
-                    )}
-                    <td className="my-orders-food-name">{item.name || item.foodName || 'Unknown'}</td>
-                    <td className="my-orders-quantity">{item.quantity || 0}</td>
-                    <td className="my-orders-price">Php {(item.price || 0).toFixed(2)}</td>
-                    {itemIndex === 0 && (
-                      <td
-                        rowSpan={order.items.length}
-                        className={`my-orders-total-amount ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
-                      >
-                        Php {(item.price * item.quantity || 0).toFixed(2)}
-                      </td>
-                    )}
-                    {itemIndex === 0 && (
-                      <td rowSpan={order.items.length} className="my-orders-status">
-                        <span className="my-orders-status-badge my-orders-status-canceled">
-                          Cancelled
-                        </span>
-                      </td>
-                    )}
+      {/* Cancelled Orders Section (Similar structure) */}
+      <div className="my-orders-canceled">
+        <div className="my-orders-header">
+          <h3 className="my-orders-title-canceled">
+            Cancelled Orders
+            <button
+              className="my-orders-toggle-btn"
+              onClick={toggleCancelledOrders}
+            >
+              <i className={`my-orders-eye-icon ${showCancelledOrders ? 'my-orders-eye-open' : 'my-orders-eye-closed'}`} />
+            </button>
+          </h3>
+          
+          {/* Search Input */}
+          <div className="my-orders-search-container">
+            <input
+              type="text"
+              placeholder="Search cancelled orders..."
+              className="my-orders-search-input"
+              value={cancelledOrdersSearch}
+              onChange={(e) => setCancelledOrdersSearch(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="my-orders-table-container">
+          {showCancelledOrders ? (
+            filteredCancelledOrders.length > 0 ? (
+              <table className="my-orders-table">
+                <thead>
+                  <tr>
+                    <th>Order Date</th>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total Price</th>
+                    <th className="my-orders-status-header">Status</th>
                   </tr>
-                ))}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <div className="my-orders-no-orders">No cancelled orders found</div>
-      )
-    ) : null}
-  </div>
-</div>
-
-
-
+                </thead>
+                <tbody>
+                  {filteredCancelledOrders.map((order) => (
+                    <React.Fragment key={order.id}>
+                      {order.items.map((item, itemIndex) => (
+                        <tr
+                          key={`${order.id}-${itemIndex}`}
+                          className={`order-row ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                        >
+                          {itemIndex === 0 && (
+                            <td
+                              rowSpan={order.items.length}
+                              className={`my-orders-date ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                            >
+                              {formatDate(order.orderDate)}
+                            </td>
+                          )}
+                          <td className="my-orders-food-name">{item.name || item.foodName || 'Unknown'}</td>
+                          <td className="my-orders-quantity">{item.quantity || 0}</td>
+                          <td className="my-orders-price">Php {(item.price || 0).toFixed(2)}</td>
+                          {itemIndex === 0 && (
+                            <td
+                              rowSpan={order.items.length}
+                              className={`my-orders-total-amount ${itemIndex === order.items.length - 1 ? 'my-orders-last-item' : ''}`}
+                            >
+                              Php {(item.price * item.quantity || 0).toFixed(2)}
+                            </td>
+                          )}
+                          {itemIndex === 0 && (
+                            <td rowSpan={order.items.length} className="my-orders-status">
+                              <span className="my-orders-status-badge my-orders-status-canceled">
+                                Cancelled
+                              </span>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="my-orders-no-orders">
+                {cancelledOrdersSearch 
+                  ? `No orders found matching "${cancelledOrdersSearch}"` 
+                  : "No cancelled orders found"}
+              </div>
+            )
+          ) : null}
+        </div>
+      </div>
 
 
       </div>
